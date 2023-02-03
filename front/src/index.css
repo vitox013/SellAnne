@@ -1,0 +1,14 @@
+:root {
+    --body-bg-color: #012E40;
+    --header: #023059;
+    --text-color: #F2E3D5;
+    --openSans: 'Open Sans', sans-serif;
+  }
+
+
+  
+  body{
+    font-family: var(--openSans)!important;
+  }
+  
+  
