@@ -11,7 +11,7 @@ function NavFooter({ path, info, icon }) {
                     to={path}
                     className="btn btn-success mb-2"
                 >
-                    <i class={`${icon}`}></i>
+                    <i className={`${icon}`}></i>
                     {info}
                 </Link>
             </Container>

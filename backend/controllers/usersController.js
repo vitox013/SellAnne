@@ -53,16 +53,14 @@ const createNewUser = asyncHandler(async (req, res) => {
 // @route   Post /users
 // @acess Private
 
-const addClient = asyncHandler(async (req, res) => {
-    
-})
+const addClient = asyncHandler(async (req, res) => {});
 
 // @desc    Update a user
 // @route   PATCH /users
 // @acess Private
 
 const updateUser = asyncHandler(async (req, res) => {
-    const { id, username, email, password } = req.body;
+    const { id, username, email, password, clientes, produtos } = req.body;
 
     if (!id || !username || !email || !password) {
         return res.status(400).json({ message: "Preencha todos os campos" });
@@ -111,17 +109,16 @@ const deleteUser = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "Usuário não encontrado" });
     }
 
-    const result = await user.deleteOne()
+    const result = await user.deleteOne();
 
-    const reply = `Usuario: ${user.username} foi deletado com sucesso`
+    const reply = `Usuario: ${user.username} foi deletado com sucesso`;
 
-    res.json(reply)
+    res.json(reply);
 });
 
 module.exports = {
     getAllUsers,
     createNewUser,
     updateUser,
-    addClient,
     deleteUser,
 };

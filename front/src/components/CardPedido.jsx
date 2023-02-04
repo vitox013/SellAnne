@@ -9,7 +9,7 @@ const CardPedido = ({ path }) => {
                 <Card.Body className="d-flex justify-content-between text-black shadow-sm btn bg-light">
                     <span>Nome</span>
                     <span>0 pedidos</span>
-                    <i class="bx bxs-edit-alt"></i>
+                    <i className="bx bxs-edit-alt"></i>
                 </Card.Body>
             </Card>
         </Link>

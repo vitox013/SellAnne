@@ -2,12 +2,16 @@ import { Container } from "react-bootstrap";
 import Layout from "./components/Layout";
 import { Routes, Route } from "react-router-dom";
 import Public from "./pages/Public";
-import Login from "./pages/Login";
-import Cadastro from "./pages/Cadastro";
-import Dashboard from "./pages/Dashboard";
+import Login from "./features/auth/Login";
+import Cadastro from "./features/users/Cadastro";
+import Dashboard from "./features/users/Dashboard";
 import DashLayout from "./components/DashLayout";
-import NovoCliente from "./pages/NovoCliente";
+import NovoCliente from "./features/clients/NovoCliente";
 import DetalhesPedido from "./pages/DetalhesPedido";
+import Prefetch from "./features/auth/Prefetch";
+import PersistLogin from "./features/auth/PersistLogin";
+import RequireAuth from "./features/auth/RequireAuth";
+
 function App() {
     return (
         <>
@@ -15,16 +19,29 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Layout />}>
                         <Route index element={<Public />} />
-                        <Route path="/login" element={<Login />} />
+
                         <Route path="/signup" element={<Cadastro />} />
 
-                        <Route path="dashboard" element={<DashLayout />}>
-                            <Route index element={<Dashboard />} />
-                            <Route
-                                path="novocliente"
-                                element={<NovoCliente />}
-                            />
-                            <Route path="cliente/" element={<DetalhesPedido />} />
+                        <Route element={<PersistLogin />}>
+                            <Route path="/login" element={<Login />} />
+                            <Route element={<RequireAuth />}>
+                                <Route element={<Prefetch />}>
+                                    <Route
+                                        path="dashboard"
+                                        element={<DashLayout />}
+                                    >
+                                        <Route index element={<Dashboard />} />
+                                        <Route
+                                            path="novocliente"
+                                            element={<NovoCliente />}
+                                        />
+                                        <Route
+                                            path="cliente/"
+                                            element={<DetalhesPedido />}
+                                        />
+                                    </Route>
+                                </Route>
+                            </Route>
                         </Route>
                     </Route>
                 </Routes>

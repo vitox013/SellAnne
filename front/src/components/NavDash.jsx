@@ -20,7 +20,7 @@ function NavDash({ info, icon, fixed }) {
                     to={info}
                 >
                     {info}
-                    <i class={`${icon}`}></i>
+                    <i className={`${icon}`}></i>
                 </Link>
             </Container>
         </Navbar>

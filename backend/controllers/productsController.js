@@ -17,7 +17,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
 // @route   Post /products
 // @acess Private
 const createNewProduct = asyncHandler(async (req, res) => {
-    const { codigo, produto, estoque, preco } = req.body;
+    const { vendedor, codigo, produto, estoque, preco } = req.body;
 
     // Confirmando data
     if (!codigo || !produto || !estoque || !preco) {
@@ -25,12 +25,14 @@ const createNewProduct = asyncHandler(async (req, res) => {
     }
 
     // Checando se produto já existe
-    const duplicate = await Products.findOne({ codigo }).lean().exec();
+    const duplicate = await Products.findOne({ vendedor, codigo })
+        .lean()
+        .exec();
     if (duplicate) {
         return res.status(409).json({ message: "Esse produto já existe" });
     }
 
-    const productsObject = { codigo, produto, estoque, preco };
+    const productsObject = { vendedor, codigo, produto, estoque, preco };
 
     const products = await Products.create(productsObject);
 
@@ -48,20 +50,22 @@ const createNewProduct = asyncHandler(async (req, res) => {
 // @acess Private
 
 const updateProduct = asyncHandler(async (req, res) => {
-    const { id, codigo, produto, estoque, preco } = req.body;
-    
+    const { vendedor, id, codigo, produto, estoque, preco } = req.body;
+
     if (!codigo || !produto || !estoque || !preco) {
         return res.status(400).json({ message: "Preencha todos os campos" });
     }
 
-    const products = await Products.findById(id).exec();
+    const products = await Products.findById(id, vendedor).exec();
 
     if (!products) {
         return res.status(400).json({ message: "Produto não encontrado" });
     }
 
     // Checando se produto já existe
-    const duplicate = await Products.findOne({ codigo }).lean().exec();
+    const duplicate = await Products.findOne({ vendedor, codigo })
+        .lean()
+        .exec();
 
     if (duplicate && duplicate?._id.toString() !== id) {
         return res

@@ -15,7 +15,7 @@ function Back({ info, icon, fixed, path }) {
                     to={path}
                     className="text-decoration-none text-dark d-flex align-items-center"
                 >
-                    <i class={`${icon}`}></i>
+                    <i className={`${icon}`}></i>
                     <span className="fw-bold fs-5 mb-0 ">Voltar</span>
                 </Link>
             </Container>
