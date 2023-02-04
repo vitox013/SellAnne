@@ -118,7 +118,6 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 module.exports = {
     getAllUsers,
-    createNewUser,
     updateUser,
     deleteUser,
 };

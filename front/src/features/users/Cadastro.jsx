@@ -5,7 +5,7 @@ import { Card, Container } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import NavDash from "../../components/NavDash";
-import { useAddNewUserMutation } from "./usersApiSlice";
+import { useAddNewUserMutation } from "./newUserApiSlice";
 
 const USER_REGEX = /^[A-z]{3,20}$/;
 const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/;
@@ -23,7 +23,7 @@ const Cadastro = () => {
     const [email, setEmail] = useState("");
 
     useEffect(() => {
-        setValidUsername(PWD_REGEX.test(username));
+        setValidUsername(USER_REGEX.test(username));
     }, [username]);
 
     useEffect(() => {
