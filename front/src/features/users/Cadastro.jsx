@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Card, Container } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
@@ -11,16 +11,18 @@ const USER_REGEX = /^[A-z]{3,20}$/;
 const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/;
 
 const Cadastro = () => {
-    const [addNewUser, { isLoading, isSuccess, isError, error }] =
-        useAddNewUserMutation();
+    const [addNewUser, { isLoading, isSuccess }] = useAddNewUserMutation();
 
     const navigate = useNavigate();
+
+    const errRef = useRef();
 
     const [username, setUsername] = useState("");
     const [validUsername, setValidUsername] = useState(false);
     const [password, setPassword] = useState("");
     const [validPassword, setValidPassword] = useState(false);
     const [email, setEmail] = useState("");
+    const [errMsg, setErrMsg] = useState("");
 
     useEffect(() => {
         setValidUsername(USER_REGEX.test(username));
@@ -34,9 +36,13 @@ const Cadastro = () => {
         if (isSuccess) {
             setUsername("");
             setPassword("");
-            navigate("/dashboard");
+            navigate("/login");
         }
     }, [isSuccess, navigate]);
+
+    useEffect(() => {
+        setErrMsg("");
+    }, [email, password, username]);
 
     const onUsernameChanged = (e) => setUsername(e.target.value);
     const onPasswordChanged = (e) => setPassword(e.target.value);
@@ -47,19 +53,33 @@ const Cadastro = () => {
 
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
-        if (canSave) {
-            await addNewUser({ username, password, email });
+        try {
+            if (canSave) {
+                await addNewUser({ username, password, email }).unwrap();
+            }
+        } catch (err) {
+            if (!err.status) {
+                setErrMsg("Sem resposta do servidor");
+            } else if (err.status === 409) {
+                setErrMsg("Já existe um usuário cadastrado com esse e-mail");
+            } else {
+                setErrMsg(err.data?.message);
+            }
+            errRef.current.focus();
         }
     };
 
+    const errClass = errMsg ? "alert alert-danger" : "d-none";
+
     return (
         <>
-            <p>{error?.data?.message}</p>
-
             <NavDash info="" />
             <Container className="d-flex flex-column col-md-6 col-lg-5 col-xxl-3 mt-5">
                 <Card className="shadow mt-5">
                     <Card.Body>
+                        <p ref={errRef} className={errClass}>
+                            {errMsg}
+                        </p>
                         <Form className="fs-5" onSubmit={onSaveUserClicked}>
                             <Form.Group className="mb-3" controlId="username">
                                 <h3 className="mb-4 fw-bold">Crie uma conta</h3>

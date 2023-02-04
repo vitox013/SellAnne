@@ -6,7 +6,7 @@ const asyncHandler = require("express-async-handler");
 // @route   GET /client
 // @acess Private
 const getAllClients = asyncHandler(async (req, res) => {
-    const clients = await Client.find({}).lean();
+    const clients = await Client.find().lean();
 
     if (!clients?.length) {
         return res.status(400).json({ message: "Nenhum cliente encontrado" });

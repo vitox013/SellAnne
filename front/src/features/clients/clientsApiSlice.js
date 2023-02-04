@@ -19,14 +19,14 @@ export const clientsApiSlice = apiSlice.injectEndpoints({
                 });
                 return clientsAdapter.setAll(initialState, loadedClients);
             },
-            providesTags: (result, error, arg) => {
-                if (result?.ids) {
-                    return [
-                        { type: "Clients", id: "LIST" },
-                        ...result.ids.map((id) => ({ type: "Clients", id })),
-                    ];
-                } else return [{ type: "Clients", id: "LIST" }];
-            },
+            // providesTags: (result, error, arg) => {
+            //     if (result?.ids) {
+            //         return [
+            //             { type: "Clients", id: "LIST" },
+            //             ...result.ids.map((id) => ({ type: "Clients", id })),
+            //         ];
+            //     } else return [{ type: "Clients", id: "LIST" }];
+            // },
         }),
         addNewClient: builder.mutation({
             query: (initialClientData) => ({

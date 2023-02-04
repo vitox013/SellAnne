@@ -52,7 +52,6 @@ const Login = () => {
             navigate("/dashboard");
         } catch (err) {
             if (!err.status) {
-                console.log(err);
                 setErrMsg("Sem resposta do servidor");
             } else if (err.status === 400) {
                 setErrMsg("Email ou senha incorretos");

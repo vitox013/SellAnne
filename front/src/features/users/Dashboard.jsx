@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, Container, Row, Form } from "react-bootstrap";
 import CardClient from "../../components/CardClient";
 import NavDash from "../../components/NavDash";
@@ -8,9 +8,8 @@ import { useGetClientsQuery } from "../clients/clientsApiSlice";
 import useAuth from "../../hooks/useAuth";
 
 const Dashboard = () => {
+    
     const { currentUser, userId, username } = useAuth();
-
-
 
     const [posicao, setPosicao] = useState("");
     function scroll() {
@@ -19,6 +18,8 @@ const Dashboard = () => {
         });
     }
     scroll();
+    
+    
 
     const {
         data: clients,
@@ -30,8 +31,8 @@ const Dashboard = () => {
         pollingInterval: 15000,
         refetchOnMountOrArgChange: true,
         refetchOnFocus: true,
+        refetchOnReconnect: true
     });
-
 
     let content;
 
@@ -42,11 +43,24 @@ const Dashboard = () => {
     }
 
     if (isSuccess) {
-        const { ids } = clients;
+        const { entities } = clients;
 
-        const tableContent = ids?.length
-            ? ids.map((clientId) => (
-                  <CardClient key={clientId} clientId={clientId} path="" />
+        var toArray = Object.keys(entities).map((key) => {
+            return entities[key];
+        });
+
+        var userClients = toArray.filter(
+            (client) => client.vendedorId === userId
+        );
+
+        const tableContent = userClients?.length
+            ? userClients.map((clientId) => (
+                  <CardClient
+                      key={clientId._id}
+                      clientId={clientId._id}
+                      userId={userId}
+                      path=""
+                  />
               ))
             : null;
 

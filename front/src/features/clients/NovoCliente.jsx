@@ -2,18 +2,19 @@ import React from "react";
 import { Col, Container, Row, Form, Button } from "react-bootstrap";
 import Back from "../../components/Back";
 import useAuth from "../../hooks/useAuth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAddNewClientMutation } from "./clientsApiSlice";
 
 const USER_REGEX = /^[A-z]{3,20}$/;
 
 const NovoCliente = () => {
-    const [addNewClient, { isLoading, isSuccess, isError, error }] =
-        useAddNewClientMutation();
+    const [addNewClient, { isLoading, isSuccess }] = useAddNewClientMutation();
 
     const navigate = useNavigate();
     const { userId } = useAuth();
+    const vendedorId = userId;
+    const errRef = useRef();
 
     const [nome, setNome] = useState("");
     const [validNome, setValidNome] = useState(false);
@@ -35,14 +36,29 @@ const NovoCliente = () => {
     const onNomeChange = (e) => setNome(e.target.value);
     const onTelefoneChange = (e) => setTelefone(e.target.value);
 
-    const canSave = validNome && !isLoading
+    const canSave = validNome && !isLoading;
 
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
-        if (canSave) {
-            await addNewClient({ nome, telefone, userId });
+        try {
+            if (canSave) {
+                await addNewClient({ vendedorId, nome, telefone });
+            }
+        } catch (err) {
+            if (!err.status) {
+                setErrMsg("Sem resposta do servidor");
+            } else if (err.status === 400) {
+                setErrMsg("Email ou senha incorretos");
+            } else if (err.status === 401) {
+                setErrMsg("Email não cadastrado");
+            } else {
+                setErrMsg(err.data?.message);
+            }
+            errRef.current.focus();
         }
-    }
+    };
+
+    const errClass = errMsg ? "alert alert-danger" : "d-none";
 
     return (
         <>
@@ -53,18 +69,35 @@ const NovoCliente = () => {
                         <h2 className="fw-bold">Cadastre seu novo cliente</h2>
                     </Col>
                     <Col className="mt-5 col-md-5 mx-md-auto ">
-                        <Form>
+                        <Form onSubmit={onSaveUserClicked}>
+                            <p
+                                ref={errRef}
+                                className={errClass}
+                                aria-live="assertive"
+                            >
+                                {errMsg}
+                            </p>
                             <Form.Group className="mb-3" controlId="vendedorId">
-                                <Form.Control type="hidden" value={userId} />
+                                <Form.Control
+                                    type="hidden"
+                                    value={vendedorId}
+                                />
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="nome">
                                 <Form.Label>Nome</Form.Label>
-                                <Form.Control type="text" />
+                                <Form.Control
+                                    type="text"
+                                    onChange={onNomeChange}
+                                />
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="telefone">
                                 <Form.Label>Telefone</Form.Label>
-                                <Form.Control type="tel" pattern="[0-9]{11}" />
+                                <Form.Control
+                                    type="tel"
+                                    pattern="[0-9]{11}"
+                                    onChange={onTelefoneChange}
+                                />
                                 <Form.Text className="text-muted">
                                     Ex: (11) 9 9999-9999
                                 </Form.Text>

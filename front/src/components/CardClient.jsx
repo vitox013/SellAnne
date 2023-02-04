@@ -1,14 +1,12 @@
 import React from "react";
 import { Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectClientById } from "../features/clients/clientsApiSlice";
 
-const CardClient = ({ path, clientId }) => {
+const CardClient = ({ path, clientId, userId }) => {
     const client = useSelector((state) => selectClientById(state, clientId));
 
-    const navigate = useNavigate();
     if (client) {
         return (
             <Link to={path} className="text-decoration-none px-0">
