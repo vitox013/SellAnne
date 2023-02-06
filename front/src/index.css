@@ -6,7 +6,16 @@
   }
 
 
-  
+  .pt-10 {
+    padding-top: 100px!important;
+  }
+
+  @media (max-width: 768px) {
+    .pt-10 {
+      padding-top: 50px!important;
+    }
+  }
+
   body{
     font-family: var(--openSans)!important;
   }

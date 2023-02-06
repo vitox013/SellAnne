@@ -26,7 +26,8 @@ app.use("/", require("./routes/root"));
 app.use('/auth', require('./routes/authRoutes'))
 app.use('/new', require('./routes/newUserRoute'))
 app.use('/users', require('./routes/usersRoutes'))
-app.use('/clients', require('./routes/clientsRoutes'))
+app.use('/clients', require('./routes/getClientsRoutes'))
+app.use('/newClient', require('./routes/newClientRoutes'))
 app.use('/products', require('./routes/productsRoutes'))
 
 app.all("*", (req, res) => {

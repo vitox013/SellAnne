@@ -6,13 +6,21 @@ const asyncHandler = require("express-async-handler");
 // @route   GET /client
 // @acess Private
 const getAllClients = asyncHandler(async (req, res) => {
-    const clients = await Client.find().lean();
+    const vendedorId = req.params.id;
 
-    if (!clients?.length) {
-        return res.status(400).json({ message: "Nenhum cliente encontrado" });
+    if (vendedorId !== "undefined") {
+        const clients = await Client.find({ vendedorId: vendedorId }).lean();
+
+        if (!clients?.length) {
+            return res
+                .status(400)
+                .json({ message: "Nenhum cliente encontrado" });
+        }
+
+        res.json(clients);
+    } else {
+        return [];
     }
-
-    res.json(clients);
 });
 
 // @desc    Create new client
@@ -26,13 +34,13 @@ const createNewClient = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "Preencha todos os campos" });
     }
 
+    console.log(req.body);
+
     // Checando se cliente já existe
     const duplicate = await Client.findOne({ nome }).lean().exec();
     if (duplicate) {
         return res.status(409).json({ message: "Esse nome já existe" });
     }
-
-    // Hash password
 
     const clientObject = { vendedorId, nome, telefone };
 

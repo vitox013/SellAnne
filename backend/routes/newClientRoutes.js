@@ -7,7 +7,6 @@ router.use(verifyJWT);
 
 router
     .route("/")
-    .get(clientsController.getAllClients)
     .post(clientsController.createNewClient)
     .patch(clientsController.updateClient)
     .delete(clientsController.deleteClient);

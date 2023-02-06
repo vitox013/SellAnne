@@ -11,8 +11,10 @@ import DetalhesPedido from "./pages/DetalhesPedido";
 import Prefetch from "./features/auth/Prefetch";
 import PersistLogin from "./features/auth/PersistLogin";
 import RequireAuth from "./features/auth/RequireAuth";
+import useAuth from "./hooks/useAuth";
 
 function App() {
+    const { userId } = useAuth();
     return (
         <>
             <Container className="App mx-0 px-0" fluid>
@@ -30,6 +32,7 @@ function App() {
                                         path="dashboard"
                                         element={<DashLayout />}
                                     >
+                                        
                                         <Route index element={<Dashboard />} />
                                         <Route
                                             path="novocliente"

@@ -6,20 +6,18 @@ import NavFooter from "../../components/NavFooter";
 import { useState } from "react";
 import { useGetClientsQuery } from "../clients/clientsApiSlice";
 import useAuth from "../../hooks/useAuth";
+import { useDispatch, useSelector } from "react-redux";
+import { selectClientsData, setClientsData } from "../clients/clientsDataSlice";
 
 const Dashboard = () => {
-    
     const { currentUser, userId, username } = useAuth();
+    const [term, setTerm] = useState("");
+    const [debouncedTerm, setDebouncedTerm] = useState(term);
+    const [conteudo, setConteudo] = useState([]);
+    const [clientes, setClientes] = useState([]);
+    const [clientFounded, setClientFounded] = useState([]);
 
-    const [posicao, setPosicao] = useState("");
-    function scroll() {
-        window.addEventListener("scroll", function () {
-            this.scrollY > 150 ? setPosicao("top") : setPosicao("");
-        });
-    }
-    scroll();
-    
-    
+    const dispatch = useDispatch();
 
     const {
         data: clients,
@@ -27,11 +25,11 @@ const Dashboard = () => {
         isSuccess,
         isError,
         error,
-    } = useGetClientsQuery(null, {
+    } = useGetClientsQuery(userId, {
         pollingInterval: 15000,
         refetchOnMountOrArgChange: true,
         refetchOnFocus: true,
-        refetchOnReconnect: true
+        refetchOnReconnect: true,
     });
 
     let content;
@@ -41,68 +39,118 @@ const Dashboard = () => {
     if (isError) {
         content = <p className="errmsg">{error?.data?.message}</p>;
     }
+    useEffect(() => {
+        if (isSuccess) {
+            const { entities } = clients;
+            var userClients = Object.keys(entities).map((key) => {
+                return entities[key];
+            });
 
-    if (isSuccess) {
-        const { entities } = clients;
+            userClients.sort((a, b) => a.nome.localeCompare(b.nome));
 
-        var toArray = Object.keys(entities).map((key) => {
-            return entities[key];
-        });
+            dispatch(setClientsData(userClients));
+            setClientes(userClients);
+        }
+    }, [isSuccess, clients]);
 
-        var userClients = toArray.filter(
-            (client) => client.vendedorId === userId
-        );
+    useEffect(() => {
+        const timer = setTimeout(() => setTerm(debouncedTerm), 1000);
+        return () => clearTimeout(timer);
+    }, [debouncedTerm]);
 
-        const tableContent = userClients?.length
-            ? userClients.map((clientId) => (
-                  <CardClient
-                      key={clientId._id}
-                      clientId={clientId._id}
-                      userId={userId}
-                      path=""
-                  />
-              ))
-            : null;
+    useEffect(() => {
+        if (term == "") {
+            setConteudo(
+                clientes?.length
+                    ? clientes.map((clientId) => (
+                        console.log(clientId.pedidos.length),
 
-        return (
-            <>
-                <NavDash
-                    info=""
-                    icon="bx bx-user-circle fs-1"
-                    fixed={posicao}
-                />
-                <Container>
-                    <h1 className="mt-2 ">Olá, {currentUser}!</h1>
-                    <Row>
-                        <Form className="d-flex mt-4 align-items-center">
-                            <h2 className="col-5">Clientes</h2>
-                            <Form.Control
-                                size="sm"
-                                type="search"
-                                placeholder="Procurar"
-                                className="me-2 h-75 w-50"
-                                aria-label="Search"
+                          <CardClient
+                              key={clientId.id}
+                              clientId={clientId.id}
+                              userId={clientId.vendedorId}
+                              clientName={clientId.nome}
+                              qtdPedido={clientId.pedidos.length}
+                              path=""
+                          />
+                      ))
+                    : null
+            );
+        }
+        if (term) {
+            const filteredClients = clientes.filter((client) =>
+                client.nome.toLowerCase().includes(term.toLowerCase())
+            );
+
+            if (filteredClients) {
+                setConteudo(
+                    filteredClients?.length ? (
+                        filteredClients.map((clientId) => (
+                            
+                            <CardClient
+                                key={clientId.id}
+                                clientId={clientId.id}
+                                userId={clientId.vendedorId}
+                                clientName={clientId.nome}
+                                qtdPedido={clientId.pedidos.length}
+                                path=""
                             />
-                            <Button
-                                variant="outline-success"
-                                className="h-75 col-1 px-0 py-0"
-                            >
-                                <i className="bx bx-search"></i>
-                            </Button>
-                        </Form>
-                    </Row>
-                    <Row className="px-2">{tableContent}</Row>
-                    <Row>
-                        <NavFooter
-                            path="/dashboard/novocliente"
-                            info="Novo cliente"
-                            icon="bx bx-plus me-1"
+                        ))
+                    ) : (
+                        <p className="alert alert-danger">
+                            Nenhum cliente {term} encontrado!
+                        </p>
+                    )
+                );
+            }
+        }
+    }, [clientes, term]);
+
+    const onSearch = (e) => {
+        e.preventDefault();
+    };
+
+    return (
+        <>
+            <NavDash
+                info=""
+                icon="bx bx-user-circle fs-1 expand "
+                fixed="top"
+            />
+            <Container>
+                <h1 className="mt-2 pt-10">Olá, {currentUser}!</h1>
+                <Row>
+                    <Form className="d-flex mt-4 align-items-center">
+                        <h2 className="col-5">Clientes</h2>
+                        <Form.Control
+                            size="sm"
+                            type="search"
+                            placeholder="Procurar"
+                            className="me-2 h-75 w-50"
+                            aria-label="Search"
+                            value={debouncedTerm}
+                            onChange={(e) => setDebouncedTerm(e.target.value)}
+                            onSubmit={onSearch}
                         />
-                    </Row>
-                </Container>
-            </>
-        );
-    }
+                        <Button
+                            variant="outline-success"
+                            className="h-75 col-1 px-0 py-0"
+                        >
+                            <i className="bx bx-search"></i>
+                        </Button>
+                    </Form>
+                </Row>
+                <Row className="px-2">{conteudo}</Row>
+                <Row>
+                    <NavFooter
+                        path="/dashboard/novocliente"
+                        info="Novo cliente"
+                        icon="bx bx-plus me-1"
+                    />
+                </Row>
+            </Container>
+        </>
+    );
 };
 
 export default Dashboard;

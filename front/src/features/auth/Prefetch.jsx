@@ -4,10 +4,20 @@ import { usersApiSlice } from "../users/usersApiSlice";
 import { productsApiSlice } from "../products/clientsApiSlice";
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "./authSlice";
+import useAuth from "../../hooks/useAuth";
 
 const Prefetch = () => {
+    // const dispatch = useDispatch();
+    // const { userId } = useAuth();
+
     useEffect(() => {
         console.log("subscribing");
+
+        // dispatch(setCredentials(userId));
+        // console.log(userId);
+
         const clients = store.dispatch(
             clientsApiSlice.endpoints.getClients.initiate()
         );
@@ -26,6 +36,6 @@ const Prefetch = () => {
         };
     }, []);
 
-   return <Outlet />
+    return <Outlet />;
 };
-export default Prefetch
+export default Prefetch;

@@ -8,7 +8,10 @@ const initialState = clientsAdapter.getInitialState();
 export const clientsApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         getClients: builder.query({
-            query: () => "/clients",
+            query: (args) => ({
+                url: `/clients/${args}`,
+                params: args,
+            }),
             validateStatus: (response, result) => {
                 return response.status === 200 && !result.isError;
             },
@@ -17,20 +20,21 @@ export const clientsApiSlice = apiSlice.injectEndpoints({
                     client.id = client._id;
                     return client;
                 });
+
                 return clientsAdapter.setAll(initialState, loadedClients);
             },
-            // providesTags: (result, error, arg) => {
-            //     if (result?.ids) {
-            //         return [
-            //             { type: "Clients", id: "LIST" },
-            //             ...result.ids.map((id) => ({ type: "Clients", id })),
-            //         ];
-            //     } else return [{ type: "Clients", id: "LIST" }];
-            // },
+            providesTags: (result, error, arg) => {
+                if (result?.ids) {
+                    return [
+                        { type: "Clients", id: "LIST" },
+                        ...result.ids.map((id) => ({ type: "Clients", id })),
+                    ];
+                } else return [{ type: "Clients", id: "LIST" }];
+            },
         }),
         addNewClient: builder.mutation({
             query: (initialClientData) => ({
-                url: "/clients",
+                url: "/newClient",
                 method: "POST",
                 body: {
                     ...initialClientData,
@@ -45,7 +49,7 @@ export const clientsApiSlice = apiSlice.injectEndpoints({
         }),
         updateClient: builder.mutation({
             query: (initialClientData) => ({
-                url: "/clients",
+                url: "/newClient",
                 method: "PATCH",
                 body: {
                     ...initialClientData,
@@ -57,7 +61,7 @@ export const clientsApiSlice = apiSlice.injectEndpoints({
         }),
         deleteClient: builder.mutation({
             query: ({ id }) => ({
-                url: `/clients`,
+                url: `/newClient`,
                 method: "DELETE",
                 body: { id },
             }),

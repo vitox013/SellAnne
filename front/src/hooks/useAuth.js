@@ -8,7 +8,7 @@ const useAuth = () => {
     if (token) {
         const decoded = jwtDecode(token);
         const { userId, currentUser, email } = decoded.UserInfo;
-
+        
         return { currentUser, userId, email };
     }
 

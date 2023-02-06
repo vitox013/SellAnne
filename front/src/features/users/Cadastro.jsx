@@ -7,6 +7,7 @@ import Form from "react-bootstrap/Form";
 import NavDash from "../../components/NavDash";
 import { useAddNewUserMutation } from "./newUserApiSlice";
 
+
 const USER_REGEX = /^[A-z]{3,20}$/;
 const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/;
 
@@ -14,7 +15,7 @@ const Cadastro = () => {
     const [addNewUser, { isLoading, isSuccess }] = useAddNewUserMutation();
 
     const navigate = useNavigate();
-
+    
     const errRef = useRef();
 
     const [username, setUsername] = useState("");

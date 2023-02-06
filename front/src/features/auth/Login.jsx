@@ -9,9 +9,9 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "./authSlice";
 import { useLoginMutation } from "./authApiSlice";
 import usePersist from "../../hooks/usePersist";
-import { selectCurrentToken } from "./authSlice";
-import { useSelector } from "react-redux/es/exports";
 import useAuth from "../../hooks/useAuth";
+
+
 
 const Login = () => {
     const { currentUser } = useAuth();
