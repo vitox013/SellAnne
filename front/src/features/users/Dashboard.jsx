@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Button, Container, Row, Form } from "react-bootstrap";
+import { Button, Container, Row, Form, NavDropdown } from "react-bootstrap";
 import CardClient from "../../components/CardClient";
 import NavDash from "../../components/NavDash";
 import NavFooter from "../../components/NavFooter";
@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useGetClientsQuery } from "../clients/clientsApiSlice";
 import useAuth from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
-import { selectClientsData, setClientsData } from "../clients/clientsDataSlice";
+import { setClientsData } from "../clients/clientsDataSlice";
 
 const Dashboard = () => {
     const { currentUser, userId, username } = useAuth();
@@ -15,7 +15,6 @@ const Dashboard = () => {
     const [debouncedTerm, setDebouncedTerm] = useState(term);
     const [conteudo, setConteudo] = useState([]);
     const [clientes, setClientes] = useState([]);
-    const [clientFounded, setClientFounded] = useState([]);
 
     const dispatch = useDispatch();
 
@@ -63,8 +62,6 @@ const Dashboard = () => {
             setConteudo(
                 clientes?.length
                     ? clientes.map((clientId) => (
-                        console.log(clientId.pedidos.length),
-
                           <CardClient
                               key={clientId.id}
                               clientId={clientId.id}
@@ -86,7 +83,6 @@ const Dashboard = () => {
                 setConteudo(
                     filteredClients?.length ? (
                         filteredClients.map((clientId) => (
-                            
                             <CardClient
                                 key={clientId.id}
                                 clientId={clientId.id}
@@ -114,8 +110,9 @@ const Dashboard = () => {
         <>
             <NavDash
                 info=""
-                icon="bx bx-user-circle fs-1 expand "
+                icon="bx bx-user-circle fs-1 expand"
                 fixed="top"
+                path="dash"
             />
             <Container>
                 <h1 className="mt-2 pt-10">Olá, {currentUser}!</h1>
@@ -138,6 +135,7 @@ const Dashboard = () => {
                         >
                             <i className="bx bx-search"></i>
                         </Button>
+                        
                     </Form>
                 </Row>
                 <Row className="px-2">{conteudo}</Row>

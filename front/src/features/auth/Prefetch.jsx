@@ -15,9 +15,6 @@ const Prefetch = () => {
     useEffect(() => {
         console.log("subscribing");
 
-        // dispatch(setCredentials(userId));
-        // console.log(userId);
-
         const clients = store.dispatch(
             clientsApiSlice.endpoints.getClients.initiate()
         );

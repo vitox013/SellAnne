@@ -1,23 +1,41 @@
 :root {
-    --body-bg-color: #012E40;
+    --body-bg-color: #012e40;
     --header: #023059;
-    --text-color: #F2E3D5;
-    --openSans: 'Open Sans', sans-serif;
-  }
+    --text-color: #f2e3d5;
+    --openSans: "Open Sans", sans-serif;
+}
 
+.pt-10 {
+    padding-top: 100px !important;
+}
 
-  .pt-10 {
-    padding-top: 100px!important;
-  }
-
-  @media (max-width: 768px) {
+@media (max-width: 768px) {
     .pt-10 {
-      padding-top: 50px!important;
+        padding-top: 50px !important;
     }
-  }
+}
 
-  body{
-    font-family: var(--openSans)!important;
-  }
-  
-  
+body {
+    font-family: var(--openSans) !important;
+}
+
+.dropdown-toggle::after {
+    display: none !important;
+}
+
+a {
+    text-decoration: none !important;
+}
+
+.tableFixHead {
+    overflow: auto;
+    height: 100px;
+    cursor: pointer;
+    
+}
+.tableFixHead thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #f8f9fa;
+}

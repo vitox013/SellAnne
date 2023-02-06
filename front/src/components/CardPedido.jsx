@@ -2,7 +2,12 @@ import React from "react";
 import { Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
+import { useSelector } from "react-redux";
+
 const CardPedido = ({ path }) => {
+
+    
+
     return (
         <Link to={path} className="text-decoration-none px-0">
             <Card className="px-0 mt-3">

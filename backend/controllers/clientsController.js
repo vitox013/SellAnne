@@ -37,7 +37,7 @@ const createNewClient = asyncHandler(async (req, res) => {
     console.log(req.body);
 
     // Checando se cliente já existe
-    const duplicate = await Client.findOne({ nome }).lean().exec();
+    const duplicate = await Client.findOne({ vendedorId, nome }).lean().exec();
     if (duplicate) {
         return res.status(409).json({ message: "Esse nome já existe" });
     }
@@ -101,6 +101,8 @@ const updateClient = asyncHandler(async (req, res) => {
 // @acess Private
 const deleteClient = asyncHandler(async (req, res) => {
     const { id } = req.body;
+    console.log(req.body);
+
 
     if (!id) {
         return res.status(400).json({ message: "Necessário informar o id" });

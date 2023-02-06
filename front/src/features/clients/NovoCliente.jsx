@@ -25,6 +25,7 @@ const NovoCliente = () => {
 
     const clients = useSelector(selectClientsData);
 
+
     useEffect(() => {
         setValidNome(USER_REGEX.test(nome));
         setDuplicatedName(clients.some((client) => client.nome === nome));

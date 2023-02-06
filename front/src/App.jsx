@@ -7,7 +7,7 @@ import Cadastro from "./features/users/Cadastro";
 import Dashboard from "./features/users/Dashboard";
 import DashLayout from "./components/DashLayout";
 import NovoCliente from "./features/clients/NovoCliente";
-import DetalhesPedido from "./pages/DetalhesPedido";
+import DetalhesCliente from "./features/clients/DetalhesCliente";
 import Prefetch from "./features/auth/Prefetch";
 import PersistLogin from "./features/auth/PersistLogin";
 import RequireAuth from "./features/auth/RequireAuth";
@@ -23,24 +23,22 @@ function App() {
                         <Route index element={<Public />} />
 
                         <Route path="/signup" element={<Cadastro />} />
-
+                        <Route path="/login" element={<Login />} />
                         <Route element={<PersistLogin />}>
-                            <Route path="/login" element={<Login />} />
                             <Route element={<RequireAuth />}>
                                 <Route element={<Prefetch />}>
                                     <Route
                                         path="dashboard"
                                         element={<DashLayout />}
                                     >
-                                        
                                         <Route index element={<Dashboard />} />
                                         <Route
                                             path="novocliente"
                                             element={<NovoCliente />}
                                         />
                                         <Route
-                                            path="cliente/"
-                                            element={<DetalhesPedido />}
+                                            path="cliente/:id"
+                                            element={<DetalhesCliente />}
                                         />
                                     </Route>
                                 </Route>
