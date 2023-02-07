@@ -36,8 +36,7 @@ const DetalhesPedido = () => {
         await deleteClient({ id });
     };
 
-    console.log(currentClient.pedidos);
-
+   
     return (
         <>
             <Navbar className="text-black mx-0 py-2 fluid bg-light shadow-sm">

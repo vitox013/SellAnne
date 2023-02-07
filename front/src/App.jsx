@@ -4,7 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import Public from "./pages/Public";
 import Login from "./features/auth/Login";
 import Cadastro from "./features/users/Cadastro";
-import Dashboard from "./features/users/Dashboard";
+import Dashboard from "./pages/Dashboard";
 import DashLayout from "./components/DashLayout";
 import NovoCliente from "./features/clients/NovoCliente";
 import DetalhesCliente from "./features/clients/DetalhesCliente";
@@ -12,7 +12,9 @@ import Prefetch from "./features/auth/Prefetch";
 import PersistLogin from "./features/auth/PersistLogin";
 import RequireAuth from "./features/auth/RequireAuth";
 import useAuth from "./hooks/useAuth";
-
+import Error404 from "./pages/Error404";
+import ClientesLayout from "./features/clients/ClientesLayout";
+import Clientes from "./features/clients/Clientes";
 function App() {
     const { userId } = useAuth();
     return (
@@ -21,9 +23,9 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Layout />}>
                         <Route index element={<Public />} />
-
                         <Route path="/signup" element={<Cadastro />} />
                         <Route path="/login" element={<Login />} />
+
                         <Route element={<PersistLogin />}>
                             <Route element={<RequireAuth />}>
                                 <Route element={<Prefetch />}>
@@ -32,6 +34,12 @@ function App() {
                                         element={<DashLayout />}
                                     >
                                         <Route index element={<Dashboard />} />
+                                    </Route>
+                                    <Route
+                                        path="clientes"
+                                        element={<ClientesLayout />}
+                                    >
+                                        <Route index element={<Clientes />} />
                                         <Route
                                             path="novocliente"
                                             element={<NovoCliente />}
@@ -45,6 +53,7 @@ function App() {
                             </Route>
                         </Route>
                     </Route>
+                    <Route path="*" element={<Error404 />} />
                 </Routes>
             </Container>
         </>

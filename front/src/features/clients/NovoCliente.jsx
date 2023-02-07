@@ -44,8 +44,6 @@ const NovoCliente = () => {
 
     const canSave = validNome && !isLoading && !duplicatedName;
     const alertClass = !duplicatedName ? "" : "is-invalid"
-    console.log(canSave);
-
 
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
@@ -54,7 +52,6 @@ const NovoCliente = () => {
             try {
                 await addNewClient({ vendedorId, nome, telefone });
             } catch (err) {
-                console.log("entrei");
                 if (!err.status) {
                     setErrMsg("Sem resposta do servidor");
                 } else if (err.status === 400) {

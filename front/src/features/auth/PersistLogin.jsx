@@ -1,4 +1,10 @@
-import { Outlet, Link } from "react-router-dom";
+import {
+    Outlet,
+    Link,
+    useNavigate,
+    Navigate,
+    useLocation,
+} from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useRefreshMutation } from "./authApiSlice";
 import usePersist from "../../hooks/usePersist";
@@ -9,6 +15,8 @@ const PersistLogin = () => {
     const [persist] = usePersist();
     const token = useSelector(selectCurrentToken);
     const effectRan = useRef(false);
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const [trueSuccess, setTrueSuccess] = useState(false);
 
@@ -53,13 +61,7 @@ const PersistLogin = () => {
         content = <p>Loading...</p>;
     } else if (isError) {
         //persist: yes, token: no
-        console.log("error");
-        content = (
-            <p className="alert alert-danger">
-                {`${error?.data?.message} - `}
-                <Link to="/login">Logue novamente, por favor!</Link>.
-            </p>
-        );
+        content = <Navigate to="/login" state={{ from: location }} replace />
     } else if (isSuccess && trueSuccess) {
         //persist: yes, token: yes
         console.log("success");

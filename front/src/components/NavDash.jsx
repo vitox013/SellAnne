@@ -53,13 +53,13 @@ function NavDash({ info, icon, fixed, path }) {
                             className="d-flex align-items-center justify-content-between "
                             onClick={sendLogout}
                         >
-                            Sair <i class="bx bx-log-out fs-3"></i>
+                            Sair <i className="bx bx-log-out fs-3"></i>
                         </NavDropdown.Item>
                     </NavDropdown>
                 ) : (
                     <Link
                         className="text-decoration-none text-black fw-bold fs-5 text-capitalize d-flex align-items-center"
-                        to={info}
+                        to="dashboard"
                     >
                         {info} <i className={`${icon}`}></i>
                     </Link>

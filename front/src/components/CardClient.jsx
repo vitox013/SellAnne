@@ -16,11 +16,14 @@ const CardClient = ({ clientId, userId, clientName, qtdPedido }) => {
 
     if (clientName) {
         return (
-            <Link to={`cliente/${clientId}`} className="text-decoration-none px-0">
+            <Link
+                to={`cliente/${clientId}`}
+                className="text-decoration-none px-0 "
+            >
                 <Card className="px-0 mt-3">
-                    <Card.Body className="d-flex text-black shadow-sm justify-content-between btn bg-light">
+                    <Card.Body className="d-flex text-black shadow-sm justify-content-between hover-card btn bg-light">
                         <span className="">{clientName}</span>
-                        
+
                         {content}
                         {/* <i className="bx bxs-edit-alt col-1"></i> */}
                     </Card.Body>

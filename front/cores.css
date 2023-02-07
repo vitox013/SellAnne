@@ -1,20 +1,21 @@
 /* Color Theme Swatches in Hex */
-.Deep-Teal-Sea-1-hex { color: #012E40; }
-.Deep-Teal-Sea-2-hex { color: #024959; }
-.Deep-Teal-Sea-3-hex { color: #026773; }
-.Deep-Teal-Sea-4-hex { color: #3CA6A6; }
-.Deep-Teal-Sea-5-hex { color: #F2E3D5; }
+.bootstrap-theme-1-hex { color: #E4E3FD; }
+.bootstrap-theme-2-hex { color: #CCD2E3; }
+.bootstrap-theme-3-hex { color: #F8F9FA; }
+.bootstrap-theme-4-hex { color: #CCDEE3; }
+.bootstrap-theme-5-hex { color: #E3FDFC; }
 
 /* Color Theme Swatches in RGBA */
-.Deep-Teal-Sea-1-rgba { color: rgba(1, 45, 63, 1); }
-.Deep-Teal-Sea-2-rgba { color: rgba(2, 73, 89, 1); }
-.Deep-Teal-Sea-3-rgba { color: rgba(2, 103, 114, 1); }
-.Deep-Teal-Sea-4-rgba { color: rgba(59, 165, 165, 1); }
-.Deep-Teal-Sea-5-rgba { color: rgba(242, 226, 212, 1); }
+.bootstrap-theme-1-rgba { color: rgba(228, 227, 253, 1); }
+.bootstrap-theme-2-rgba { color: rgba(204, 210, 227, 1); }
+.bootstrap-theme-3-rgba { color: rgba(248, 249, 250, 1); }
+.bootstrap-theme-4-rgba { color: rgba(204, 222, 227, 1); }
+.bootstrap-theme-5-rgba { color: rgba(227, 253, 252, 1); }
 
 /* Color Theme Swatches in HSLA */
-.Deep-Teal-Sea-1-hsla { color: hsla(197, 96, 12, 1); }
-.Deep-Teal-Sea-2-hsla { color: hsla(191, 95, 17, 1); }
-.Deep-Teal-Sea-3-hsla { color: hsla(186, 96, 22, 1); }
-.Deep-Teal-Sea-4-hsla { color: hsla(180, 46, 44, 1); }
-.Deep-Teal-Sea-5-hsla { color: hsla(28, 52, 89, 1); }
+.bootstrap-theme-1-hsla { color: hsla(242, 86, 94, 1); }
+.bootstrap-theme-2-hsla { color: hsla(224, 29, 84, 1); }
+.bootstrap-theme-3-hsla { color: hsla(210, 16, 97, 1); }
+.bootstrap-theme-4-hsla { color: hsla(193, 29, 84, 1); }
+.bootstrap-theme-5-hsla { color: hsla(177, 86, 94, 1); }
+

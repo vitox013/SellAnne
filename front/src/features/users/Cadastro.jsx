@@ -15,7 +15,7 @@ const Cadastro = () => {
     const [addNewUser, { isLoading, isSuccess }] = useAddNewUserMutation();
 
     const navigate = useNavigate();
-    
+
     const errRef = useRef();
 
     const [username, setUsername] = useState("");

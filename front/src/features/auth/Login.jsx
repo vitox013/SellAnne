@@ -10,17 +10,14 @@ import { setCredentials } from "./authSlice";
 import { useLoginMutation } from "./authApiSlice";
 import usePersist from "../../hooks/usePersist";
 import useAuth from "../../hooks/useAuth";
-
-
+import { Helmet } from "react-helmet";
 
 const Login = () => {
-    const { currentUser } = useAuth();
     const navigate = useNavigate();
+    const { userId } = useAuth();
 
     useEffect(() => {
-        if (currentUser) {
-            navigate("/dashboard");
-        }
+        if (userId) navigate("/dashboard");
     }, []);
 
     const emailRef = useRef();
@@ -74,6 +71,9 @@ const Login = () => {
 
     return (
         <>
+            <Helmet>
+                <title>DashSell | Login</title>
+            </Helmet>
             <NavDash info="" />
             <Container className="d-flex flex-column col-md-6 col-lg-5 col-xxl-3 mt-5">
                 <Card className="shadow mt-5">

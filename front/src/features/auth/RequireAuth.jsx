@@ -5,6 +5,7 @@ const RequireAuth = () => {
     const location = useLocation();
     const { userId } = useAuth();
 
+
     const content = userId ? (
         <Outlet />
     ) : (

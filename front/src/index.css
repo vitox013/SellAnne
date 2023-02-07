@@ -39,3 +39,11 @@ a {
     z-index: 1;
     background-color: #f8f9fa;
 }
+
+.hover-card {
+    transition: 0.4s ease-in-out !important;
+}
+
+.hover-card:hover {
+    background-color: #CCDEE3 !important;
+}

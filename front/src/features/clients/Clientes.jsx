@@ -4,10 +4,11 @@ import CardClient from "../../components/CardClient";
 import NavDash from "../../components/NavDash";
 import NavFooter from "../../components/NavFooter";
 import { useState } from "react";
-import { useGetClientsQuery } from "../clients/clientsApiSlice";
+import { useGetClientsQuery } from "./clientsApiSlice";
 import useAuth from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
-import { setClientsData } from "../clients/clientsDataSlice";
+import { setClientsData } from "./clientsDataSlice";
+import { Helmet } from "react-helmet";
 
 const Dashboard = () => {
     const { currentUser, userId, username } = useAuth();
@@ -108,6 +109,9 @@ const Dashboard = () => {
 
     return (
         <>
+            <Helmet>
+                <title>DashSell | {currentUser}</title>
+            </Helmet>
             <NavDash
                 info=""
                 icon="bx bx-user-circle fs-1 expand"
@@ -135,7 +139,6 @@ const Dashboard = () => {
                         >
                             <i className="bx bx-search"></i>
                         </Button>
-                        
                     </Form>
                 </Row>
                 <Row className="px-2">{conteudo}</Row>

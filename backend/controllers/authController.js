@@ -49,7 +49,7 @@ const login = asyncHandler(async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
     });
 
-    // Send accessToken containing username and roles
+    // Send accessToken containing email
     res.json({ accessToken });
 });
 

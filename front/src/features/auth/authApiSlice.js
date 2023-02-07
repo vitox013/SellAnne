@@ -1,5 +1,6 @@
 import { apiSlice } from "../../app/api/apiSlice";
 import { logOut, setCredentials } from "./authSlice";
+import { useNavigate } from "react-router-dom";
 
 
 export const authApiSlice = apiSlice.injectEndpoints({
@@ -39,6 +40,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
                     const { accessToken } = data;
                     dispatch(setCredentials({ accessToken }));
                 } catch (err) {
+
                     console.log(err);
                 }
             },
