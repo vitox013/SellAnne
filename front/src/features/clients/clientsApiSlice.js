@@ -26,10 +26,10 @@ export const clientsApiSlice = apiSlice.injectEndpoints({
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
                     return [
-                        { type: "Clients", id: "LIST" },
-                        ...result.ids.map((id) => ({ type: "Clients", id })),
+                        { type: "Client", id: "LIST" },
+                        ...result.ids.map((id) => ({ type: "Client", id })),
                     ];
-                } else return [{ type: "Clients", id: "LIST" }];
+                } else return [{ type: "Client", id: "LIST" }];
             },
         }),
         addNewClient: builder.mutation({
@@ -98,3 +98,4 @@ export const {
 } = clientsAdapter.getSelectors(
     (state) => selectClientsData(state) ?? initialState
 );
+

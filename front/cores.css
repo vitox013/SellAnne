@@ -1,10 +1,9 @@
 /* Color Theme Swatches in Hex */
-.bootstrap-theme-1-hex { color: #E4E3FD; }
-.bootstrap-theme-2-hex { color: #CCD2E3; }
-.bootstrap-theme-3-hex { color: #F8F9FA; }
-.bootstrap-theme-4-hex { color: #CCDEE3; }
-.bootstrap-theme-5-hex { color: #E3FDFC; }
-
+.cor-1 { color: #E4E3FD; }
+.cor-2 { color: #CCD2E3; }
+.cor-3 { color: #F8F9FA; }
+.cor-4 { color: #CCDEE3; }
+.cor-5 { color: #E3FDFC; }
 /* Color Theme Swatches in RGBA */
 .bootstrap-theme-1-rgba { color: rgba(228, 227, 253, 1); }
 .bootstrap-theme-2-rgba { color: rgba(204, 210, 227, 1); }

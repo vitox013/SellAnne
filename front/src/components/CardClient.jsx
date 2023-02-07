@@ -17,7 +17,7 @@ const CardClient = ({ clientId, userId, clientName, qtdPedido }) => {
     if (clientName) {
         return (
             <Link
-                to={`cliente/${clientId}`}
+                to={`${clientId}`}
                 className="text-decoration-none px-0 "
             >
                 <Card className="px-0 mt-3">

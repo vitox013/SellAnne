@@ -31,7 +31,6 @@ a {
     overflow: auto;
     height: 100px;
     cursor: pointer;
-    
 }
 .tableFixHead thead th {
     position: sticky;
@@ -45,5 +44,23 @@ a {
 }
 
 .hover-card:hover {
-    background-color: #CCDEE3 !important;
+    background-color: #ccdee3 !important;
+    cursor: pointer;
+}
+
+/* Color Theme Swatches in Hex */
+.bg-cor-1 {
+    background-color: #e4e3fd !important;
+}
+.bg-cor-2 {
+    background-color: #ccd2e3 !important;
+}
+.bg-cor-3 {
+    background-color: #f8f9fa !important;
+}
+.bg-cor-4 {
+    background-color: #ccdee3 !important;
+}
+.bg-cor-5 {
+    background-color: #e3fdfc !important;
 }

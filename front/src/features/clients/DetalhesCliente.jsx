@@ -1,24 +1,43 @@
 import { useState, useEffect, React } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Container, Navbar, Button, Modal, Table } from "react-bootstrap";
-import { useDeleteClientMutation } from "./clientsApiSlice";
+import {
+    Container,
+    Navbar,
+    Button,
+    Modal,
+    Table,
+    Card,
+    Row,
+    Col,
+} from "react-bootstrap";
+import { useDeleteClientMutation, useGetClientsQuery } from "./clientsApiSlice";
+
+import useAuth from "../../hooks/useAuth";
 import CardPedido from "../../components/CardPedido";
-import { selectClientsData } from "./clientsDataSlice";
-import { useSelector } from "react-redux";
 
 const DetalhesPedido = () => {
     const [show, setShow] = useState(false);
     const [errMsg, setErrMsg] = useState("");
-    const [currentClient, setCurrentClient] = useState({});
+    const [content, setContent] = useState([]);
+    const [clientPedidos, setClientPedidos] = useState([]);
+    const [clienteNome, setClienteNome] = useState("");
 
     const { id } = useParams();
-    const [deleteClient, { isSuccess, error }] = useDeleteClientMutation(id);
+    const { userId } = useAuth();
     const navigate = useNavigate();
-    const clientsData = useSelector(selectClientsData);
+
+    const { client: pedidos, clientName } = useGetClientsQuery(userId, {
+        selectFromResult: ({ data }) => ({
+            client: data?.entities[id].pedidos,
+            clientName: data?.entities[id].nome,
+        }),
+    });
+
+    const [deleteClient, { isSuccess, error }] = useDeleteClientMutation(id);
 
     useEffect(() => {
-        setCurrentClient(clientsData.find((client) => client.id === id));
-    }, []);
+        setClientPedidos(pedidos);
+    }, [pedidos]);
 
     useEffect(() => {
         if (isSuccess) {
@@ -31,12 +50,34 @@ const DetalhesPedido = () => {
 
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
+
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
         await deleteClient({ id });
     };
 
-   
+    useEffect(() => {
+        if (pedidos) {
+            setContent(
+                pedidos.length
+                    ? pedidos.map((pedido) => (
+                          <CardPedido
+                              key={pedido._id}
+                              path={pedido._id}
+                              produto={pedido.produto}
+                              quantidade={pedido.quantidade}
+                              situacao={pedido.situacao}
+                              valor=""
+                          />
+                      ))
+                    : null
+            );
+        }
+        if (clientName) {
+            setClienteNome(clientName);
+        }
+    }, [pedidos, clienteNome]);
+
     return (
         <>
             <Navbar className="text-black mx-0 py-2 fluid bg-light shadow-sm">
@@ -77,36 +118,15 @@ const DetalhesPedido = () => {
                 </Container>
             </Navbar>
             <Container className="pt-2">
-                <h2>{currentClient.nome}</h2>
-                <Table className="tableFixHead pointer-event" striped bordered hover >
-                    <thead >
-                        <tr className="bg-light ">
-                            <th>Item</th>
-                            <th>Quant</th>
-                            <th>Valor</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody className="py-2">
-                        <tr>
-                            <td>1</td>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>@mdo</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td colSpan={2}>Larry the Bird</td>
-                            <td>@twitter</td>
-                        </tr>
-                    </tbody>
-                </Table>
+                <h2>{clienteNome}</h2>
+                <Card className=" px-2 py-2 mt-3 text-black shadow-sm bg-cor-1 fw-bold">
+                    <Row>
+                        <Col xs={6}>Item</Col>
+                        <Col>Qtd</Col>
+                        <Col>Valor</Col>
+                    </Row>
+                </Card>
+                {content}
             </Container>
         </>
     );

@@ -45,7 +45,7 @@ function App() {
                                             element={<NovoCliente />}
                                         />
                                         <Route
-                                            path="cliente/:id"
+                                            path=":id"
                                             element={<DetalhesCliente />}
                                         />
                                     </Route>

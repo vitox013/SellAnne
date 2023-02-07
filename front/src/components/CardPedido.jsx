@@ -1,21 +1,16 @@
 import React from "react";
-import { Card } from "react-bootstrap";
+import { Card, Col, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-import { useSelector } from "react-redux";
-
-const CardPedido = ({ path }) => {
-
-    
-
+const CardPedido = ({ path, produto, quantidade, valor }) => {
     return (
-        <Link to={path} className="text-decoration-none px-0">
-            <Card className="px-0 mt-3">
-                <Card.Body className="d-flex justify-content-between text-black shadow-sm btn bg-light">
-                    <span>Nome</span>
-                    <span>0 pedidos</span>
-                    <i className="bx bxs-edit-alt"></i>
-                </Card.Body>
+        <Link to={path} className="text-decoration-none px-0 ">
+            <Card className="px-2 py-2 mt-3 text-black shadow-sm hover-card bg-light">
+                <Row>
+                    <Col xs={6}>{produto}</Col>
+                    <Col>{quantidade}</Col>
+                    <Col>{valor}</Col>
+                </Row>
             </Card>
         </Link>
     );
