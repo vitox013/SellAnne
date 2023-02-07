@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
-import NavDash from "../components/NavDash";
+import NavDash from "../components/NavBar";
 import NavFooter from "../components/NavFooter";
 import { useState } from "react";
 import { useGetClientsQuery } from "../features/clients/clientsApiSlice";
@@ -68,6 +68,7 @@ const Dashboard = () => {
                 icon="bx bx-user-circle fs-1 expand"
                 fixed="top"
                 path="dash"
+                page="dashboard"
             />
             <Container>
                 <h1 className="mt-2 pt-10 text-center">Olá, {currentUser}!</h1>

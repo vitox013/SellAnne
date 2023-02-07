@@ -4,13 +4,13 @@ import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import { Link } from "react-router-dom";
 import logo from "../img/dashSell_LOGO_transparent.png";
-import NavDash from "../components/NavDash";
+import NavDash from "../components/NavBar";
 
 const Public = () => {
     return (
         <>
 
-            <NavDash info="login" icon={"bx bx-log-in fs-3"} />
+            <NavDash info="login" page="public" icon={"bx bx-log-in fs-3"} />
             <Container>
                 <Row className="text text-center fw-semibold mt-5 h2 gerencie mx-3">
                     <p>Gerencia suas vendas online.</p>

@@ -1,14 +1,13 @@
 import React, { useEffect } from "react";
 import { Button, Container, Row, Form, NavDropdown } from "react-bootstrap";
 import CardClient from "../../components/CardClient";
-import NavDash from "../../components/NavDash";
+import NavDash from "../../components/NavBar";
 import NavFooter from "../../components/NavFooter";
 import { useState } from "react";
 import { useGetClientsQuery } from "./clientsApiSlice";
 import useAuth from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { setClientsData } from "./clientsDataSlice";
-import { Helmet } from "react-helmet";
 
 const Dashboard = () => {
     const { currentUser, userId, username } = useAuth();
@@ -109,14 +108,12 @@ const Dashboard = () => {
 
     return (
         <>
-            <Helmet>
-                <title>DashSell | {currentUser}</title>
-            </Helmet>
             <NavDash
-                info=""
+                info="Produtos"
                 icon="bx bx-user-circle fs-1 expand"
                 fixed="top"
                 path="dash"
+                page="clientes"
             />
             <Container>
                 <h1 className="mt-2 pt-10">Olá, {currentUser}!</h1>
@@ -144,7 +141,7 @@ const Dashboard = () => {
                 <Row className="px-2">{conteudo}</Row>
                 <Row>
                     <NavFooter
-                        path="/dashboard/novocliente"
+                        path="/clientes/novocliente"
                         info="Novo cliente"
                         icon="bx bx-plus me-1"
                     />

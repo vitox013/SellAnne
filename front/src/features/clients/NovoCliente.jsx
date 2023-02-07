@@ -35,7 +35,7 @@ const NovoCliente = () => {
         if (isSuccess) {
             setNome("");
             setTelefone("");
-            navigate("/dashboard");
+            navigate("/clientes");
         }
     }, [isSuccess, navigate]);
 
