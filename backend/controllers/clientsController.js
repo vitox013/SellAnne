@@ -8,19 +8,13 @@ const asyncHandler = require("express-async-handler");
 const getAllClients = asyncHandler(async (req, res) => {
     const vendedorId = req.params.id;
 
-    if (vendedorId !== "undefined") {
-        const clients = await Client.find({ vendedorId: vendedorId }).lean();
+    const clients = await Client.find({ vendedorId: vendedorId }).lean();
 
-        if (!clients?.length) {
-            return res
-                .status(400)
-                .json({ message: "Nenhum cliente encontrado" });
-        }
-
-        res.json(clients);
-    } else {
-        return [];
+    if (!clients?.length) {
+        return res.status(400).json({ message: "Nenhum cliente encontrado" });
     }
+
+    res.json(clients);
 });
 
 // @desc    Create new client

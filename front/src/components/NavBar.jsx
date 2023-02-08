@@ -87,13 +87,15 @@ function NavBar({ info, icon, fixed, path, page }) {
             fixed={fixed}
         >
             <Container className="d-flex align-items-center">
-                <Link to="/">
-                    <img
-                        alt=""
-                        src={logo}
-                        className="d-inline-block col-7 col-md-12"
-                    />
-                </Link>
+                <div>
+                    <Link to="/">
+                        <img
+                            alt=""
+                            src={logo}
+                            className="d-inline-block col-7 col-md-12"
+                        />
+                    </Link>
+                </div>
                 {conteudo}
             </Container>
         </Navbar>

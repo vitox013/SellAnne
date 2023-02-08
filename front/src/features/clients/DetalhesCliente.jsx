@@ -8,12 +8,12 @@ import {
     Card,
     Row,
     Col,
+    Form,
 } from "react-bootstrap";
 import { useDeleteClientMutation, useGetClientsQuery } from "./clientsApiSlice";
 import { useGetProductsQuery } from "../products/productsApiSlice";
 import useAuth from "../../hooks/useAuth";
 import CardPedido from "../../components/CardPedido";
-import NavFooter from "../../components/NavFooter";
 
 const DetalhesPedido = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
@@ -149,11 +149,57 @@ const DetalhesPedido = () => {
                     </Row>
                 </Card>
                 {content}
-                <NavFooter
-                    path="/clientes/novopedido"
-                    info="Novo pedido"
-                    icon="bx bx-plus me-1"
-                />
+                <Navbar
+                    className="text-black mx-0 py-0 fluid shadow-sm"
+                    fixed="bottom"
+                >
+                    <Container className="d-flex justify-content-center">
+                        <Button variant="success" onClick={handleShow}>
+                            Novo pedido
+                        </Button>
+
+                        <Modal show={show} onHide={handleClose}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Cadastre novo pedido</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <Form>
+                                    <Form.Group
+                                        className="mb-3"
+                                        controlId=""
+                                    >
+                                        <Form.Label>Email address</Form.Label>
+                                        <Form.Control
+                                            type="email"
+                                            placeholder="name@example.com"
+                                            autoFocus
+                                        />
+                                    </Form.Group>
+                                    <Form.Group
+                                        className="mb-3"
+                                        controlId="exampleForm.ControlTextarea1"
+                                    >
+                                        <Form.Label>
+                                            Example textarea
+                                        </Form.Label>
+                                        <Form.Control as="textarea" rows={3} />
+                                    </Form.Group>
+                                </Form>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button
+                                    variant="secondary"
+                                    onClick={handleClose}
+                                >
+                                    Close
+                                </Button>
+                                <Button variant="primary" onClick={handleClose}>
+                                    Save Changes
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
+                    </Container>
+                </Navbar>
             </Container>
         </>
     );

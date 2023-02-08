@@ -5,7 +5,7 @@ const { logger, logEvents } = require("./middleware/logger");
 const errorHandler = require("./middleware/errorHandler");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const corsOptions = require('./config/corsOptions')
+const corsOptions = require("./config/corsOptions");
 const connectDB = require("./config/dbConn");
 const mongoose = require("mongoose");
 const PORT = process.env.PORT || 3500;
@@ -23,13 +23,15 @@ app.use(cookieParser());
 app.use("/", express.static(path.join(__dirname, "public")));
 
 app.use("/", require("./routes/root"));
-app.use('/auth', require('./routes/authRoutes'))
-app.use('/new', require('./routes/newUserRoute'))
-app.use('/users', require('./routes/usersRoutes'))
-app.use('/getClients', require('./routes/getClientsRoutes'))
-app.use('/client', require('./routes/clientRoutes'))
-app.use('/getProducts', require('./routes/getProductsRoutes'))
-app.use('/products', require('./routes/productsRoutes'))
+app.use("/auth", require("./routes/authRoutes"));
+app.use("/new", require("./routes/newUserRoute"));
+app.use("/users", require("./routes/usersRoutes"));
+app.use("/getClients", require("./routes/getClientsRoutes"));
+app.use("/client", require("./routes/clientRoutes"));
+app.use("/getProducts", require("./routes/getProductsRoutes"));
+app.use("/products", require("./routes/productsRoutes"));
+app.use("/getPedidos", require("./routes/getPedidosRoutes"));
+app.use("/pedidos", require("./routes/pedidosRoutes"));
 
 app.all("*", (req, res) => {
     res.status(404);
@@ -44,14 +46,15 @@ app.all("*", (req, res) => {
 
 app.use(errorHandler);
 
-mongoose.connection.once('open', () => {
+mongoose.connection.once("open", () => {
     console.log("Conectado ao MongoDB!");
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-})
+});
 
-mongoose.connection.on('error', err => {
+mongoose.connection.on("error", (err) => {
     console.log(`Erro ao conectar ao MongoDB: ${err}`);
-    logEvents(`${err.no}: ${err.code}\t${err.syscall}\t${err.hostname}`, 'mongoErrLog.log')
-})
-
-
+    logEvents(
+        `${err.no}: ${err.code}\t${err.syscall}\t${err.hostname}`,
+        "mongoErrLog.log"
+    );
+});

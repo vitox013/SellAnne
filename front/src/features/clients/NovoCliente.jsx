@@ -70,7 +70,7 @@ const NovoCliente = () => {
 
     return (
         <>
-            <Back icon="bx bx-arrow-back fs-1" path="/dashboard" />
+            <Back path="/dashboard" />
             <Container>
                 <Row className="px-2 mt-md-5">
                     <Col className="mt-2 col-12 text-center">

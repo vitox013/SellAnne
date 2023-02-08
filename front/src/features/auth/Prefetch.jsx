@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import useAuth from "../../hooks/useAuth";
+import { pedidosApiSlice } from "../pedidos/pedidosApiSlice";
 
 const Prefetch = () => {
     const dispatch = useDispatch();
@@ -21,6 +22,11 @@ const Prefetch = () => {
         );
         store.dispatch(
             productsApiSlice.util.prefetch("getProducts", userId, {
+                force: true,
+            })
+        );
+        store.dispatch(
+            pedidosApiSlice.util.prefetch("getPedidos", userId, {
                 force: true,
             })
         );
