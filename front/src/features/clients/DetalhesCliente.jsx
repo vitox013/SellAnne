@@ -5,21 +5,27 @@ import {
     Navbar,
     Button,
     Modal,
-    Table,
     Card,
     Row,
     Col,
 } from "react-bootstrap";
 import { useDeleteClientMutation, useGetClientsQuery } from "./clientsApiSlice";
-
+import { useGetProductsQuery } from "../products/productsApiSlice";
 import useAuth from "../../hooks/useAuth";
 import CardPedido from "../../components/CardPedido";
+import NavFooter from "../../components/NavFooter";
 
 const DetalhesPedido = () => {
+    const formatter = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+    });
     const [show, setShow] = useState(false);
     const [errMsg, setErrMsg] = useState("");
     const [content, setContent] = useState([]);
     const [clientPedidos, setClientPedidos] = useState([]);
+    const [products, setProducts] = useState([]);
+
     const [clienteNome, setClienteNome] = useState("");
 
     const { id } = useParams();
@@ -33,6 +39,12 @@ const DetalhesPedido = () => {
         }),
     });
 
+    const { products: produtos } = useGetProductsQuery(userId, {
+        selectFromResult: ({ data }) => ({
+            products: data?.entities,
+        }),
+    });
+
     const [deleteClient, { isSuccess, error }] = useDeleteClientMutation(id);
 
     useEffect(() => {
@@ -41,7 +53,7 @@ const DetalhesPedido = () => {
 
     useEffect(() => {
         if (isSuccess) {
-            navigate("/dashboard");
+            navigate("/clientes");
         }
         if (error) {
             setErrMsg("Erro ao deletar cliente");
@@ -58,32 +70,41 @@ const DetalhesPedido = () => {
 
     useEffect(() => {
         if (pedidos) {
-            setContent(
-                pedidos.length
-                    ? pedidos.map((pedido) => (
-                          <CardPedido
-                              key={pedido._id}
-                              path={pedido._id}
-                              produto={pedido.produto}
-                              quantidade={pedido.quantidade}
-                              situacao={pedido.situacao}
-                              valor=""
-                          />
-                      ))
-                    : null
-            );
+            if (produtos) {
+                const products = Object.keys(produtos).map(
+                    (key) => produtos[key]
+                );
+
+                pedidos.map((item) => {
+                    products.map(function (prod) {
+                        if (prod._id == item.produto) {
+                            return setContent(
+                                <CardPedido
+                                    key={item._id}
+                                    path={item._id}
+                                    produto={prod.produto}
+                                    codigo={prod.codigo}
+                                    quantidade={item.quantidade}
+                                    valor={formatter.format(prod.preco)}
+                                    status={item.situacao}
+                                />
+                            );
+                        }
+                    });
+                });
+            }
         }
         if (clientName) {
             setClienteNome(clientName);
         }
-    }, [pedidos, clienteNome]);
+    }, [pedidos, clienteNome, produtos]);
 
     return (
         <>
             <Navbar className="text-black mx-0 py-2 fluid bg-light shadow-sm">
                 <Container className="d-flex align-items-center">
                     <Link
-                        to="/dashboard"
+                        to="/clientes"
                         className=" d-flex align-items-center text-dark"
                     >
                         <i className="bx bx-left-arrow-alt fs-1"></i>
@@ -120,13 +141,19 @@ const DetalhesPedido = () => {
             <Container className="pt-2">
                 <h2>{clienteNome}</h2>
                 <Card className=" px-2 py-2 mt-3 text-black shadow-sm bg-cor-1 fw-bold">
-                    <Row>
-                        <Col xs={6}>Item</Col>
-                        <Col>Qtd</Col>
-                        <Col>Valor</Col>
+                    <Row className="text-center">
+                        <Col xs={3}>Item</Col>
+                        <Col xs={2}>Qtd</Col>
+                        <Col xs={3}>Valor</Col>
+                        <Col xs={4}>Situação</Col>
                     </Row>
                 </Card>
                 {content}
+                <NavFooter
+                    path="/clientes/novopedido"
+                    info="Novo pedido"
+                    icon="bx bx-plus me-1"
+                />
             </Container>
         </>
     );

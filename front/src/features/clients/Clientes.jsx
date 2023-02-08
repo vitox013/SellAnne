@@ -18,39 +18,36 @@ const Clientes = () => {
 
     const dispatch = useDispatch();
 
-    const {
-        data: clients,
-        isLoading,
-        isSuccess,
-        isError,
-        error,
-    } = useGetClientsQuery(userId, {
-        pollingInterval: 15000,
-        refetchOnMountOrArgChange: true,
-        refetchOnFocus: true,
-        refetchOnReconnect: true,
+    // const {
+    //     data: clients,
+    //     isLoading,
+    //     isSuccess,
+    //     isError,
+    //     error,
+    // } = useGetClientsQuery(userId, {
+    //     pollingInterval: 15000,
+    //     refetchOnMountOrArgChange: true,
+    //     refetchOnFocus: true,
+    //     refetchOnReconnect: true,
+    // });
+    const { client } = useGetClientsQuery(userId, {
+        selectFromResult: ({ data }) => ({
+            client: data?.entities,
+        }),
     });
 
     let content;
 
-    if (isLoading) content = <p>Loading...</p>;
-
-    if (isError) {
-        content = <p className="errmsg">{error?.data?.message}</p>;
-    }
     useEffect(() => {
-        if (isSuccess) {
-            const { entities } = clients;
-            var userClients = Object.keys(entities).map((key) => {
-                return entities[key];
+        if (client) {
+            var userClients = Object.keys(client).map((key) => {
+                return client[key];
             });
-
             userClients.sort((a, b) => a.nome.localeCompare(b.nome));
-
             dispatch(setClientsData(userClients));
             setClientes(userClients);
         }
-    }, [isSuccess, clients]);
+    }, [client]);
 
     useEffect(() => {
         const timer = setTimeout(() => setTerm(debouncedTerm), 1000);

@@ -11,10 +11,11 @@ export const clientsApiSlice = apiSlice.injectEndpoints({
             query: (args) => ({
                 url: `/getClients/${args}`,
                 params: args,
+                validateStatus: (response, result) => {
+                    return response.status === 200 && !result.isError;
+                },
             }),
-            validateStatus: (response, result) => {
-                return response.status === 200 && !result.isError;
-            },
+
             transformResponse: (responseData) => {
                 const loadedClients = responseData.map((client) => {
                     client.id = client._id;
@@ -48,7 +49,7 @@ export const clientsApiSlice = apiSlice.injectEndpoints({
         }),
         updateClient: builder.mutation({
             query: (initialClientData) => ({
-                url: "/newClient",
+                url: "/client",
                 method: "PATCH",
                 body: {
                     ...initialClientData,
@@ -60,7 +61,7 @@ export const clientsApiSlice = apiSlice.injectEndpoints({
         }),
         deleteClient: builder.mutation({
             query: ({ id }) => ({
-                url: `/newClient`,
+                url: `/client`,
                 method: "DELETE",
                 body: { id },
             }),

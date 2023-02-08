@@ -18,6 +18,7 @@ import Clientes from "./features/clients/Clientes";
 import ProductsLayout from "./features/products/ProductsLayout";
 import Produtos from "./features/products/Produtos";
 import Teste from "./pages/Teste";
+import NovoPedido from "./features/clients/NovoPedido";
 
 function App() {
     const { userId } = useAuth();
@@ -52,6 +53,10 @@ function App() {
                                         <Route
                                             path=":id"
                                             element={<DetalhesCliente />}
+                                        />
+                                        <Route
+                                            path="novopedido"
+                                            element={<NovoPedido />}
                                         />
                                     </Route>
                                     <Route

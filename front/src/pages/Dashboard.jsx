@@ -17,37 +17,43 @@ const Dashboard = () => {
 
     const dispatch = useDispatch();
 
-    const {
-        data: clients,
-        isLoading,
-        isSuccess,
-        isError,
-        error,
-    } = useGetClientsQuery(userId, {
-        pollingInterval: 15000,
-        refetchOnMountOrArgChange: true,
-        refetchOnFocus: true,
-        refetchOnReconnect: true,
-    });
+    // const {
+    //     clients,
+    //     isLoading,
+    //     isSuccess,
+    //     isError,
+    //     error,
+    // } = useGetClientsQuery(userId, {
 
+    // });
+
+    const { client } = useGetClientsQuery(userId, {
+        selectFromResult: ({ data }) => ({
+            client: data?.entities,
+        }),
+    });
     let content;
 
-    if (isLoading) content = <p>Loading...</p>;
+    // if (isLoading) content = <p>Loading...</p>;
 
-    if (isError) {
-        content = <p className="errmsg">{error?.data?.message}</p>;
-    }
+    // if (isError) {
+    //     content = <p className="errmsg">{error?.data?.message}</p>;
+    // }
+    // useEffect(() => {
+    //     if (isSuccess) {
+    //         const { entities } = clients;
+    //         var userClients = Object.keys(entities).map((key) => {
+    //             return entities[key];
+    //         });
+
+    //         userClients.sort((a, b) => a.nome.localeCompare(b.nome));
+    //         setClientes(userClients);
+    //     }
+    // }, [isSuccess, clients]);
+
     useEffect(() => {
-        if (isSuccess) {
-            const { entities } = clients;
-            var userClients = Object.keys(entities).map((key) => {
-                return entities[key];
-            });
-
-            userClients.sort((a, b) => a.nome.localeCompare(b.nome));
-            setClientes(userClients);
-        }
-    }, [isSuccess, clients]);
+        console.log(client);
+    }, [client]);
 
     useEffect(() => {
         const timer = setTimeout(() => setTerm(debouncedTerm), 1000);

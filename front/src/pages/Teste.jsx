@@ -11,11 +11,14 @@ import { useGetClientsQuery } from "../features/clients/clientsApiSlice";
 import useAuth from "../hooks/useAuth";
 
 const Teste = () => {
-    const data = useSelector(selectClientsData);
+    const id = "63dc93cc7b44c2fdc39ba3d8";
+    const { userId } = useAuth();
 
-    console.log(data);
-
-
+    const { client } = useGetClientsQuery(userId, {
+        selectFromResult: ({ data }) => ({
+            client: data?.entities
+        }),
+    });
 
     // if (data.length === 0) {
     //     console.log("entrei");

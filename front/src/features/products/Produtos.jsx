@@ -4,7 +4,7 @@ import CardClient from "../../components/CardClient";
 import NavDash from "../../components/NavBar";
 import NavFooter from "../../components/NavFooter";
 import { useState } from "react";
-import { useGetProductsQuery } from "./clientsApiSlice";
+import { useGetProductsQuery } from "./productsApiSlice";
 import useAuth from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { setClientsData } from "../clients/clientsDataSlice";
