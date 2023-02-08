@@ -5,12 +5,20 @@ const asyncHandler = require("express-async-handler");
 // @route   GET /products
 // @acess Private
 const getAllProducts = asyncHandler(async (req, res) => {
-    const products = await Products.find().lean();
+    const vendedorId = req.params.id;
 
-    if (!products?.length) {
-        return res.status(400).json({ message: "Nenhum produto encontrado" });
+    if (vendedorId !== "undefined") {
+        const products = await Products.find({ vendedor: vendedorId }).lean();
+
+        if (!products?.length) {
+            return res
+                .status(400)
+                .json({ message: "Nenhum produto encontrado" });
+        }
+        res.json(products);
+    } else {
+        return [];
     }
-    res.json(products);
 });
 
 // @desc    Create new products

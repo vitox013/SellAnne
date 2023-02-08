@@ -7,7 +7,6 @@ router.use(verifyJWT);
 
 router
     .route("/")
-    .get(productsController.getAllProducts)
     .post(productsController.createNewProduct)
     .patch(productsController.updateProduct)
     .delete(productsController.deleteProduct);

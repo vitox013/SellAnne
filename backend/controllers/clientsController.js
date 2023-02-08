@@ -103,7 +103,6 @@ const deleteClient = asyncHandler(async (req, res) => {
     const { id } = req.body;
     console.log(req.body);
 
-
     if (!id) {
         return res.status(400).json({ message: "Necessário informar o id" });
     }

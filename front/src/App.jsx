@@ -15,6 +15,10 @@ import useAuth from "./hooks/useAuth";
 import Error404 from "./pages/Error404";
 import ClientesLayout from "./features/clients/ClientesLayout";
 import Clientes from "./features/clients/Clientes";
+import ProductsLayout from "./features/products/ProductsLayout";
+import Produtos from "./features/products/Produtos";
+import Teste from "./pages/Teste";
+
 function App() {
     const { userId } = useAuth();
     return (
@@ -35,6 +39,7 @@ function App() {
                                     >
                                         <Route index element={<Dashboard />} />
                                     </Route>
+                                    <Route path="teste" element={<Teste />} />
                                     <Route
                                         path="clientes"
                                         element={<ClientesLayout />}
@@ -48,6 +53,12 @@ function App() {
                                             path=":id"
                                             element={<DetalhesCliente />}
                                         />
+                                    </Route>
+                                    <Route
+                                        path="produtos"
+                                        element={<ProductsLayout />}
+                                    >
+                                        <Route index element={<Produtos />} />
                                     </Route>
                                 </Route>
                             </Route>

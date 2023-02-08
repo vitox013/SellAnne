@@ -4,27 +4,26 @@ import CardClient from "../../components/CardClient";
 import NavDash from "../../components/NavBar";
 import NavFooter from "../../components/NavFooter";
 import { useState } from "react";
-import { useGetClientsQuery } from "./clientsApiSlice";
+import { useGetProductsQuery } from "./clientsApiSlice";
 import useAuth from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
-import { setClientsData } from "./clientsDataSlice";
+import { setClientsData } from "../clients/clientsDataSlice";
+import CardProduct from "../../components/CardProduct";
 
-const Clientes = () => {
-    const { currentUser, userId, username } = useAuth();
+const Produtos = () => {
+    const { currentUser, userId } = useAuth();
     const [term, setTerm] = useState("");
     const [debouncedTerm, setDebouncedTerm] = useState(term);
     const [conteudo, setConteudo] = useState([]);
-    const [clientes, setClientes] = useState([]);
-
-    const dispatch = useDispatch();
+    const [produtos, setProdutos] = useState([]);
 
     const {
-        data: clients,
+        data: products,
         isLoading,
         isSuccess,
         isError,
         error,
-    } = useGetClientsQuery(userId, {
+    } = useGetProductsQuery(userId, {
         pollingInterval: 15000,
         refetchOnMountOrArgChange: true,
         refetchOnFocus: true,
@@ -40,17 +39,14 @@ const Clientes = () => {
     }
     useEffect(() => {
         if (isSuccess) {
-            const { entities } = clients;
-            var userClients = Object.keys(entities).map((key) => {
+            const { entities } = products;
+            var clientProducts = Object.keys(entities).map((key) => {
                 return entities[key];
             });
-
-            userClients.sort((a, b) => a.nome.localeCompare(b.nome));
-
-            dispatch(setClientsData(userClients));
-            setClientes(userClients);
+            clientProducts.sort((a, b) => a.codigo - b.codigo);
+            setProdutos(clientProducts);
         }
-    }, [isSuccess, clients]);
+    }, [isSuccess, products]);
 
     useEffect(() => {
         const timer = setTimeout(() => setTerm(debouncedTerm), 1000);
@@ -60,35 +56,36 @@ const Clientes = () => {
     useEffect(() => {
         if (term == "") {
             setConteudo(
-                clientes?.length
-                    ? clientes.map((clientId) => (
-                          <CardClient
-                              key={clientId.id}
-                              clientId={clientId.id}
-                              userId={clientId.vendedorId}
-                              clientName={clientId.nome}
-                              qtdPedido={clientId.pedidos.length}
-                              path=""
+                produtos?.length
+                    ? produtos.map((produto) => (
+                          <CardProduct
+                              key={produto._id}
+                              path={produto._id}
+                              nomeProduto={produto.produto}
+                              cod={produto.codigo}
+                              vendedor={produto.vendedor}
+                              estoque={produto.estoque}
+                              preco={produto.preco}
                           />
                       ))
                     : null
             );
         }
         if (term) {
-            const filteredClients = clientes.filter((client) =>
+            const filteredProducts = produtos.filter((client) =>
                 client.nome.toLowerCase().includes(term.toLowerCase())
             );
 
-            if (filteredClients) {
+            if (filteredProducts) {
                 setConteudo(
-                    filteredClients?.length ? (
-                        filteredClients.map((clientId) => (
+                    filteredProducts?.length ? (
+                        filteredProducts.map((produto) => (
                             <CardClient
-                                key={clientId.id}
-                                clientId={clientId.id}
-                                userId={clientId.vendedorId}
-                                clientName={clientId.nome}
-                                qtdPedido={clientId.pedidos.length}
+                                key={produto.id}
+                                produto={produto.id}
+                                userId={produto.vendedorId}
+                                clientName={produto.nome}
+                                qtdPedido={produto.pedidos.length}
                                 path=""
                             />
                         ))
@@ -100,7 +97,7 @@ const Clientes = () => {
                 );
             }
         }
-    }, [clientes, term]);
+    }, [produtos, term]);
 
     const onSearch = (e) => {
         e.preventDefault();
@@ -151,4 +148,4 @@ const Clientes = () => {
     );
 };
 
-export default Clientes;
+export default Produtos;

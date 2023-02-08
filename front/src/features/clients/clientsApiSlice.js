@@ -9,7 +9,7 @@ export const clientsApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         getClients: builder.query({
             query: (args) => ({
-                url: `/clients/${args}`,
+                url: `/getClients/${args}`,
                 params: args,
             }),
             validateStatus: (response, result) => {
@@ -20,7 +20,6 @@ export const clientsApiSlice = apiSlice.injectEndpoints({
                     client.id = client._id;
                     return client;
                 });
-
                 return clientsAdapter.setAll(initialState, loadedClients);
             },
             providesTags: (result, error, arg) => {
@@ -34,7 +33,7 @@ export const clientsApiSlice = apiSlice.injectEndpoints({
         }),
         addNewClient: builder.mutation({
             query: (initialClientData) => ({
-                url: "/newClient",
+                url: "/client",
                 method: "POST",
                 body: {
                     ...initialClientData,
@@ -98,4 +97,3 @@ export const {
 } = clientsAdapter.getSelectors(
     (state) => selectClientsData(state) ?? initialState
 );
-

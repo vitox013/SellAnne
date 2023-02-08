@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import NavDash from "../components/NavBar";
-import NavFooter from "../components/NavFooter";
 import { useState } from "react";
 import { useGetClientsQuery } from "../features/clients/clientsApiSlice";
 import useAuth from "../hooks/useAuth";
@@ -46,8 +45,6 @@ const Dashboard = () => {
             });
 
             userClients.sort((a, b) => a.nome.localeCompare(b.nome));
-
-            dispatch(setClientsData(userClients));
             setClientes(userClients);
         }
     }, [isSuccess, clients]);
@@ -81,7 +78,7 @@ const Dashboard = () => {
                         </Link>
                     </Col>
                     <Col>
-                        <Link to="">
+                        <Link to="/produtos">
                             <Card className="text-center text-dark hover-card bg-light shadow-sm fw-bold fs-5 py-3 ">
                                 Ver produtos
                             </Card>
@@ -105,6 +102,9 @@ const Dashboard = () => {
                     <Row>
                         <Col></Col>
                     </Row>
+                    <Link to="/teste" className="btn text-bg-dark">
+                        TESTE
+                    </Link>
                 </Card>
             </Container>
         </>

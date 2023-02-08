@@ -7,30 +7,25 @@ import { Outlet } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "./authSlice";
 import useAuth from "../../hooks/useAuth";
-
+import { setClientsData } from "../clients/clientsDataSlice";
 const Prefetch = () => {
-    // const dispatch = useDispatch();
-    // const { userId } = useAuth();
+    const dispatch = useDispatch();
+    const { userId } = useAuth();
 
     useEffect(() => {
         console.log("subscribing");
 
-        const clients = store.dispatch(
-            clientsApiSlice.endpoints.getClients.initiate()
+        store.dispatch(
+            clientsApiSlice.util.prefetch("getClients", userId, { force: true })
         );
-        const users = store.dispatch(
-            usersApiSlice.endpoints.getUsers.initiate()
+        store.dispatch(
+            usersApiSlice.util.prefetch("getUsers", userId, { force: true })
         );
-        const products = store.dispatch(
-            productsApiSlice.endpoints.getProducts.initiate()
+        store.dispatch(
+            productsApiSlice.util.prefetch("getProducts", userId, {
+                force: true,
+            })
         );
-
-        return () => {
-            console.log("unsubscribing");
-            clients.unsubscribe();
-            users.unsubscribe();
-            products.unsubscribe();
-        };
     }, []);
 
     return <Outlet />;
