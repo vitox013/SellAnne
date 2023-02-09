@@ -16,6 +16,7 @@ import useAuth from "../../hooks/useAuth";
 import CardPedido from "../../components/CardPedido";
 import { useGetPedidosQuery } from "../pedidos/pedidosApiSlice";
 import { useAddNewPedidoMutation } from "../pedidos/pedidosApiSlice";
+import { useUpdateProductMutation } from "../products/productsApiSlice";
 
 const DetalhesPedido = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
@@ -33,7 +34,7 @@ const DetalhesPedido = () => {
     const [productFound, setProductFound] = useState([]);
     const [list, setList] = useState([]);
     const [produtoId, setProdutoId] = useState("");
-    const [qtdPaga, setQtdPaga] = useState(0);
+    const [qtdPaga, setQtdPaga] = useState("");
     const [quantidade, setQuantidade] = useState(0);
     const [msg, setMsg] = useState([]);
 
@@ -64,6 +65,9 @@ const DetalhesPedido = () => {
 
     const [addNewPedido, { isSuccess: addIsSuccess }] =
         useAddNewPedidoMutation();
+
+    const [updateProduct, { isSuccess: updateIsSuccess }] =
+        useUpdateProductMutation();
 
     useEffect(() => {
         if (cliente && produtos) {
@@ -137,7 +141,6 @@ const DetalhesPedido = () => {
 
     useEffect(() => {
         if (addIsSuccess) {
-            setCodigo("");
             setProdutoId("");
             setQtdPaga("");
             setQuantidade("");
@@ -157,9 +160,42 @@ const DetalhesPedido = () => {
 
     const handleAddNewPedido = async (e) => {
         e.preventDefault();
-        console.log(clientId, produtoId, qtdPaga, quantidade);
 
-        await addNewPedido({ clientId, produtoId, quantidade, qtdPaga });
+        if (productFound.length > 0 && produtoId) {
+            const canSave =
+                productFound[0].estoque >= quantidade &&
+                qtdPaga <= quantidade &&
+                qtdPaga;
+
+            if (canSave) {
+                try {
+                    await addNewPedido({
+                        clientId,
+                        produtoId,
+                        quantidade,
+                        qtdPaga,
+                    });
+                    await updateProduct({
+                        vendedor: userId,
+                        id: produtoId,
+                        codigo: productFound[0].codigo,
+                        produto: productFound[0].produto,
+                        estoque: productFound[0].estoque - quantidade,
+                        preco: productFound[0].preco,
+                    });
+                    console.log(
+                        userId,
+                        produtoId,
+                        productFound[0].codigo,
+                        productFound[0].produto,
+                        productFound[0].estoque - quantidade,
+                        productFound[0].preco
+                    );
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+        }
     };
 
     return (
@@ -306,11 +342,33 @@ const DetalhesPedido = () => {
                                             type="number"
                                             required
                                             inputMode="numeric"
+                                            max={
+                                                productFound.length > 0
+                                                    ? productFound[0].estoque
+                                                    : ""
+                                            }
                                             value={quantidade}
                                             onChange={(e) =>
                                                 setQuantidade(e.target.value)
                                             }
+                                            className={
+                                                productFound.length > 0
+                                                    ? productFound[0].estoque >=
+                                                          quantidade &&
+                                                      quantidade > 0
+                                                        ? "is-valid"
+                                                        : "is-invalid"
+                                                    : ""
+                                            }
                                         />
+                                        <Form.Text>
+                                            {productFound.length > 0
+                                                ? productFound[0].estoque > 0
+                                                    ? productFound[0].estoque +
+                                                      " restantes"
+                                                    : "SEM ESTOQUE"
+                                                : ""}
+                                        </Form.Text>
                                     </Form.Group>
                                     <Form.Group
                                         className="mb-3"
@@ -339,10 +397,16 @@ const DetalhesPedido = () => {
                                         <Form.Control
                                             type="number"
                                             inputMode="numeric"
+                                            max={quantidade}
                                             required
                                             value={qtdPaga}
                                             onChange={(e) =>
                                                 setQtdPaga(e.target.value)
+                                            }
+                                            className={
+                                                qtdPaga <= quantidade && qtdPaga
+                                                    ? "is-valid"
+                                                    : "is-invalid"
                                             }
                                         />
                                     </Form.Group>

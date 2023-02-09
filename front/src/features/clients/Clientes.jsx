@@ -18,18 +18,6 @@ const Clientes = () => {
 
     const dispatch = useDispatch();
 
-    // const {
-    //     data: clients,
-    //     isLoading,
-    //     isSuccess,
-    //     isError,
-    //     error,
-    // } = useGetClientsQuery(userId, {
-    //     pollingInterval: 15000,
-    //     refetchOnMountOrArgChange: true,
-    //     refetchOnFocus: true,
-    //     refetchOnReconnect: true,
-    // });
     const { client } = useGetClientsQuery(userId, {
         selectFromResult: ({ data }) => ({
             client: data?.entities,

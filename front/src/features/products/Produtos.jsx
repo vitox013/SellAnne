@@ -14,8 +14,6 @@ import NavFooter from "../../components/NavFooter";
 import { useState } from "react";
 import { useGetProductsQuery } from "./productsApiSlice";
 import useAuth from "../../hooks/useAuth";
-import { useDispatch, useSelector } from "react-redux";
-import { setClientsData } from "../clients/clientsDataSlice";
 import CardProduct from "../../components/CardProduct";
 
 const Produtos = () => {
@@ -25,36 +23,23 @@ const Produtos = () => {
     const [conteudo, setConteudo] = useState([]);
     const [produtos, setProdutos] = useState([]);
 
-    const {
-        data: products,
-        isLoading,
-        isSuccess,
-        isError,
-        error,
-    } = useGetProductsQuery(userId, {
-        pollingInterval: 15000,
-        refetchOnMountOrArgChange: true,
-        refetchOnFocus: true,
-        refetchOnReconnect: true,
+    const { products } = useGetProductsQuery(userId, {
+        selectFromResult: ({ data }) => ({
+            products: data?.entities,
+        }),
     });
 
     let content;
 
-    if (isLoading) content = <p>Loading...</p>;
-
-    if (isError) {
-        content = <p className="errmsg">{error?.data?.message}</p>;
-    }
     useEffect(() => {
-        if (isSuccess) {
-            const { entities } = products;
-            var clientProducts = Object.keys(entities).map((key) => {
-                return entities[key];
+        if (products) {
+            var clientProducts = Object.keys(products).map((key) => {
+                return products[key];
             });
             clientProducts.sort((a, b) => a.codigo - b.codigo);
             setProdutos(clientProducts);
         }
-    }, [isSuccess, products]);
+    }, [products]);
 
     useEffect(() => {
         const timer = setTimeout(() => setTerm(debouncedTerm), 1000);

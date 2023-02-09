@@ -25,7 +25,6 @@ const NovoCliente = () => {
 
     const clients = useSelector(selectClientsData);
 
-
     useEffect(() => {
         setValidNome(USER_REGEX.test(nome));
         setDuplicatedName(clients.some((client) => client.nome === nome));
@@ -43,7 +42,7 @@ const NovoCliente = () => {
     const onTelefoneChange = (e) => setTelefone(e.target.value);
 
     const canSave = validNome && !isLoading && !duplicatedName;
-    const alertClass = !duplicatedName ? "" : "is-invalid"
+    const alertClass = !duplicatedName ? "" : "is-invalid";
 
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
