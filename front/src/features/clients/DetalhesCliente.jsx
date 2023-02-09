@@ -33,9 +33,9 @@ const DetalhesPedido = () => {
     const [productFound, setProductFound] = useState([]);
     const [list, setList] = useState([]);
     const [produtoId, setProdutoId] = useState("");
-    const [codigo, setCodigo] = useState("");
     const [qtdPaga, setQtdPaga] = useState(0);
     const [quantidade, setQuantidade] = useState(0);
+    const [msg, setMsg] = useState([]);
 
     const { id: clientId } = useParams();
 
@@ -52,11 +52,13 @@ const DetalhesPedido = () => {
             pedidos: data?.entities,
         }),
     });
+
     const { products: produtos } = useGetProductsQuery(userId, {
         selectFromResult: ({ data }) => ({
             products: data?.entities,
         }),
     });
+
     const [deleteClient, { isSuccess, error }] =
         useDeleteClientMutation(clientId);
 
@@ -64,31 +66,33 @@ const DetalhesPedido = () => {
         useAddNewPedidoMutation();
 
     useEffect(() => {
-        if (pedidos && cliente && produtos) {
+        if (cliente && produtos) {
             const products = Object.keys(produtos).map((key) => produtos[key]);
-            const orders = Object.keys(pedidos).map((key) => pedidos[key]);
-
             setProducts(products);
             setContent([]);
 
-            orders.map((ped) => {
-                products.map(function (prod) {
-                    if (prod._id == ped.produtoId) {
-                        setContent((oldArray) => [
-                            ...oldArray,
-                            <CardPedido
-                                key={ped._id}
-                                path={ped._id}
-                                produto={prod.produto}
-                                codigo={prod.codigo}
-                                quantidade={ped.quantidade}
-                                valor={formatter.format(prod.preco)}
-                                qtdPaga={ped.qtdPaga}
-                            />,
-                        ]);
-                    }
+            if (pedidos) {
+                const orders = Object.keys(pedidos).map((key) => pedidos[key]);
+
+                orders.map((ped) => {
+                    products.map(function (prod) {
+                        if (prod._id == ped.produtoId) {
+                            setContent((oldArray) => [
+                                ...oldArray,
+                                <CardPedido
+                                    key={ped._id}
+                                    path={ped._id}
+                                    produto={prod.produto}
+                                    codigo={prod.codigo}
+                                    quantidade={ped.quantidade}
+                                    valor={formatter.format(prod.preco)}
+                                    qtdPaga={ped.qtdPaga}
+                                />,
+                            ]);
+                        }
+                    });
                 });
-            });
+            }
         }
         if (cliente) {
             setClienteNome(cliente.nome);
@@ -116,7 +120,7 @@ const DetalhesPedido = () => {
         if (products) {
             setList(
                 products.map((prod) => (
-                    <option value={prod.codigo} key={prod.id}>
+                    <option value={prod.codigo} key={prod.codigo}>
                         {`${prod.produto} | ${formatter.format(prod.preco)}`}
                     </option>
                 ))
@@ -124,6 +128,10 @@ const DetalhesPedido = () => {
         }
         if (productFound.length > 0) {
             setProdutoId(productFound[0].id);
+        } else {
+            setMsg(
+                <h2 className="mt-5 text-center">Nenhum pedido cadastrado</h2>
+            );
         }
     }, [term, products, quantidade]);
 
@@ -203,7 +211,7 @@ const DetalhesPedido = () => {
                         <Col xs={4}>Situação</Col>
                     </Row>
                 </Card>
-                {content}
+                {pedidos ? [content] : [msg]}
                 <Navbar
                     className="text-black mb-3 mx-0 py-0 fluid"
                     fixed="bottom"
@@ -252,7 +260,7 @@ const DetalhesPedido = () => {
                                             list="listaProdutos"
                                         />
                                         <datalist id="listaProdutos">
-                                            {list.length && list}
+                                            {list.length > 0 && list}
                                         </datalist>
 
                                         <Form.Text>

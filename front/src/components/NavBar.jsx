@@ -44,7 +44,6 @@ function NavBar({ info, icon, fixed, path, page }) {
                     align="end"
                 >
                     <NavDropdown.Item>Meu perfil</NavDropdown.Item>
-                    <NavDropdown.Item>Resumo vendas</NavDropdown.Item>
                     <NavDropdown.Divider />
                     <NavDropdown.Item
                         className="d-flex align-items-center justify-content-between "
@@ -55,12 +54,18 @@ function NavBar({ info, icon, fixed, path, page }) {
                 </NavDropdown>
             </Nav>
         );
-    } else if (page == "clientes") {
+    } else if (page == "clientes" || page == "produtos") {
         conteudo = (
             <Nav className="d-flex align-items-center">
-                <Link to="/dashboard" className="text-black fw-bold">
-                    Dashboard
-                </Link>
+                {page == "clientes" ? (
+                    <Link to="/produtos" className="text-black fw-bold">
+                        Produtos
+                    </Link>
+                ) : (
+                    <Link to="/clientes" className="text-black ms-1 fw-bold">
+                        Clientes
+                    </Link>
+                )}
                 <NavDropdown
                     title={<i className={`${icon} text-black`}></i>}
                     id="basic-nav-dropdown"
@@ -68,7 +73,7 @@ function NavBar({ info, icon, fixed, path, page }) {
                     align="end"
                 >
                     <NavDropdown.Item>Meu perfil</NavDropdown.Item>
-                    <NavDropdown.Item>Resumo vendas</NavDropdown.Item>
+                    <NavDropdown.Item><Link to="/dashboard" className="text-dark">Dashboard</Link ></NavDropdown.Item>
                     <NavDropdown.Divider />
                     <NavDropdown.Item
                         className="d-flex align-items-center justify-content-between "
