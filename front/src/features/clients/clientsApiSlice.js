@@ -60,10 +60,10 @@ export const clientsApiSlice = apiSlice.injectEndpoints({
             ],
         }),
         deleteClient: builder.mutation({
-            query: ({ id }) => ({
+            query: ({ clientId }) => ({
                 url: `/client`,
                 method: "DELETE",
-                body: { id },
+                body: { clientId },
             }),
             invalidatesTags: (result, error, arg) => [
                 { type: "Client", id: arg.id },

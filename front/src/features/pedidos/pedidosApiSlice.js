@@ -8,10 +8,14 @@ const initialState = pedidosAdapter.getInitialState();
 export const pedidosApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         getPedidos: builder.query({
-            query: (args) => ({ url: `/getPedidos/${args}`, params: args }),
-            validateStatus: (response, result) => {
-                return response.status === 200 && !result.isError;
-            },
+            query: (args) => ({
+                url: `/getPedidos/${args}`,
+                params: args,
+                validateStatus: (response, result) => {
+                    return response.status === 200 && !result.isError;
+                },
+            }),
+
             transformResponse: (responseData) => {
                 const loadedPedidos = responseData.map((pedido) => {
                     pedido.id = pedido._id;
@@ -22,16 +26,58 @@ export const pedidosApiSlice = apiSlice.injectEndpoints({
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
                     return [
-                        { type: "Pedidos", id: "LIST" },
-                        ...result.ids.map((id) => ({ type: "Pedidos", id })),
+                        { type: "Pedido", id: "LIST" },
+                        ...result.ids.map((id) => ({ type: "Pedido", id })),
                     ];
-                } else return [{ type: "Pedidos", id: "LIST" }];
+                } else return [{ type: "Pedido", id: "LIST" }];
             },
+        }),
+        addNewPedido: builder.mutation({
+            query: (initialPedidoData) => ({
+                url: "/pedido",
+                method: "POST",
+                body: {
+                    ...initialPedidoData,
+                },
+            }),
+            invalidatesTags: [
+                {
+                    type: "Pedido",
+                    id: "LIST",
+                },
+            ],
+        }),
+        updatePedido: builder.mutation({
+            query: (initialPedidoData) => ({
+                url: "/pedido",
+                method: "PATCH",
+                body: {
+                    ...initialPedidoData,
+                },
+            }),
+            invalidatesTags: (result, error, arg) => [
+                { type: "Pedido", id: arg.id },
+            ],
+        }),
+        deletePedido: builder.mutation({
+            query: ({ id }) => ({
+                url: `/pedido`,
+                method: "DELETE",
+                body: { id },
+            }),
+            invalidatesTags: (result, error, arg) => [
+                { type: "Pedido", id: arg.id },
+            ],
         }),
     }),
 });
 
-export const { useGetPedidosQuery } = pedidosApiSlice;
+export const {
+    useGetPedidosQuery,
+    useAddNewPedidoMutation,
+    useDeletePedidoMutation,
+    useUpdatePedidoMutation,
+} = pedidosApiSlice;
 
 // returns the query result object
 export const selectPedidosResult =

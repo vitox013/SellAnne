@@ -31,7 +31,7 @@ app.use("/client", require("./routes/clientRoutes"));
 app.use("/getProducts", require("./routes/getProductsRoutes"));
 app.use("/products", require("./routes/productsRoutes"));
 app.use("/getPedidos", require("./routes/getPedidosRoutes"));
-app.use("/pedidos", require("./routes/pedidosRoutes"));
+app.use("/pedido", require("./routes/pedidosRoutes"));
 
 app.all("*", (req, res) => {
     res.status(404);

@@ -64,7 +64,7 @@ const Clientes = () => {
                               clientId={clientId.id}
                               userId={clientId.vendedorId}
                               clientName={clientId.nome}
-                              qtdPedido={clientId.pedidos.length}
+                              qtdPedido=""
                               path=""
                           />
                       ))
@@ -85,7 +85,6 @@ const Clientes = () => {
                                 clientId={clientId.id}
                                 userId={clientId.vendedorId}
                                 clientName={clientId.nome}
-                                qtdPedido={clientId.pedidos.length}
                                 path=""
                             />
                         ))

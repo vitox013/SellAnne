@@ -16,20 +16,16 @@ const Prefetch = () => {
         store.dispatch(
             clientsApiSlice.util.prefetch("getClients", userId, { force: true })
         );
-
-        store.dispatch(
-            usersApiSlice.util.prefetch("getUsers", userId, { force: true })
-        );
         store.dispatch(
             productsApiSlice.util.prefetch("getProducts", userId, {
                 force: true,
             })
         );
-        store.dispatch(
-            pedidosApiSlice.util.prefetch("getPedidos", userId, {
-                force: true,
-            })
-        );
+        // store.dispatch(
+        //     pedidosApiSlice.util.prefetch("getPedidos", userId, {
+        //         force: true,
+        //     })
+        // );
     }, []);
 
     return <Outlet />;

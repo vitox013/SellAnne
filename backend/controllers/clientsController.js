@@ -94,14 +94,14 @@ const updateClient = asyncHandler(async (req, res) => {
 // @route   DELETE /client
 // @acess Private
 const deleteClient = asyncHandler(async (req, res) => {
-    const { id } = req.body;
+    const { clientId } = req.body;
     console.log(req.body);
 
-    if (!id) {
-        return res.status(400).json({ message: "Necessário informar o id" });
+    if (!clientId) {
+        return res.status(400).json({ message: "Necessário informar o clientId" });
     }
 
-    const client = await Client.findById(id).exec();
+    const client = await Client.findById(clientId).exec();
 
     if (!client) {
         return res.status(400).json({ message: "Cliente não encontrado" });

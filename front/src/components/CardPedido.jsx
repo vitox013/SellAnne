@@ -2,9 +2,11 @@ import React from "react";
 import { Card, Col, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-const CardPedido = ({ path, produto, quantidade, valor, codigo, status }) => {
+const CardPedido = ({ path, produto, quantidade, valor, codigo, qtdPaga }) => {
     const statusClass =
-        status == "Não pago" ? "alert alert-danger" : "alert alert-success";
+        qtdPaga < quantidade ? "alert alert-danger" : "alert alert-success";
+
+    const status = qtdPaga < quantidade ? "Não pago" : "Pago";
 
     return (
         <Link to={path} className="text-decoration-none px-0 ">

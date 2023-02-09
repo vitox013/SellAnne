@@ -9,7 +9,7 @@ const Pedidos = require("../models/Pedidos");
 const getAllPedidos = asyncHandler(async (req, res) => {
     const clientId = req.params.id;
 
-    const pedidos = await Client.find({ clientId: clientId }).lean();
+    const pedidos = await Pedidos.find({ clientId: clientId }).lean();
 
     if (!pedidos?.length) {
         return res.status(400).json({ message: "Nenhum pedido encontrado" });
