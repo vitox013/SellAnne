@@ -9,7 +9,7 @@ import { useSelector } from "react-redux/es/exports";
 
 const USER_REGEX = /^[a-zA-Z\ 0-9]{3,20}$/;
 
-const NovoCliente = () => {
+const NovoProduto = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
         style: "currency",
         currency: "BRL",
@@ -21,7 +21,6 @@ const NovoCliente = () => {
     const { userId: vendedorId } = useAuth();
 
     const errRef = useRef();
-    const [validNome, setValidNome] = useState(false);
     const [codigo, setCodigo] = useState("");
     const [produto, setProduto] = useState("");
 
@@ -68,7 +67,7 @@ const NovoCliente = () => {
 
     return (
         <>
-            <Back path="/dashboard" />
+            <Back path="/produtos" />
             <Container>
                 <Row className="px-2 mt-md-5">
                     <Col className="mt-2 col-12 text-center">
@@ -98,12 +97,6 @@ const NovoCliente = () => {
                                     className="text-capitalize"
                                     required
                                 />
-
-                                {/* {duplicatedName && (
-                                    <Form.Text className="invalid-feedback">
-                                        Já existe um cliente com esse nome
-                                    </Form.Text>
-                                )} */}
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="codigo">
@@ -152,4 +145,4 @@ const NovoCliente = () => {
     );
 };
 
-export default NovoCliente;
+export default NovoProduto;

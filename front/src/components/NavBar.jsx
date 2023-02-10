@@ -73,7 +73,11 @@ function NavBar({ info, icon, fixed, path, page }) {
                     align="end"
                 >
                     <NavDropdown.Item>Meu perfil</NavDropdown.Item>
-                    <NavDropdown.Item><Link to="/dashboard" className="text-dark">Dashboard</Link ></NavDropdown.Item>
+                    <NavDropdown.Item>
+                        <Link to="/dashboard" className="text-dark">
+                            Dashboard
+                        </Link>
+                    </NavDropdown.Item>
                     <NavDropdown.Divider />
                     <NavDropdown.Item
                         className="d-flex align-items-center justify-content-between "

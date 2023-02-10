@@ -186,14 +186,6 @@ const DetalhesPedido = () => {
                         estoque: productFound[0].estoque - quantidade,
                         preco: productFound[0].preco,
                     });
-                    console.log(
-                        userId,
-                        produtoId,
-                        productFound[0].codigo,
-                        productFound[0].produto,
-                        productFound[0].estoque - quantidade,
-                        productFound[0].preco
-                    );
                 } catch (err) {
                     console.log(err);
                 }

@@ -68,7 +68,7 @@ const createNewProduct = asyncHandler(async (req, res) => {
 const updateProduct = asyncHandler(async (req, res) => {
     const { vendedor, id, codigo, produto, estoque, preco } = req.body;
 
-    if (!codigo || !produto || !preco) {
+    if (!codigo || !produto || !preco || !estoque) {
         return res.status(400).json({ message: "Preencha todos os campos" });
     }
 
@@ -86,7 +86,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     if (duplicate && duplicate?._id.toString() !== id) {
         return res
             .status(409)
-            .json({ message: "Existe um outro produto com esse codigo" });
+            .json({ message: "Existe um outro produto com esse código" });
     }
 
     products.codigo = codigo;
@@ -103,13 +103,15 @@ const updateProduct = asyncHandler(async (req, res) => {
 // @route   DELETE /products
 // @acess Private
 const deleteProduct = asyncHandler(async (req, res) => {
-    const { id } = req.body;
+    const { productId } = req.body;
 
-    if (!id) {
-        return res.status(400).json({ message: "Necessário informar o id" });
+    if (!productId) {
+        return res
+            .status(400)
+            .json({ message: "Necessário informar o productId" });
     }
 
-    const products = await Products.findById(id).exec();
+    const products = await Products.findById(productId).exec();
 
     if (!products) {
         return res.status(400).json({ message: "Produto não encontrado" });
