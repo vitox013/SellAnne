@@ -17,6 +17,7 @@ import CardPedido from "../../components/CardPedido";
 import { useGetPedidosQuery } from "../pedidos/pedidosApiSlice";
 import { useAddNewPedidoMutation } from "../pedidos/pedidosApiSlice";
 import { useUpdateProductMutation } from "../products/productsApiSlice";
+import { v4 as uuidv4 } from "uuid";
 
 const DetalhesPedido = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
@@ -134,7 +135,9 @@ const DetalhesPedido = () => {
             setProdutoId(productFound[0].id);
         } else {
             setMsg(
-                <h2 className="mt-5 text-center">Nenhum pedido cadastrado</h2>
+                <h2 key={uuidv4()} className="mt-5 text-center">
+                    Nenhum pedido cadastrado
+                </h2>
             );
         }
     }, [term, products, quantidade]);

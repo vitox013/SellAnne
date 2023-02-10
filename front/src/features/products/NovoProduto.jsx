@@ -15,7 +15,8 @@ const NovoCliente = () => {
         currency: "BRL",
     });
 
-    const [addProduct, { isSuccess, isLoading }] = useAddNewProductMutation();
+    const [addProduct, { isSuccess, isLoading, error }] =
+        useAddNewProductMutation();
     const navigate = useNavigate();
     const { userId: vendedorId } = useAuth();
 
@@ -28,11 +29,6 @@ const NovoCliente = () => {
     const [preco, setPreco] = useState("");
     const [errMsg, setErrMsg] = useState("");
 
-    // useEffect(() => {
-    //     setValidNome(USER_REGEX.test(nome));
-    //     // setDuplicatedName(clients.some((client) => client.nome === nome));
-    // }, [nome]);
-
     useEffect(() => {
         if (isSuccess) {
             setCodigo("");
@@ -41,7 +37,10 @@ const NovoCliente = () => {
             setPreco("");
             navigate("/produtos");
         }
-    }, [isSuccess, navigate]);
+        if (error) {
+            setErrMsg(error.data.message);
+        }
+    }, [isSuccess, navigate, error]);
 
     const onCodigoChange = (e) => setCodigo(e.target.value);
     const onProdutoChange = (e) => setProduto(e.target.value);
@@ -55,26 +54,13 @@ const NovoCliente = () => {
         e.preventDefault();
 
         if (canSave) {
-            try {
-                await addProduct({
-                    vendedorId,
-                    codigo,
-                    produto,
-                    estoque,
-                    preco,
-                });
-            } catch (err) {
-                if (!err.status) {
-                    setErrMsg("Sem resposta do servidor");
-                } else if (err.status === 409) {
-                    setErrMsg("Esse produto já existe");
-                } else if (err.status === 400) {
-                    setErrMsg("Preencha todos os campos");
-                } else {
-                    setErrMsg(err.data?.message);
-                }
-                errRef.current.focus();
-            }
+            await addProduct({
+                vendedorId,
+                codigo,
+                produto,
+                estoque,
+                preco,
+            });
         }
     };
 
@@ -89,7 +75,7 @@ const NovoCliente = () => {
                         <h2 className="fw-bold">Cadastre seu novo Produto</h2>
                     </Col>
                     <Col className="mt-5 col-md-5 mx-md-auto ">
-                        <Form onSubmit={onSaveUserClicked}>
+                        <Form onSubmit={onSaveUserClicked} className="fw-bold">
                             <p
                                 ref={errRef}
                                 className={errClass}
@@ -109,7 +95,7 @@ const NovoCliente = () => {
                                     type="text"
                                     value={produto}
                                     onChange={onProdutoChange}
-                                    className=""
+                                    className="text-capitalize"
                                     required
                                 />
 
@@ -122,6 +108,7 @@ const NovoCliente = () => {
 
                             <Form.Group className="mb-3" controlId="codigo">
                                 <Form.Label>Código</Form.Label>
+
                                 <Form.Control
                                     type="number"
                                     pattern="[0-9]{11}"
@@ -144,7 +131,6 @@ const NovoCliente = () => {
                                 <Form.Label>Preço</Form.Label>
                                 <Form.Control
                                     type="number"
-                                    pattern="[0-9]{11}"
                                     value={preco}
                                     onChange={onPrecoChange}
                                     required

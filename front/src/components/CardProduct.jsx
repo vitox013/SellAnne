@@ -9,8 +9,8 @@ const CardProduct = ({ vendedor, cod, nomeProduto, estoque, preco, path }) => {
                 <Row className="text-center">
                     <Col xs={2}>{cod}</Col>
                     <Col xs={4}>{nomeProduto}</Col>
-                    <Col xs={3}>{estoque}</Col>
-                    <Col xs={3}>{preco}</Col>
+                    <Col xs={2}>{estoque}</Col>
+                    <Col xs={4}>{preco}</Col>
                 </Row>
             </Card>
         </Link>

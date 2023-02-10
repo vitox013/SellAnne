@@ -19,6 +19,7 @@ import ProductsLayout from "./features/products/ProductsLayout";
 import Produtos from "./features/products/Produtos";
 import Teste from "./pages/Teste";
 import NovoProduto from "./features/products/NovoProduto";
+import DetalhesProduto from "./features/products/DetalhesProduto";
 
 function App() {
     const { userId } = useAuth();
@@ -60,6 +61,7 @@ function App() {
                                         element={<ProductsLayout />}
                                     >
                                         <Route index element={<Produtos />} />
+                                        <Route path=":id" element={<DetalhesProduto />} />
                                         <Route
                                             path="novoproduto"
                                             element={<NovoProduto />}

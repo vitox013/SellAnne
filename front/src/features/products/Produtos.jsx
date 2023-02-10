@@ -17,6 +17,10 @@ import useAuth from "../../hooks/useAuth";
 import CardProduct from "../../components/CardProduct";
 
 const Produtos = () => {
+    const formatter = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+    });
     const { currentUser, userId } = useAuth();
     const [term, setTerm] = useState("");
     const [debouncedTerm, setDebouncedTerm] = useState(term);
@@ -58,33 +62,35 @@ const Produtos = () => {
                               cod={produto.codigo}
                               vendedor={produto.vendedor}
                               estoque={produto.estoque}
-                              preco={produto.preco}
+                              preco={formatter.format(produto.preco)}
                           />
                       ))
                     : null
             );
         }
         if (term) {
-            const filteredProducts = produtos.filter((client) =>
-                client.nome.toLowerCase().includes(term.toLowerCase())
+            const filteredProducts = produtos.filter((prod) =>
+                prod.produto.toLowerCase().includes(term.toLowerCase())
             );
+
+            console.log(filteredProducts);
 
             if (filteredProducts) {
                 setConteudo(
                     filteredProducts?.length ? (
                         filteredProducts.map((produto) => (
-                            <CardClient
+                            <CardProduct
                                 key={produto.id}
-                                produto={produto.id}
-                                userId={produto.vendedorId}
-                                clientName={produto.nome}
-                                qtdPedido={produto.pedidos.length}
-                                path=""
+                                nomeProduto={produto.produto}
+                                cod={produto.codigo}
+                                estoque={produto.estoque}
+                                preco={formatter.format(produto.preco)}
+                                path={produto.id}
                             />
                         ))
                     ) : (
                         <p className="alert alert-danger">
-                            Nenhum cliente {term} encontrado!
+                            Nenhum produto {term} encontrado!
                         </p>
                     )
                 );
