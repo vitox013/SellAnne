@@ -5,17 +5,29 @@ import useAuth from "../../hooks/useAuth";
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAddNewClientMutation, useGetClientsQuery } from "./clientsApiSlice";
-import { useSelector } from "react-redux/es/exports";
-import { selectClientsData } from "./clientsDataSlice";
 
 const USER_REGEX = /^[A-z\ ]{3,20}$/;
 
 const NovoCliente = () => {
-    const [addNewClient, { isLoading, isSuccess }] = useAddNewClientMutation();
-
     const navigate = useNavigate();
-    const { userId } = useAuth();
-    const vendedorId = userId;
+    const { userId: vendedorId } = useAuth();
+    const [clientes, setClientes] = useState([]);
+
+    const [addNewClient, { isLoading, isSuccess, error }] =
+        useAddNewClientMutation();
+    const { clients } = useGetClientsQuery(vendedorId, {
+        selectFromResult: ({ data }) => ({
+            clients: data?.entities,
+        }),
+    });
+
+    useEffect(() => {
+        if (clients) {
+            let objClientes = Object.keys(clients).map((key) => clients[key]);
+            setClientes(objClientes);
+        }
+    }, [clients]);
+
     const errRef = useRef();
     const [nome, setNome] = useState("");
     const [validNome, setValidNome] = useState(false);
@@ -23,11 +35,9 @@ const NovoCliente = () => {
     const [errMsg, setErrMsg] = useState("");
     const [duplicatedName, setDuplicatedName] = useState(false);
 
-    const clients = useSelector(selectClientsData);
-
     useEffect(() => {
         setValidNome(USER_REGEX.test(nome));
-        setDuplicatedName(clients.some((client) => client.nome === nome));
+        setDuplicatedName(clientes.some((client) => client.nome === nome));
     }, [nome]);
 
     useEffect(() => {
@@ -35,8 +45,10 @@ const NovoCliente = () => {
             setNome("");
             setTelefone("");
             navigate("/clientes");
+        } else if (error) {
+            setErrMsg(error.data.message);
         }
-    }, [isSuccess, navigate]);
+    }, [isSuccess, navigate, error]);
 
     const onNomeChange = (e) => setNome(e.target.value);
     const onTelefoneChange = (e) => setTelefone(e.target.value);
@@ -48,20 +60,7 @@ const NovoCliente = () => {
         e.preventDefault();
 
         if (canSave) {
-            try {
-                await addNewClient({ vendedorId, nome, telefone });
-            } catch (err) {
-                if (!err.status) {
-                    setErrMsg("Sem resposta do servidor");
-                } else if (err.status === 400) {
-                    setErrMsg("Email ou senha incorretos");
-                } else if (err.status === 401) {
-                    setErrMsg("Email não cadastrado");
-                } else {
-                    setErrMsg(err.data?.message);
-                }
-                errRef.current.focus();
-            }
+            await addNewClient({ vendedorId, nome, telefone });
         }
     };
 
@@ -95,7 +94,7 @@ const NovoCliente = () => {
                                 <Form.Control
                                     type="text"
                                     onChange={onNomeChange}
-                                    className={alertClass}
+                                    className={`${alertClass} text-capitalize`}
                                 />
 
                                 {duplicatedName && (

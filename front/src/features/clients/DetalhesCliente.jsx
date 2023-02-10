@@ -55,24 +55,30 @@ const DetalhesPedido = () => {
         }),
     });
 
+    console.log(pedidos)
+
     const { products: produtos } = useGetProductsQuery(userId, {
         selectFromResult: ({ data }) => ({
             products: data?.entities,
         }),
     });
 
-    const [deleteClient, { isSuccess, error }] =
+    console.log(produtos)
+
+
+    const [deleteClient, { isSuccess: deleteIsSuccess, error: errorDelete }] =
         useDeleteClientMutation(clientId);
 
-    const [addNewPedido, { isSuccess: addIsSuccess }] =
+    const [addNewPedido, { isSuccess: addIsSuccess, error: errorNewPedido }] =
         useAddNewPedidoMutation();
 
-    const [updateProduct, { isSuccess: updateIsSuccess }] =
+    const [updateProduct, { isSuccess: updateIsSuccess, error: errorUpdate }] =
         useUpdateProductMutation();
 
     useEffect(() => {
         if (cliente && produtos) {
             const products = Object.keys(produtos).map((key) => produtos[key]);
+
             setProducts(products);
             setContent([]);
 
@@ -105,13 +111,21 @@ const DetalhesPedido = () => {
     }, [pedidos, cliente, produtos]);
 
     useEffect(() => {
-        if (isSuccess) {
+        if (deleteIsSuccess) {
             navigate("/clientes");
         }
-        if (error) {
+        if (errorDelete) {
             setErrMsg("Erro ao deletar cliente");
         }
-    }, [isSuccess, navigate, error]);
+    }, [
+        navigate,
+        addIsSuccess,
+        updateIsSuccess,
+        addIsSuccess,
+        errorDelete,
+        errorNewPedido,
+        errorUpdate,
+    ]);
 
     useEffect(() => {
         const timer = setTimeout(() => setTerm(debouncedTerm), 1000);

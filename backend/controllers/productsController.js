@@ -61,7 +61,7 @@ const createNewProduct = asyncHandler(async (req, res) => {
 const updateProduct = asyncHandler(async (req, res) => {
     const { vendedor, id, codigo, produto, estoque, preco } = req.body;
 
-    if (!codigo || !produto || !preco || !estoque) {
+    if (!codigo || !produto || !preco) {
         return res.status(400).json({ message: "Preencha todos os campos" });
     }
 

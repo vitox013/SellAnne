@@ -75,6 +75,7 @@ const DetalhesProduto = () => {
     const onDeleteUserClicked = async (e) => {
         e.preventDefault();
         await deleteProduto({ productId });
+        
     };
 
     const onSaveUserClicked = async (e) => {
