@@ -53,27 +53,29 @@ const Produtos = () => {
     useEffect(() => {
         if (term == "") {
             setConteudo(
-                produtos?.length
-                    ? produtos.map((produto) => (
-                          <CardProduct
-                              key={produto._id}
-                              path={produto._id}
-                              nomeProduto={produto.produto}
-                              cod={produto.codigo}
-                              vendedor={produto.vendedor}
-                              estoque={produto.estoque}
-                              preco={formatter.format(produto.preco)}
-                          />
-                      ))
-                    : null
+                produtos?.length ? (
+                    produtos.map((produto) => (
+                        <CardProduct
+                            key={produto._id}
+                            path={produto._id}
+                            nomeProduto={produto.produto}
+                            cod={produto.codigo}
+                            vendedor={produto.vendedor}
+                            estoque={produto.estoque}
+                            preco={formatter.format(produto.preco)}
+                        />
+                    ))
+                ) : (
+                    <p className="alert alert-danger text-center">
+                        Nenhum produto cadastrado!
+                    </p>
+                )
             );
         }
         if (term) {
             const filteredProducts = produtos.filter((prod) =>
                 prod.produto.toLowerCase().includes(term.toLowerCase())
             );
-
-            console.log(filteredProducts);
 
             if (filteredProducts) {
                 setConteudo(
@@ -89,7 +91,7 @@ const Produtos = () => {
                             />
                         ))
                     ) : (
-                        <p className="alert alert-danger">
+                        <p className="alert alert-danger text-center">
                             Nenhum produto {term} encontrado!
                         </p>
                     )
@@ -115,11 +117,11 @@ const Produtos = () => {
                 <h1 className="mt-2 pt-10">Olá, {currentUser}!</h1>
                 <Row>
                     <Form className="d-flex mt-4 align-items-center">
-                        <h2 className="col-5">Produtos</h2>
+                        <h2 className="col-5 col-md-7">Produtos</h2>
                         <Form.Control
                             size="sm"
                             type="search"
-                            placeholder="Procurar"
+                            placeholder="Procurar produto"
                             className="me-2 h-75 w-50"
                             aria-label="Search"
                             value={debouncedTerm}

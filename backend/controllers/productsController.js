@@ -7,18 +7,9 @@ const asyncHandler = require("express-async-handler");
 const getAllProducts = asyncHandler(async (req, res) => {
     const vendedorId = req.params.id;
 
-    if (vendedorId !== "undefined") {
-        const products = await Products.find({ vendedor: vendedorId }).lean();
+    const products = await Products.find({ vendedor: vendedorId }).lean();
 
-        if (!products?.length) {
-            return res
-                .status(400)
-                .json({ message: "Nenhum produto encontrado" });
-        }
-        res.json(products);
-    } else {
-        return [];
-    }
+    res.json(products);
 });
 
 // @desc    Create new products
@@ -39,7 +30,9 @@ const createNewProduct = asyncHandler(async (req, res) => {
         .lean()
         .exec();
     if (duplicate) {
-        return res.status(409).json({ message: "Esse produto já existe" });
+        return res
+            .status(409)
+            .json({ message: "Já existe um produto com esse código" });
     }
 
     const productsObject = {

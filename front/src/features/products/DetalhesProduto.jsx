@@ -23,7 +23,6 @@ const DetalhesProduto = () => {
     const errRef = useRef();
     const { id: productId } = useParams();
     const { userId } = useAuth();
-    const [content, setContent] = useState([]);
     const [codigo, setCodigo] = useState("");
     const [estoque, setEstoque] = useState("");
     const [produto, setProduto] = useState("");

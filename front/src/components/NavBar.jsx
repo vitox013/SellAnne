@@ -43,7 +43,12 @@ function NavBar({ info, icon, fixed, path, page }) {
                     drop="down"
                     align="end"
                 >
-                    <NavDropdown.Item>Meu perfil</NavDropdown.Item>
+                    <Link
+                        to=""
+                        className="text-dark btn w-100 d-flex hover-card"
+                    >
+                        Meu perfil
+                    </Link>
                     <NavDropdown.Divider />
                     <NavDropdown.Item
                         className="d-flex align-items-center justify-content-between "
@@ -58,11 +63,14 @@ function NavBar({ info, icon, fixed, path, page }) {
         conteudo = (
             <Nav className="d-flex align-items-center">
                 {page == "clientes" ? (
-                    <Link to="/produtos" className="text-black fw-bold">
+                    <Link to="/produtos" className="text-black fw-bold fs-5">
                         Produtos
                     </Link>
                 ) : (
-                    <Link to="/clientes" className="text-black ms-1 fw-bold">
+                    <Link
+                        to="/clientes"
+                        className="text-black ms-1 fw-bold fs-5"
+                    >
                         Clientes
                     </Link>
                 )}
@@ -72,12 +80,20 @@ function NavBar({ info, icon, fixed, path, page }) {
                     drop="down"
                     align="end"
                 >
-                    <NavDropdown.Item>Meu perfil</NavDropdown.Item>
-                    <NavDropdown.Item>
-                        <Link to="/dashboard" className="text-dark">
-                            Dashboard
-                        </Link>
-                    </NavDropdown.Item>
+                    <Link
+                        to=""
+                        className="text-dark btn w-100 d-flex hover-card"
+                    >
+                        Meu perfil
+                    </Link>
+
+                    <Link
+                        to="/dashboard"
+                        className="text-dark btn w-100 d-flex hover-card"
+                    >
+                        Dashboard
+                    </Link>
+
                     <NavDropdown.Divider />
                     <NavDropdown.Item
                         className="d-flex align-items-center justify-content-between "
