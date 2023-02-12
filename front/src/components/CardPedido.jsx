@@ -18,9 +18,9 @@ const CardPedido = ({ path, produto, quantidade, valor, codigo, qtdPaga }) => {
                         <span className="fw-bold">{produto}</span>
                         <small>cod: {codigo}</small>
                     </Col>
-                    <Col xs={1}>{quantidade}</Col>
-                    <Col xs={4}>{valor}</Col>
-                    <Col xs={3}>{status}</Col>
+                    <Col xs={2}>{quantidade}</Col>
+                    <Col xs={4} className="px-0">{valor}</Col>
+                    <Col xs={2} className="px-0">{status}</Col>
                 </Row>
             </Card>
         </Link>

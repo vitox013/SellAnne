@@ -5,6 +5,10 @@ import useAuth from "../../hooks/useAuth";
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAddNewClientMutation, useGetClientsQuery } from "./clientsApiSlice";
+import {
+    useUpdateUserMutation,
+    useGetUserDataQuery,
+} from "../users/userApiSlice";
 
 const USER_REGEX = /^[A-z\ ]{3,20}$/;
 
@@ -14,17 +18,17 @@ const NovoCliente = () => {
     const [clientes, setClientes] = useState([]);
 
     const [addNewClient, { isLoading, isSuccess, error }] =
-        useAddNewClientMutation();
-    const { clients } = useGetClientsQuery(vendedorId, {
+        useUpdateUserMutation();
+
+    const { clients } = useGetUserDataQuery(vendedorId, {
         selectFromResult: ({ data }) => ({
-            clients: data?.entities,
+            clients: data?.clients,
         }),
     });
 
     useEffect(() => {
         if (clients) {
-            let objClientes = Object.keys(clients).map((key) => clients[key]);
-            setClientes(objClientes);
+            setClientes(clients);
         }
     }, [clients]);
 
@@ -60,7 +64,10 @@ const NovoCliente = () => {
         e.preventDefault();
 
         if (canSave) {
-            await addNewClient({ vendedorId, nome, telefone });
+            await addNewClient({
+                userId: vendedorId,
+                cliente: { clientName: nome, telefone },
+            });
         }
     };
 

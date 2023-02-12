@@ -18,6 +18,7 @@ import { useGetPedidosQuery } from "../pedidos/pedidosApiSlice";
 import { useAddNewPedidoMutation } from "../pedidos/pedidosApiSlice";
 import { useUpdateProductMutation } from "../products/productsApiSlice";
 import { v4 as uuidv4 } from "uuid";
+import { useGetUserDataQuery } from "../users/userApiSlice";
 
 const DetalhesPedido = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
@@ -31,6 +32,8 @@ const DetalhesPedido = () => {
     const [clienteNome, setClienteNome] = useState("");
     const [term, setTerm] = useState("");
     const [debouncedTerm, setDebouncedTerm] = useState(term);
+    const [pedidos, setPedidos] = useState([]);
+    const [cliente, setCliente] = useState({});
     const [products, setProducts] = useState([]);
     const [productFound, setProductFound] = useState([]);
     const [list, setList] = useState([]);
@@ -44,27 +47,13 @@ const DetalhesPedido = () => {
     const { userId } = useAuth();
     const navigate = useNavigate();
 
-    const { client: cliente } = useGetClientsQuery(userId, {
+    const { clients } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
-            client: data?.entities[clientId],
-        }),
-    });
-    const { pedidos } = useGetPedidosQuery(clientId, {
-        selectFromResult: ({ data }) => ({
-            pedidos: data?.entities,
+            clients: data?.clients,
         }),
     });
 
-    console.log(pedidos)
-
-    const { products: produtos } = useGetProductsQuery(userId, {
-        selectFromResult: ({ data }) => ({
-            products: data?.entities,
-        }),
-    });
-
-    console.log(produtos)
-
+    // console.log(clients);
 
     const [deleteClient, { isSuccess: deleteIsSuccess, error: errorDelete }] =
         useDeleteClientMutation(clientId);
@@ -76,39 +65,40 @@ const DetalhesPedido = () => {
         useUpdateProductMutation();
 
     useEffect(() => {
-        if (cliente && produtos) {
-            const products = Object.keys(produtos).map((key) => produtos[key]);
+        if (clients) {
+            setCliente(clients.find((client) => client._id === clientId));
+        }
 
+        // console.log(cliente);
+
+        if (cliente) {
+            setPedidos(cliente.pedidos);
             setProducts(products);
-            setContent([]);
+            // setContent([]);
 
             if (pedidos) {
-                const orders = Object.keys(pedidos).map((key) => pedidos[key]);
+                // console.log(pedidos);
 
-                orders.map((ped) => {
-                    products.map(function (prod) {
-                        if (prod._id == ped.produtoId) {
-                            setContent((oldArray) => [
-                                ...oldArray,
-                                <CardPedido
-                                    key={ped._id}
-                                    path={ped._id}
-                                    produto={prod.produto}
-                                    codigo={prod.codigo}
-                                    quantidade={ped.quantidade}
-                                    valor={formatter.format(prod.preco)}
-                                    qtdPaga={ped.qtdPaga}
-                                />,
-                            ]);
-                        }
-                    });
-                });
+                setContent(
+                    pedidos.map((ped) => 
+                        (<CardPedido
+                            key={ped._id}
+                            path={ped._id}
+                            produto={ped.nomeProduto}
+                            codigo={ped.codigoProduto}
+                            quantidade={ped.quantidade}
+                            valor={formatter.format(ped.valor)}
+                            qtdPaga={ped.qtdPaga}
+                        />)
+                    )
+                );
+                console.log(content)
             }
         }
         if (cliente) {
-            setClienteNome(cliente.nome);
+            setClienteNome(cliente.clientName);
         }
-    }, [pedidos, cliente, produtos]);
+    }, [clients, cliente, pedidos]);
 
     useEffect(() => {
         if (deleteIsSuccess) {

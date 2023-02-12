@@ -25,13 +25,8 @@ app.use("/", express.static(path.join(__dirname, "public")));
 app.use("/", require("./routes/root"));
 app.use("/auth", require("./routes/authRoutes"));
 app.use("/new", require("./routes/newUserRoute"));
-app.use("/users", require("./routes/usersRoutes"));
-app.use("/getClients", require("./routes/getClientsRoutes"));
-app.use("/client", require("./routes/clientRoutes"));
-app.use("/getProducts", require("./routes/getProductsRoutes"));
-app.use("/products", require("./routes/productsRoutes"));
-app.use("/getPedidos", require("./routes/getPedidosRoutes"));
-app.use("/pedido", require("./routes/pedidosRoutes"));
+app.use("/user", require("./routes/userRoutes"));
+app.use("/getUserData", require("./routes/getUserData"));
 
 app.all("*", (req, res) => {
     res.status(404);

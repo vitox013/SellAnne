@@ -1,24 +1,26 @@
 import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
 
-const usersAdapter = createEntityAdapter({});
+const userAdapter = createEntityAdapter({});
 
-const initialState = usersAdapter.getInitialState();
+const initialState = userAdapter.getInitialState();
 
-export const usersApiSlice = apiSlice.injectEndpoints({
+export const userApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        getUsers: builder.query({
-            query: () => "/users",
+        getUserData: builder.query({
+            query: (args) => `/getUserData/${args}`,
             validateStatus: (response, result) => {
                 return response.status === 200 && !result.isError;
             },
-            transformResponse: (responseData) => {
-                const loadedUsers = responseData.map((user) => {
-                    user.id = user._id;
-                    return user;
-                });
-                return usersAdapter.setAll(initialState, loadedUsers);
-            },
+            // transformResponse: (responseData) => {
+            //     const loadedUser = responseData.clients.map((user) => {
+            //         user.id = user._id;
+            //         return user;
+            //     });
+            //     console.log(loadedUser);
+                 
+            //     return userAdapter.setAll(initialState, loadedUser);
+            // },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
                     return [
@@ -30,7 +32,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         }),
         updateUser: builder.mutation({
             query: (initialUserData) => ({
-                url: "/users",
+                url: "/user",
                 method: "PATCH",
                 body: {
                     ...initialUserData,
@@ -42,7 +44,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         }),
         deleteUser: builder.mutation({
             query: ({ id }) => ({
-                url: `/users`,
+                url: `/user`,
                 method: "DELETE",
                 body: { id },
             }),
@@ -54,26 +56,24 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 });
 
 export const {
-    useGetUsersQuery,
+    useGetUserDataQuery,
     useUpdateUserMutation,
     useDeleteUserMutation,
-} = usersApiSlice;
+} = userApiSlice;
 
 // returns the query result object
-export const selectUsersResult = usersApiSlice.endpoints.getUsers.select();
+export const selectUserResult = userApiSlice.endpoints.getUserData.select();
 
 // creates memoized selector
-const selectUsersData = createSelector(
-    selectUsersResult,
-    (usersResult) => usersResult.data // normalized state object with ids & entities
+const selectUserData = createSelector(
+    selectUserResult,
+    (userResult) => userResult.data // normalized state object with ids & entities
 );
 
 //getSelectors creates these selectors and we rename them with aliases using destructuring
 export const {
-    selectAll: selectAllUsers,
+    selectAll: selectAllUser,
     selectById: selectUserById,
     selectIds: selectUserIds,
-    // Pass in a selector that returns the users slice of state
-} = usersAdapter.getSelectors(
-    (state) => selectUsersData(state) ?? initialState
-);
+    // Pass in a selector that returns the user slice of state
+} = userAdapter.getSelectors((state) => selectUserData(state) ?? initialState);

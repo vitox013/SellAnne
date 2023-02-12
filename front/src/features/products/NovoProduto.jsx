@@ -17,6 +17,7 @@ const NovoProduto = () => {
 
     const [addProduct, { isSuccess, isLoading, error }] =
         useAddNewProductMutation();
+        
     const navigate = useNavigate();
     const { userId: vendedorId } = useAuth();
 

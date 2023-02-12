@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useGetProductsQuery } from "./productsApiSlice";
 import useAuth from "../../hooks/useAuth";
 import CardProduct from "../../components/CardProduct";
+import { useGetUserDataQuery } from "../users/userApiSlice";
 
 const Produtos = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
@@ -27,9 +28,9 @@ const Produtos = () => {
     const [conteudo, setConteudo] = useState([]);
     const [produtos, setProdutos] = useState([]);
 
-    const { products } = useGetProductsQuery(userId, {
+    const { products } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
-            products: data?.entities,
+            products: data?.produtos,
         }),
     });
 
@@ -37,11 +38,9 @@ const Produtos = () => {
 
     useEffect(() => {
         if (products) {
-            var clientProducts = Object.keys(products).map((key) => {
-                return products[key];
-            });
-            clientProducts.sort((a, b) => a.codigo - b.codigo);
-            setProdutos(clientProducts);
+            
+            const prodSorted = products.sort((a, b) => a.code - b.code);
+            setProdutos(prodSorted);
         }
     }, [products]);
 
@@ -58,8 +57,8 @@ const Produtos = () => {
                         <CardProduct
                             key={produto._id}
                             path={produto._id}
-                            nomeProduto={produto.produto}
-                            cod={produto.codigo}
+                            nomeProduto={produto.productName}
+                            cod={produto.code}
                             vendedor={produto.vendedor}
                             estoque={produto.estoque}
                             preco={formatter.format(produto.preco)}
@@ -74,7 +73,7 @@ const Produtos = () => {
         }
         if (term) {
             const filteredProducts = produtos.filter((prod) =>
-                prod.produto.toLowerCase().includes(term.toLowerCase())
+                prod.productName.toLowerCase().includes(term.toLowerCase())
             );
 
             if (filteredProducts) {
@@ -83,11 +82,11 @@ const Produtos = () => {
                         filteredProducts.map((produto) => (
                             <CardProduct
                                 key={produto.id}
-                                nomeProduto={produto.produto}
-                                cod={produto.codigo}
+                                nomeProduto={produto.productName}
+                                cod={produto.code}
                                 estoque={produto.estoque}
                                 preco={formatter.format(produto.preco)}
-                                path={produto.id}
+                                path={produto._id}
                             />
                         ))
                     ) : (

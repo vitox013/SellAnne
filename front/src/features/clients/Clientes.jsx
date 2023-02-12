@@ -8,6 +8,7 @@ import { useGetClientsQuery } from "./clientsApiSlice";
 import useAuth from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { setClientsData } from "./clientsDataSlice";
+import { useGetUserDataQuery } from "../users/userApiSlice";
 
 const Clientes = () => {
     const { currentUser, userId, username } = useAuth();
@@ -18,24 +19,24 @@ const Clientes = () => {
 
     const dispatch = useDispatch();
 
-    const { client } = useGetClientsQuery(userId, {
+    const { clients } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
-            client: data?.entities,
+            clients: data?.clients
         }),
     });
+
+    console.log(clients);
 
     let content;
 
     useEffect(() => {
-        if (client) {
-            var userClients = Object.keys(client).map((key) => {
-                return client[key];
-            });
-            userClients.sort((a, b) => a.nome.localeCompare(b.nome));
-            dispatch(setClientsData(userClients));
-            setClientes(userClients);
+        if (clients) {
+            
+            // clients.sort((a, b) => a.nome -(b.nome));
+            dispatch(setClientsData(clients));
+            setClientes(clients);
         }
-    }, [client]);
+    }, [clients]);
 
     useEffect(() => {
         const timer = setTimeout(() => setTerm(debouncedTerm), 1000);
@@ -48,12 +49,12 @@ const Clientes = () => {
                 clientes?.length
                     ? clientes.map((clientId) => (
                           <CardClient
-                              key={clientId.id}
-                              clientId={clientId.id}
-                              userId={clientId.vendedorId}
-                              clientName={clientId.nome}
-                              qtdPedido=""
-                              path=""
+                              key={clientId._id}
+                              clientId={clientId._id}
+                              
+                              clientName={clientId.clientName}
+                              qtdPedido={clientId.pedidos.length}
+                              path={clientId._id}
                           />
                       ))
                     : null
@@ -61,7 +62,7 @@ const Clientes = () => {
         }
         if (term) {
             const filteredClients = clientes.filter((client) =>
-                client.nome.toLowerCase().includes(term.toLowerCase())
+                client.clientName.toLowerCase().includes(term.toLowerCase())
             );
 
             if (filteredClients) {
@@ -71,9 +72,8 @@ const Clientes = () => {
                             <CardClient
                                 key={clientId.id}
                                 clientId={clientId.id}
-                                userId={clientId.vendedorId}
-                                clientName={clientId.nome}
-                                path=""
+                                clientName={clientId.clientName}
+                                path={clientId._id}
                             />
                         ))
                     ) : (
