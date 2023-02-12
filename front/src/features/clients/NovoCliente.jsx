@@ -4,7 +4,6 @@ import Back from "../../components/Back";
 import useAuth from "../../hooks/useAuth";
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAddNewClientMutation, useGetClientsQuery } from "./clientsApiSlice";
 import {
     useUpdateUserMutation,
     useGetUserDataQuery,

@@ -12,7 +12,6 @@ import CardClient from "../../components/CardClient";
 import NavDash from "../../components/NavBar";
 import NavFooter from "../../components/NavFooter";
 import { useState } from "react";
-import { useGetProductsQuery } from "./productsApiSlice";
 import useAuth from "../../hooks/useAuth";
 import CardProduct from "../../components/CardProduct";
 import { useGetUserDataQuery } from "../users/userApiSlice";
@@ -33,8 +32,6 @@ const Produtos = () => {
             products: data?.produtos,
         }),
     });
-
-    let content;
 
     useEffect(() => {
         if (products) {

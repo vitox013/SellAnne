@@ -17,7 +17,6 @@ import ClientesLayout from "./features/clients/ClientesLayout";
 import Clientes from "./features/clients/Clientes";
 import ProductsLayout from "./features/products/ProductsLayout";
 import Produtos from "./features/products/Produtos";
-import Teste from "./pages/Teste";
 import NovoProduto from "./features/products/NovoProduto";
 import DetalhesProduto from "./features/products/DetalhesProduto";
 
@@ -41,7 +40,6 @@ function App() {
                                     >
                                         <Route index element={<Dashboard />} />
                                     </Route>
-                                    <Route path="teste" element={<Teste />} />
                                     <Route
                                         path="clientes"
                                         element={<ClientesLayout />}
@@ -61,7 +59,10 @@ function App() {
                                         element={<ProductsLayout />}
                                     >
                                         <Route index element={<Produtos />} />
-                                        <Route path=":id" element={<DetalhesProduto />} />
+                                        <Route
+                                            path=":id"
+                                            element={<DetalhesProduto />}
+                                        />
                                         <Route
                                             path="novoproduto"
                                             element={<NovoProduto />}

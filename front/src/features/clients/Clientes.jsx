@@ -4,10 +4,8 @@ import CardClient from "../../components/CardClient";
 import NavDash from "../../components/NavBar";
 import NavFooter from "../../components/NavFooter";
 import { useState } from "react";
-import { useGetClientsQuery } from "./clientsApiSlice";
 import useAuth from "../../hooks/useAuth";
-import { useDispatch, useSelector } from "react-redux";
-import { setClientsData } from "./clientsDataSlice";
+import { useDispatch } from "react-redux";
 import { useGetUserDataQuery } from "../users/userApiSlice";
 
 const Clientes = () => {
@@ -21,7 +19,7 @@ const Clientes = () => {
 
     const { clients } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
-            clients: data?.clients
+            clients: data?.clients,
         }),
     });
 
@@ -31,9 +29,7 @@ const Clientes = () => {
 
     useEffect(() => {
         if (clients) {
-            
             // clients.sort((a, b) => a.nome -(b.nome));
-            dispatch(setClientsData(clients));
             setClientes(clients);
         }
     }, [clients]);
@@ -51,7 +47,6 @@ const Clientes = () => {
                           <CardClient
                               key={clientId._id}
                               clientId={clientId._id}
-                              
                               clientName={clientId.clientName}
                               qtdPedido={clientId.pedidos.length}
                               path={clientId._id}

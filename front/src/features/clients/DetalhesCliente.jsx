@@ -13,8 +13,6 @@ import {
 
 import useAuth from "../../hooks/useAuth";
 import CardPedido from "../../components/CardPedido";
-
-import { useUpdateProductMutation } from "../products/productsApiSlice";
 import { v4 as uuidv4 } from "uuid";
 import {
     useGetUserDataQuery,
