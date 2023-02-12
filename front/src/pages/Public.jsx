@@ -13,7 +13,7 @@ const Public = () => {
             <NavDash info="login" page="public" icon={"bx bx-log-in fs-3"} />
             <Container>
                 <Row className="text text-center fw-semibold mt-5 h2 gerencie mx-3">
-                    <p>Gerencia suas vendas online.</p>
+                    <p>Gerencie suas vendas online.</p>
                 </Row>
                 <Row className="text-center just fs-5 mt-3 mx-3">
                     <p>Tenha mais controle e eficiência no seu negócio.</p>

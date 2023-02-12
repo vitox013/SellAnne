@@ -10,15 +10,17 @@ import {
     Col,
     Form,
 } from "react-bootstrap";
-import { useDeleteClientMutation, useGetClientsQuery } from "./clientsApiSlice";
-import { useGetProductsQuery } from "../products/productsApiSlice";
+
 import useAuth from "../../hooks/useAuth";
 import CardPedido from "../../components/CardPedido";
-import { useGetPedidosQuery } from "../pedidos/pedidosApiSlice";
-import { useAddNewPedidoMutation } from "../pedidos/pedidosApiSlice";
+
 import { useUpdateProductMutation } from "../products/productsApiSlice";
 import { v4 as uuidv4 } from "uuid";
-import { useGetUserDataQuery } from "../users/userApiSlice";
+import {
+    useGetUserDataQuery,
+    useUpdateUserMutation,
+    useDeleteUserMutation,
+} from "../users/userApiSlice";
 
 const DetalhesPedido = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
@@ -34,12 +36,11 @@ const DetalhesPedido = () => {
     const [debouncedTerm, setDebouncedTerm] = useState(term);
     const [pedidos, setPedidos] = useState([]);
     const [cliente, setCliente] = useState({});
-    const [products, setProducts] = useState([]);
     const [productFound, setProductFound] = useState([]);
     const [list, setList] = useState([]);
     const [produtoId, setProdutoId] = useState("");
     const [qtdPaga, setQtdPaga] = useState("");
-    const [quantidade, setQuantidade] = useState(0);
+    const [quantidade, setQuantidade] = useState("");
     const [msg, setMsg] = useState([]);
 
     const { id: clientId } = useParams();
@@ -47,41 +48,36 @@ const DetalhesPedido = () => {
     const { userId } = useAuth();
     const navigate = useNavigate();
 
-    const { clients } = useGetUserDataQuery(userId, {
+    const { clients, products } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
             clients: data?.clients,
+            products: data?.produtos,
         }),
     });
 
-    // console.log(clients);
+    // console.log(products);
 
     const [deleteClient, { isSuccess: deleteIsSuccess, error: errorDelete }] =
-        useDeleteClientMutation(clientId);
+        useDeleteUserMutation(clientId);
 
     const [addNewPedido, { isSuccess: addIsSuccess, error: errorNewPedido }] =
-        useAddNewPedidoMutation();
+        useUpdateUserMutation();
 
     const [updateProduct, { isSuccess: updateIsSuccess, error: errorUpdate }] =
-        useUpdateProductMutation();
+        useUpdateUserMutation();
 
     useEffect(() => {
         if (clients) {
             setCliente(clients.find((client) => client._id === clientId));
         }
 
-        // console.log(cliente);
-
         if (cliente) {
             setPedidos(cliente.pedidos);
-            setProducts(products);
-            // setContent([]);
 
             if (pedidos) {
-                // console.log(pedidos);
-
                 setContent(
-                    pedidos.map((ped) => 
-                        (<CardPedido
+                    pedidos.map((ped) => (
+                        <CardPedido
                             key={ped._id}
                             path={ped._id}
                             produto={ped.nomeProduto}
@@ -89,10 +85,9 @@ const DetalhesPedido = () => {
                             quantidade={ped.quantidade}
                             valor={formatter.format(ped.valor)}
                             qtdPaga={ped.qtdPaga}
-                        />)
-                    )
+                        />
+                    ))
                 );
-                console.log(content)
             }
         }
         if (cliente) {
@@ -115,6 +110,7 @@ const DetalhesPedido = () => {
         errorDelete,
         errorNewPedido,
         errorUpdate,
+        deleteIsSuccess,
     ]);
 
     useEffect(() => {
@@ -124,26 +120,28 @@ const DetalhesPedido = () => {
 
     useEffect(() => {
         if (term && products) {
-            setProductFound(products.filter((prod) => prod.codigo == term));
+            setProductFound(products.filter((prod) => prod.code == term));
         }
         if (products) {
             setList(
                 products.map((prod) => (
-                    <option value={prod.codigo} key={prod.codigo}>
-                        {`${prod.produto} | ${formatter.format(prod.preco)}`}
+                    <option value={prod.code} key={prod.code}>
+                        {`${prod.productName} | ${formatter.format(
+                            prod.preco
+                        )}`}
                     </option>
                 ))
             );
         }
         if (productFound.length > 0) {
-            setProdutoId(productFound[0].id);
-        } else {
-            setMsg(
-                <h2 key={uuidv4()} className="mt-5 text-center">
-                    Nenhum pedido cadastrado
-                </h2>
-            );
+            setProdutoId(productFound[0]._id);
         }
+
+        setMsg(
+            <h2 key={uuidv4()} className="mt-5 text-center">
+                Nenhum pedido cadastrado
+            </h2>
+        );
     }, [term, products, quantidade]);
 
     useEffect(() => {
@@ -151,7 +149,9 @@ const DetalhesPedido = () => {
             setProdutoId("");
             setQtdPaga("");
             setQuantidade("");
+            setDebouncedTerm("");
             setShowPedido(false);
+            setProductFound([]);
         }
     }, [addIsSuccess]);
 
@@ -162,7 +162,11 @@ const DetalhesPedido = () => {
 
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
-        await deleteClient({ clientId });
+        await deleteClient({
+            cliente: {
+                _id: clientId,
+            },
+        });
     };
 
     const handleAddNewPedido = async (e) => {
@@ -172,27 +176,31 @@ const DetalhesPedido = () => {
             const canSave =
                 productFound[0].estoque >= quantidade &&
                 qtdPaga <= quantidade &&
-                qtdPaga;
+                qtdPaga > 0;
 
             if (canSave) {
-                try {
-                    await addNewPedido({
-                        clientId,
-                        produtoId,
-                        quantidade,
-                        qtdPaga,
-                    });
-                    await updateProduct({
-                        vendedor: userId,
-                        id: produtoId,
-                        codigo: productFound[0].codigo,
-                        produto: productFound[0].produto,
+                await addNewPedido({
+                    cliente: {
+                        _id: clientId,
+                        pedido: {
+                            codigoProduto: productFound[0].code,
+                            nomeProduto: productFound[0].productName,
+                            quantidade,
+                            qtdPaga,
+                            valor: productFound[0].preco,
+                        },
+                    },
+                });
+                await updateProduct({
+                    userId,
+                    produto: {
+                        _id: produtoId,
+                        code: productFound[0].code,
+                        productName: productFound[0].productName,
                         estoque: productFound[0].estoque - quantidade,
                         preco: productFound[0].preco,
-                    });
-                } catch (err) {
-                    console.log(err);
-                }
+                    },
+                });
             }
         }
     };
@@ -246,7 +254,7 @@ const DetalhesPedido = () => {
                         <Col xs={4}>Situação</Col>
                     </Row>
                 </Card>
-                {pedidos ? [content] : [msg]}
+                {pedidos ? (pedidos.length > 0 ? [content] : [msg]) : null}
                 <Navbar
                     className="text-black mb-3 mx-0 py-0 fluid"
                     fixed="bottom"
@@ -312,7 +320,8 @@ const DetalhesPedido = () => {
                                         <Form.Control
                                             value={
                                                 productFound.length > 0
-                                                    ? productFound[0].produto
+                                                    ? productFound[0]
+                                                          .productName
                                                     : ""
                                             }
                                             readOnly
@@ -327,7 +336,7 @@ const DetalhesPedido = () => {
                                             type="hidden"
                                             value={
                                                 productFound.length > 0
-                                                    ? productFound[0].id
+                                                    ? productFound[0]._id
                                                     : ""
                                             }
                                         />
@@ -403,7 +412,9 @@ const DetalhesPedido = () => {
                                                 setQtdPaga(e.target.value)
                                             }
                                             className={
-                                                qtdPaga <= quantidade && qtdPaga
+                                                qtdPaga <= quantidade &&
+                                                qtdPaga &&
+                                                qtdPaga > 0
                                                     ? "is-valid"
                                                     : "is-invalid"
                                             }

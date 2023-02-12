@@ -128,6 +128,8 @@ const updateUser = asyncHandler(async (req, res) => {
             }
         }
         if (produto) {
+            const user = await User.findById(userId).exec();
+
             if (produto._id) {
                 const atualizarProduto = await User.findOneAndUpdate(
                     {
@@ -148,6 +150,8 @@ const updateUser = asyncHandler(async (req, res) => {
                 res.json({ message: `${produto.productNome} atualizado!` });
             } else {
                 user.produtos.push(produto);
+                await user.save();
+                res.json({ message: "Produto Criado" });
             }
         }
     }
@@ -184,10 +188,10 @@ const deleteUser = asyncHandler(async (req, res) => {
             return res.status(200).json({ message: "Cliente deletado" });
         }
     } else if (produto) {
-        const deletarProduto = await User.findOneAndUpdate(
-            {},
-            { $pull: { produtos: { _id: produto._id } } }
-        );
+        const deletarProduto = await User.findByIdAndUpdate(userId, {
+            $pull: { produtos: { _id: produto._id } },
+        });
+
         return res.status(200).json({ message: "Produto deletado" });
     }
 

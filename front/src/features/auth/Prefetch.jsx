@@ -14,19 +14,6 @@ const Prefetch = () => {
 
     useEffect(() => {
         store.dispatch(
-            clientsApiSlice.util.prefetch("getClients", userId, { force: true })
-        );
-        store.dispatch(
-            productsApiSlice.util.prefetch("getProducts", userId, {
-                force: true,
-            })
-        );
-        // store.dispatch(
-        //     pedidosApiSlice.util.prefetch("getPedidos", userId, {
-        //         force: true,
-        //     })
-        // );
-        store.dispatch(
             userApiSlice.util.prefetch("getUserData", userId, {
                 force: true,
             })

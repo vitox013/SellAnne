@@ -41,7 +41,7 @@ const NovoCliente = () => {
 
     useEffect(() => {
         setValidNome(USER_REGEX.test(nome));
-        setDuplicatedName(clientes.some((client) => client.nome === nome));
+        setDuplicatedName(clientes.some((client) => client.clientName == nome));
     }, [nome]);
 
     useEffect(() => {
@@ -58,7 +58,8 @@ const NovoCliente = () => {
     const onTelefoneChange = (e) => setTelefone(e.target.value);
 
     const canSave = validNome && !isLoading && !duplicatedName;
-    const alertClass = !duplicatedName ? "" : "is-invalid";
+    const alertClass =
+        !duplicatedName && (validNome || !nome) ? "" : "is-invalid";
 
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
@@ -75,7 +76,7 @@ const NovoCliente = () => {
 
     return (
         <>
-            <Back path="/dashboard" />
+            <Back path="/clientes" />
             <Container>
                 <Row className="px-2 mt-md-5">
                     <Col className="mt-2 col-12 text-center">
@@ -116,6 +117,7 @@ const NovoCliente = () => {
                                 <Form.Control
                                     type="tel"
                                     pattern="[0-9]{11}"
+                                    value={telefone}
                                     onChange={onTelefoneChange}
                                 />
                                 <Form.Text className="text-muted">

@@ -18,7 +18,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
             //         return user;
             //     });
             //     console.log(loadedUser);
-                 
+
             //     return userAdapter.setAll(initialState, loadedUser);
             // },
             providesTags: (result, error, arg) => {
@@ -43,10 +43,10 @@ export const userApiSlice = apiSlice.injectEndpoints({
             ],
         }),
         deleteUser: builder.mutation({
-            query: ({ id }) => ({
+            query: (initialUserData) => ({
                 url: `/user`,
                 method: "DELETE",
-                body: { id },
+                body: { ...initialUserData },
             }),
             invalidatesTags: (result, error, arg) => [
                 { type: "User", id: arg.id },

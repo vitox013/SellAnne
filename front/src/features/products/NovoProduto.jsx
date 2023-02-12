@@ -4,8 +4,10 @@ import Back from "../../components/Back";
 import useAuth from "../../hooks/useAuth";
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAddNewProductMutation } from "./productsApiSlice";
-import { useSelector } from "react-redux/es/exports";
+import {
+    useUpdateUserMutation,
+    useGetUserDataQuery,
+} from "../users/userApiSlice";
 
 const USER_REGEX = /^[a-zA-Z\ 0-9]{3,20}$/;
 
@@ -15,19 +17,25 @@ const NovoProduto = () => {
         currency: "BRL",
     });
 
-    const [addProduct, { isSuccess, isLoading, error }] =
-        useAddNewProductMutation();
-        
     const navigate = useNavigate();
-    const { userId: vendedorId } = useAuth();
+    const { userId } = useAuth();
 
     const errRef = useRef();
     const [codigo, setCodigo] = useState("");
     const [produto, setProduto] = useState("");
-
     const [estoque, setEstoque] = useState("");
     const [preco, setPreco] = useState("");
     const [errMsg, setErrMsg] = useState("");
+    const [duplicated, setDuplicated] = useState("");
+
+    const [addProduct, { isSuccess, isLoading, error }] =
+        useUpdateUserMutation();
+
+    const { products } = useGetUserDataQuery(userId, {
+        selectFromResult: ({ data }) => ({
+            products: data?.produtos,
+        }),
+    });
 
     useEffect(() => {
         if (isSuccess) {
@@ -42,24 +50,30 @@ const NovoProduto = () => {
         }
     }, [isSuccess, navigate, error]);
 
+    useEffect(() => {
+        if (products) {
+            setDuplicated(products.find((prod) => prod.code == codigo));
+        }
+    }, [codigo]);
+
     const onCodigoChange = (e) => setCodigo(e.target.value);
     const onProdutoChange = (e) => setProduto(e.target.value);
     const onEstoqueChange = (e) => setEstoque(e.target.value);
     const onPrecoChange = (e) => setPreco(e.target.value);
 
     const canSave = codigo && produto && estoque && preco && !isLoading;
-    // const alertClass = !duplicatedName ? "" : "is-invalid";
 
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
-
         if (canSave) {
             await addProduct({
-                vendedorId,
-                codigo,
-                produto,
-                estoque,
-                preco,
+                userId,
+                produto: {
+                    code: codigo,
+                    productName: produto,
+                    estoque: estoque,
+                    preco: preco,
+                },
             });
         }
     };
@@ -83,11 +97,8 @@ const NovoProduto = () => {
                             >
                                 {errMsg}
                             </p>
-                            <Form.Group className="mb-3" controlId="vendedorId">
-                                <Form.Control
-                                    type="hidden"
-                                    value={vendedorId}
-                                />
+                            <Form.Group className="mb-3" controlId="userId">
+                                <Form.Control type="hidden" value={userId} />
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="nome">
                                 <Form.Label>Nome</Form.Label>
@@ -109,7 +120,17 @@ const NovoProduto = () => {
                                     value={codigo}
                                     onChange={onCodigoChange}
                                     required
+                                    className={
+                                        (codigo <= 0 && codigo) || duplicated
+                                            ? "is-invalid"
+                                            : ""
+                                    }
                                 />
+                                {duplicated && (
+                                    <Form.Text>
+                                        Já existe produto com esse código
+                                    </Form.Text>
+                                )}
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="estoque">
                                 <Form.Label>Quantidade em estoque</Form.Label>

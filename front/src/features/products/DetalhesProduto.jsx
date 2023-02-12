@@ -2,10 +2,10 @@ import React, { useEffect, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import {
-    useDeleteProductMutation,
-    useGetProductsQuery,
-    useUpdateProductMutation,
-} from "./productsApiSlice";
+    useUpdateUserMutation,
+    useDeleteUserMutation,
+    useGetUserDataQuery,
+} from "../users/userApiSlice";
 import { useState } from "react";
 import {
     Navbar,
@@ -26,39 +26,53 @@ const DetalhesProduto = () => {
     const [codigo, setCodigo] = useState("");
     const [estoque, setEstoque] = useState("");
     const [produto, setProduto] = useState("");
+    const [productName, setProductName] = useState("");
+    const [duplicated, setDuplicated] = useState("");
     const [preco, setPreco] = useState("");
     const [changed, setChanged] = useState(false);
     const [errMsg, setErrMsg] = useState("");
 
     const navigate = useNavigate();
 
-    const { products } = useGetProductsQuery(userId, {
+    const { products } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
-            products: data?.entities[productId],
+            products: data?.produtos,
         }),
     });
 
     const [deleteProduto, { isSuccess: isDeleteSuccess, error: deleteError }] =
-        useDeleteProductMutation();
+        useDeleteUserMutation();
 
     const [updateProduto, { isSuccess: isUpdateSuccess, error: updateError }] =
-        useUpdateProductMutation();
+        useUpdateUserMutation();
 
     useEffect(() => {
         if (products) {
-            setCodigo(products.codigo);
-            setEstoque(products.estoque);
-            setPreco(products.preco);
-            setProduto(products.produto);
+            setProduto(products.find((prod) => prod._id === productId));
         }
     }, [products]);
+
+    useEffect(() => {
+        if (produto) {
+            setCodigo(produto.code);
+            setEstoque(produto.estoque);
+            setPreco(produto.preco);
+            setProductName(produto.productName);
+        }
+    }, [produto]);
+
+    useEffect(() => {
+        if (codigo != produto.code && products) {
+            setDuplicated(products.find((prod) => prod.code == codigo));
+        }
+    }, [codigo]);
 
     const onCodigoChange = (e) => {
         setCodigo(e.target.value);
         setChanged(true);
     };
     const onProdutoChange = (e) => {
-        setProduto(e.target.value);
+        setProductName(e.target.value);
         setChanged(true);
     };
     const onEstoqueChange = (e) => {
@@ -70,24 +84,30 @@ const DetalhesProduto = () => {
         setChanged(true);
     };
 
-    const canSave = codigo > 0 && estoque >= 0 && preco >= 0;
+    const canSave = codigo > 0 && estoque >= 0 && preco >= 0 && !duplicated;
 
     const onDeleteUserClicked = async (e) => {
         e.preventDefault();
-        await deleteProduto({ productId });
-        
+        await deleteProduto({
+            userId,
+            produto: {
+                _id: productId,
+            },
+        });
     };
 
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
         if (canSave) {
             await updateProduto({
-                vendedor: userId,
-                id: productId,
-                codigo,
-                produto,
-                estoque,
-                preco,
+                userId,
+                produto: {
+                    _id: productId,
+                    code: codigo,
+                    productName,
+                    estoque,
+                    preco,
+                },
             });
         }
     };
@@ -104,7 +124,6 @@ const DetalhesProduto = () => {
 
     const errClass = errMsg ? "alert alert-danger" : "d-none";
 
-    console.log(changed);
     return (
         <>
             <Back
@@ -136,7 +155,7 @@ const DetalhesProduto = () => {
                                 <Form.Label>Nome</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    value={produto}
+                                    value={productName}
                                     onChange={onProdutoChange}
                                     className="text-capitalize"
                                     required
@@ -152,8 +171,17 @@ const DetalhesProduto = () => {
                                     value={codigo}
                                     onChange={onCodigoChange}
                                     required
-                                    className={codigo <= 0 ? "is-invalid" : ""}
+                                    className={
+                                        codigo <= 0 || duplicated
+                                            ? "is-invalid"
+                                            : ""
+                                    }
                                 />
+                                {duplicated && (
+                                    <Form.Text>
+                                        Já existe produto com esse código
+                                    </Form.Text>
+                                )}
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="estoque">
                                 <Form.Label>Quantidade em estoque</Form.Label>

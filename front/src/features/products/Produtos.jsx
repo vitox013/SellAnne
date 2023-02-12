@@ -38,9 +38,8 @@ const Produtos = () => {
 
     useEffect(() => {
         if (products) {
-            
-            const prodSorted = products.sort((a, b) => a.code - b.code);
-            setProdutos(prodSorted);
+            // const prodSorted = products.sort((a, b) => a.code - b.code);
+            setProdutos(products);
         }
     }, [products]);
 
