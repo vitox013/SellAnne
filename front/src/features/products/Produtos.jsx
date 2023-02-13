@@ -131,14 +131,16 @@ const Produtos = () => {
                         </Button>
                     </Form>
                 </Row>
-                <Card className=" py-2 mt-3 text-black shadow-sm fw-bold">
-                    <Row className="text-center">
-                        <Col xs={2}>Cod</Col>
-                        <Col xs={4}>Item</Col>
-                        <Col xs={3}>Estoque</Col>
-                        <Col xs={3}>Valor</Col>
-                    </Row>
-                </Card>
+                <Row className="px-2">
+                    <Card className="py-2 mt-3 text-black shadow-sm fw-bold">
+                        <Row className="text-center">
+                            <Col xs={2}>Cod</Col>
+                            <Col xs={4}>Item</Col>
+                            <Col xs={3} className="px-0">Estoque</Col>
+                            <Col xs={3}>Valor</Col>
+                        </Row>
+                    </Card>
+                </Row>
                 <Row className="px-2">{conteudo}</Row>
                 <Row>
                     <NavFooter

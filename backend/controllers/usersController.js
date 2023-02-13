@@ -1,6 +1,4 @@
 const User = require("../models/User");
-const Client = require("../models/Client");
-const Products = require("../models/Products");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 
@@ -165,16 +163,37 @@ const deleteUser = asyncHandler(async (req, res) => {
 
     if (cliente) {
         if (cliente.pedido) {
+            console.log(cliente._id);
+            console.log(cliente.pedido._id);
+
             const deletarPedido = await User.findOneAndUpdate(
+                { "clients._id": cliente._id },
                 {
-                    "clients._id": cliente._id,
-                },
-                {
-                    $pullAll: {
-                        "clients.$.pedidos": [{ _id: cliente.pedido._id }],
+                    $pull: {
+                        "clients.$[field].pedidos": {
+                            _id: cliente.pedido._id,
+                        },
                     },
-                }
+                },
+                { arrayFilters: [{ "field._id": cliente._id }] }
             );
+            console.log(deletarPedido);
+
+            // const deletarPedido = await User.findOneAndUpdate(
+            //     {
+            //         "clients.pedidos._id": cliente.pedido._id,
+            //     },
+            //     {
+            //         $pullAll: {
+            //             "clients.$.pedidos.$[field]":
+            //                 cliente.pedido.quantidade
+            //         },
+            //     },
+            //     {
+            //         arrayFilters: [{ "field._id": cliente.pedido._id }],
+            //     }
+            // );
+
             return res.status(200).json({ message: "Pedido deletado" });
         } else {
             const deletarCliente = await User.findOneAndUpdate(

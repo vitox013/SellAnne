@@ -48,6 +48,10 @@ a {
     cursor: pointer;
 }
 
+.pointer {
+    cursor: pointer;
+}
+
 /* Color Theme Swatches in Hex */
 .bg-cor-1 {
     background-color: #e4e3fd !important;

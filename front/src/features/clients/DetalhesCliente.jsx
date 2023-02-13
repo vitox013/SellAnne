@@ -1,5 +1,5 @@
 import { useState, useEffect, React } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import {
     Container,
     Navbar,
@@ -10,7 +10,7 @@ import {
     Col,
     Form,
 } from "react-bootstrap";
-
+import Message from "../../components/Message";
 import useAuth from "../../hooks/useAuth";
 import CardPedido from "../../components/CardPedido";
 import { v4 as uuidv4 } from "uuid";
@@ -45,6 +45,12 @@ const DetalhesPedido = () => {
 
     const { userId } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    let message = "";
+    if (location.state) {
+        message = location.state.message;
+    }
 
     const { clients, products } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
@@ -52,8 +58,6 @@ const DetalhesPedido = () => {
             products: data?.produtos,
         }),
     });
-
-    // console.log(products);
 
     const [deleteClient, { isSuccess: deleteIsSuccess, error: errorDelete }] =
         useDeleteUserMutation(clientId);
@@ -77,12 +81,13 @@ const DetalhesPedido = () => {
                     pedidos.map((ped) => (
                         <CardPedido
                             key={ped._id}
-                            path={ped._id}
+                            pedidoId={ped._id}
                             produto={ped.nomeProduto}
                             codigo={ped.codigoProduto}
                             quantidade={ped.quantidade}
-                            valor={formatter.format(ped.valor)}
+                            valor={ped.valor}
                             qtdPaga={ped.qtdPaga}
+                            clientNome={cliente.clientName}
                         />
                     ))
                 );
@@ -173,8 +178,10 @@ const DetalhesPedido = () => {
         if (productFound.length > 0 && produtoId) {
             const canSave =
                 productFound[0].estoque >= quantidade &&
-                qtdPaga <= quantidade &&
-                qtdPaga > 0;
+                qtdPaga <= productFound[0].preco * quantidade &&
+                qtdPaga >= 0;
+
+            console.log(canSave);
 
             if (canSave) {
                 await addNewPedido({
@@ -235,7 +242,7 @@ const DetalhesPedido = () => {
                             >
                                 Excluir
                             </Button>
-                            <Button variant="success" onClick={handleClose}>
+                            <Button variant="secondary" onClick={handleClose}>
                                 Cancelar
                             </Button>
                         </Modal.Footer>
@@ -245,13 +252,16 @@ const DetalhesPedido = () => {
             <Container className="pt-2">
                 <h2>{clienteNome}</h2>
                 <Card className=" px-2 py-2 mt-3 text-black shadow-sm fw-bold">
-                    <Row className="text-center">
-                        <Col xs={3}>Item</Col>
-                        <Col xs={2}>Qtd</Col>
-                        <Col xs={3}>Valor</Col>
-                        <Col xs={4}>Situação</Col>
+                    <Row>
+                        <Col xs={4}>Item</Col>
+                        <Col className="ps-0">Qtd</Col>
+                        <Col className="ps-0">Valor</Col>
+                        <Col>Situação</Col>
                     </Row>
                 </Card>
+                {message && (
+                    <Message msg={message} type="alert alert-success" />
+                )}
                 {pedidos ? (pedidos.length > 0 ? [content] : [msg]) : null}
                 <Navbar
                     className="text-black mb-3 mx-0 py-0 fluid"
@@ -395,26 +405,55 @@ const DetalhesPedido = () => {
                                     </Form.Group>
                                     <Form.Group
                                         className="mb-3"
-                                        controlId="qtdPaga"
+                                        controlId="valorTotal"
                                     >
                                         <Form.Label>
-                                            Quantidade já paga
+                                            Valor total pedido
                                         </Form.Label>
+                                        <Form.Control
+                                            readOnly
+                                            value={
+                                                productFound.length > 0
+                                                    ? formatter.format(
+                                                          productFound[0]
+                                                              .preco *
+                                                              quantidade
+                                                      )
+                                                    : ""
+                                            }
+                                            disabled
+                                        />
+                                    </Form.Group>
+                                    <Form.Group
+                                        className="mb-3"
+                                        controlId="qtdPaga"
+                                    >
+                                        <Form.Label>Valor já pago</Form.Label>
                                         <Form.Control
                                             type="number"
                                             inputMode="numeric"
-                                            max={quantidade}
+                                            max={
+                                                productFound.length > 0
+                                                    ? productFound[0].preco *
+                                                      quantidade
+                                                    : ""
+                                            }
                                             required
                                             value={qtdPaga}
                                             onChange={(e) =>
                                                 setQtdPaga(e.target.value)
                                             }
                                             className={
-                                                qtdPaga <= quantidade &&
-                                                qtdPaga &&
-                                                qtdPaga > 0
-                                                    ? "is-valid"
-                                                    : "is-invalid"
+                                                productFound.length > 0
+                                                    ? qtdPaga <=
+                                                          productFound[0]
+                                                              .preco *
+                                                              quantidade &&
+                                                      qtdPaga &&
+                                                      qtdPaga >= 0
+                                                        ? "is-valid"
+                                                        : "is-invalid"
+                                                    : ""
                                             }
                                         />
                                     </Form.Group>
