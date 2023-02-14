@@ -13,13 +13,15 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import {
     useDeleteUserMutation,
+    useGetUserDataQuery,
     useUpdateUserMutation,
 } from "../features/users/userApiSlice";
 import useAuth from "../hooks/useAuth";
 
 const CardPedido = ({
     pedidoId,
-    produto,
+    produtoId,
+    nomeProduto,
     quantidade,
     valor,
     codigo,
@@ -40,15 +42,36 @@ const CardPedido = ({
     const [quantity, setQuantity] = useState(quantidade);
     const [quantPaga, setQuantPaga] = useState(qtdPaga);
     const [pago, setPago] = useState(false);
+    const [produto, setProduto] = useState();
     const [alterado, setAlterado] = useState(false);
+    const [canUpdateProduto, setCanUpdateProduto] = useState(false);
     const [errMsg, setErrMsg] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
 
-    const [updatePedido, { isSuccess: isUpdateSuccess, error: errorUpdate }] =
-        useUpdateUserMutation();
+    const [
+        updateProduct,
+        { isSuccess: isUpdateProductSuccess, error: errorUpdateProduct },
+    ] = useUpdateUserMutation();
+
+    const [
+        updatePedido,
+        { isSuccess: isUpdatePedidoSuccess, error: errorUpdatePedido },
+    ] = useUpdateUserMutation();
 
     const [deletePedido, { isSuccess: isDeleteSuccess, error: errorDelete }] =
         useDeleteUserMutation();
+
+    const { products } = useGetUserDataQuery(userId, {
+        selectFromResult: ({ data }) => ({
+            products: data.produtos,
+        }),
+    });
+
+    useEffect(() => {
+        setProduto(products.find((p) => p._id === produtoId));
+    }, [products]);
+
+    console.log(produto);
 
     const handleShow = () => setShow(true);
     const handleClose = () => {
@@ -74,6 +97,51 @@ const CardPedido = ({
     };
 
     useEffect(() => {
+        if (produto) {
+            setCanUpdateProduto(produto.estoque >= quantity - quantidade);
+        } else {
+            setCanUpdateProduto(false);
+        }
+    }, [produto, quantity]);
+
+    const onClickUpdate = async () => {
+        if (produto && canUpdateProduto) {
+            let estoqueAtt =
+                quantity >= quantidade
+                    ? produto.estoque - (quantity - quantidade)
+                    : produto.estoque + (quantidade - quantity);
+
+            await updateProduct({
+                userId,
+                produto: {
+                    _id: produtoId,
+                    estoque: estoqueAtt,
+                },
+            });
+            await updatePedido({
+                userId,
+                cliente: {
+                    pedido: {
+                        _id: pedidoId,
+                        quantidade: quantity,
+                        qtdPaga: quantPaga,
+                    },
+                },
+            });
+        } else if (!produto) {
+            await updatePedido({
+                userId,
+                cliente: {
+                    pedido: {
+                        _id: pedidoId,
+                        qtdPaga: quantPaga,
+                    },
+                },
+            });
+        }
+    };
+
+    useEffect(() => {
         if (isDeleteSuccess) {
             setShow(false);
             navigate(`/clientes/${clientId}`, {
@@ -82,7 +150,21 @@ const CardPedido = ({
         } else if (errorDelete) {
             setErrMsg("Erro ao excluir o pedido!");
         }
-    }, [isDeleteSuccess, errorDelete]);
+        if (isUpdatePedidoSuccess) {
+            setShow(false);
+            navigate(`/clientes/${clientId}`, {
+                state: { message: "Pedido atualizado com sucesso!" },
+            });
+        } else if (errorUpdatePedido) {
+            setErrMsg("Erro ao editar pedido!");
+        }
+    }, [
+        isDeleteSuccess,
+        errorDelete,
+        isUpdatePedidoSuccess,
+        isUpdateProductSuccess,
+        errorUpdatePedido,
+    ]);
 
     useEffect(() => {
         if (quantity && qtdPaga) {
@@ -92,7 +174,9 @@ const CardPedido = ({
     }, [quantity, quantPaga]);
 
     const statusClass =
-        qtdPaga < quantidade ? "alert alert-danger" : "alert alert-success";
+        qtdPaga < quantidade * valor
+            ? "alert alert-danger"
+            : "alert alert-success";
 
     const status = qtdPaga < quantidade * valor ? "Não pago" : "Pago";
 
@@ -101,12 +185,12 @@ const CardPedido = ({
     return (
         <>
             <Card
-                className={`px-2 py-2 mt-3 text-black shadow-sm hover-card text-decoration-none px-0${statusClass}`}
+                className={`px-2 py-2 mt-3 text-black shadow-sm hover-card text-decoration-none px-0 ${statusClass}`}
                 onClick={handleShow}
             >
                 <Row className="d-flex align-items-center">
                     <Col xs={4} className="d-flex flex-column fw">
-                        <span className="fw-bold">{produto}</span>
+                        <span className="fw-bold">{nomeProduto}</span>
                         <small>cod: {codigo}</small>
                     </Col>
                     <Col className="ps-3 pe-0">{quantidade}</Col>
@@ -137,7 +221,7 @@ const CardPedido = ({
                     <Row>
                         <Col className="mb-4">
                             <h5 className="mb-0">
-                                {produto} | {formatter.format(valor)}
+                                {nomeProduto} | {formatter.format(valor)}
                             </h5>
                             <small>cod: {codigo}</small>
                         </Col>
@@ -173,12 +257,34 @@ const CardPedido = ({
                         <Col>Quantidade</Col>
                         <Col>Valor total</Col>
                     </Row>
-                    <Row className="mt-1 d-flex align-items-center">
+                    <Row className="mt-1 d-flex">
                         <Col xs={6}>
-                            <Form.Control
-                                value={quantity}
-                                onChange={(e) => setQuantity(e.target.value)}
-                            ></Form.Control>
+                            <Form>
+                                <Form.Group>
+                                    <Form.Control
+                                        value={quantity}
+                                        onChange={(e) =>
+                                            setQuantity(e.target.value)
+                                        }
+                                        className={
+                                            produto
+                                                ? produto.estoque >=
+                                                  quantity - quantidade
+                                                    ? ""
+                                                    : "is-invalid"
+                                                : ""
+                                        }
+                                        disabled={!produto}
+                                    ></Form.Control>
+                                    {produto ? (
+                                        <Form.Text className="text-muted">
+                                            {produto.estoque} em estoque
+                                        </Form.Text>
+                                    ) : (
+                                        "Produto não cadastrado ou excluído"
+                                    )}
+                                </Form.Group>
+                            </Form>
                         </Col>
                         <Col xs={6}>{formatter.format(quantity * valor)}</Col>
                     </Row>
@@ -222,7 +328,7 @@ const CardPedido = ({
                             <Col>
                                 <Button
                                     variant="success"
-                                    onClick=""
+                                    onClick={onClickUpdate}
                                     className="me-2"
                                 >
                                     Salvar edição

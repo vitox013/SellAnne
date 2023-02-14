@@ -14,7 +14,13 @@ function Message({ type, msg }) {
         return () => clearTimeout(timer);
     }, [msg]);
 
-    return <>{visible && <div className={`message ${type} mt-2`}>{msg}</div>}</>;
+    return (
+        <>
+            {visible && (
+                <div className={`message ${type} mt-2 text-center`}>{msg}</div>
+            )}
+        </>
+    );
 }
 
 export default Message;

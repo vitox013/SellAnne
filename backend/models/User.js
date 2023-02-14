@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema({
             },
             pedidos: [
                 {
+                    produtoId: {
+                        type: String,
+                        required: true,
+                    },
                     codigoProduto: {
                         type: Number,
                         required: true,

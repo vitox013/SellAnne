@@ -81,8 +81,9 @@ const DetalhesPedido = () => {
                     pedidos.map((ped) => (
                         <CardPedido
                             key={ped._id}
+                            produtoId={ped.produtoId}
                             pedidoId={ped._id}
-                            produto={ped.nomeProduto}
+                            nomeProduto={ped.nomeProduto}
                             codigo={ped.codigoProduto}
                             quantidade={ped.quantidade}
                             valor={ped.valor}
@@ -188,6 +189,7 @@ const DetalhesPedido = () => {
                     cliente: {
                         _id: clientId,
                         pedido: {
+                            produtoId: productFound[0]._id,
                             codigoProduto: productFound[0].code,
                             nomeProduto: productFound[0].productName,
                             quantidade,

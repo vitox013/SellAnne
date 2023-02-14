@@ -112,7 +112,7 @@ const updateUser = asyncHandler(async (req, res) => {
                             $set: {
                                 "clients.$.pedidos.$[field].quantidade":
                                     cliente.pedido.quantidade,
-                                "clients.$.pedidos.$[field].quantidade":
+                                "clients.$.pedidos.$[field].qtdPaga":
                                     cliente.pedido.qtdPaga,
                             },
                         },

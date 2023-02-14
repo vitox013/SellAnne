@@ -35,8 +35,7 @@ const Produtos = () => {
 
     useEffect(() => {
         if (products) {
-            // const prodSorted = products.sort((a, b) => a.code - b.code);
-            setProdutos(products);
+            setProdutos(products.slice().sort((a, b) => a.code - b.code));
         }
     }, [products]);
 
@@ -136,7 +135,9 @@ const Produtos = () => {
                         <Row className="text-center">
                             <Col xs={2}>Cod</Col>
                             <Col xs={4}>Item</Col>
-                            <Col xs={3} className="px-0">Estoque</Col>
+                            <Col xs={3} className="px-0">
+                                Estoque
+                            </Col>
                             <Col xs={3}>Valor</Col>
                         </Row>
                     </Card>

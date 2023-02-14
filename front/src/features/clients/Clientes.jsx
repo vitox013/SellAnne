@@ -15,8 +15,6 @@ const Clientes = () => {
     const [conteudo, setConteudo] = useState([]);
     const [clientes, setClientes] = useState([]);
 
-    const dispatch = useDispatch();
-
     const { clients } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
             clients: data?.clients,
@@ -25,12 +23,13 @@ const Clientes = () => {
 
     console.log(clients);
 
-    let content;
-
     useEffect(() => {
         if (clients) {
-            // clients.sort((a, b) => a.nome -(b.nome));
-            setClientes(clients);
+            setClientes(
+                clients
+                    .slice()
+                    .sort((a, b) => (a.clientName > b.clientName ? 1 : -1))
+            );
         }
     }, [clients]);
 
