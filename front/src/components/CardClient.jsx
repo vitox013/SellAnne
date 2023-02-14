@@ -16,19 +16,16 @@ const CardClient = ({ clientId, userId, clientName, qtdPedido }) => {
 
     if (clientName) {
         return (
-            <Link
-                to={`${clientId}`}
-                className="text-decoration-none px-0 "
-            >
-                <Card className="px-0 mt-3">
+            <Card className="px-0 mt-3">
+                <Link to={`${clientId}`} className="text-decoration-none px-0 ">
                     <Card.Body className="d-flex text-black shadow-sm justify-content-between hover-card btn bg-light">
                         <span className="">{clientName}</span>
 
                         {content}
                         {/* <i className="bx bxs-edit-alt col-1"></i> */}
                     </Card.Body>
-                </Card>
-            </Link>
+                </Link>
+            </Card>
         );
     } else return null;
 };

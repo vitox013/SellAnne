@@ -40,6 +40,9 @@ const DetalhesPedido = () => {
     const [qtdPaga, setQtdPaga] = useState("");
     const [quantidade, setQuantidade] = useState("");
     const [msg, setMsg] = useState([]);
+    const [totalPago, setTotalPago] = useState("");
+    const [aPagar, setAPagar] = useState(false);
+    const [showStats, setShowStats] = useState(false);
 
     const { id: clientId } = useParams();
 
@@ -92,12 +95,29 @@ const DetalhesPedido = () => {
                         />
                     ))
                 );
+                console.log(pedidos);
+                setTotalPago(
+                    pedidos.reduce((acc, ped) => acc + ped.qtdPaga, 0)
+                );
+                setAPagar(
+                    pedidos
+                        .reduce(
+                            (acc, ped) =>
+                                acc +
+                                (ped.quantidade * ped.valor - ped.qtdPaga),
+                            0
+                        )
+                        .toFixed(2)
+                );
             }
         }
         if (cliente) {
             setClienteNome(cliente.clientName);
         }
     }, [clients, cliente, pedidos]);
+
+    console.log(totalPago);
+    console.log(aPagar);
 
     useEffect(() => {
         if (deleteIsSuccess) {
@@ -163,6 +183,8 @@ const DetalhesPedido = () => {
     const handleClose = () => setShow(false);
     const handleShowPedido = () => setShowPedido(true);
     const handleClosePedido = () => setShowPedido(false);
+    const handleShowStats = () => setShowStats(true);
+    const handleCloseStats = () => setShowStats(false);
 
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
@@ -179,10 +201,8 @@ const DetalhesPedido = () => {
         if (productFound.length > 0 && produtoId) {
             const canSave =
                 productFound[0].estoque >= quantidade &&
-                qtdPaga <= productFound[0].preco * quantidade &&
+                qtdPaga <= (productFound[0].preco * quantidade).toFixed(2) &&
                 qtdPaga >= 0;
-
-            console.log(canSave);
 
             if (canSave) {
                 await addNewPedido({
@@ -251,8 +271,48 @@ const DetalhesPedido = () => {
                     </Modal>
                 </Container>
             </Navbar>
+
             <Container className="pt-2">
-                <h2>{clienteNome}</h2>
+                <Row>
+                    <Col className="h2 gap-2 d-flex align-items-end">
+                        {clienteNome}
+                        {showStats ? (
+                            <i
+                                className="bx bxs-low-vision pointer"
+                                onClick={handleCloseStats}
+                            ></i>
+                        ) : (
+                            <i
+                                className="bx bxs-show pointer"
+                                onClick={handleShowStats}
+                            ></i>
+                        )}
+                    </Col>
+                </Row>
+                {showStats ? (
+                    <>
+                        <Row>
+                            <Col xs={6} md={2}>
+                                <Card className="p-1 text-center bg-success bg-opacity-75">
+                                    <p className="my-0">Total pago</p>
+                                    <p className="my-0">
+                                        {formatter.format(totalPago)}
+                                    </p>
+                                </Card>
+                            </Col>
+                            <Col xs={6} md={2}>
+                                <Card className="p-1 text-center bg-danger bg-opacity-75">
+                                    <p className="my-0">À pagar</p>
+                                    <p className="my-0">
+                                        {formatter.format(aPagar)}
+                                    </p>
+                                </Card>
+                            </Col>
+                        </Row>
+                    </>
+                ) : (
+                    ""
+                )}
                 <Card className=" px-2 py-2 mt-3 text-black shadow-sm fw-bold">
                     <Row>
                         <Col xs={4}>Item</Col>
@@ -265,6 +325,7 @@ const DetalhesPedido = () => {
                     <Message msg={message} type="alert alert-success" />
                 )}
                 {pedidos ? (pedidos.length > 0 ? [content] : [msg]) : null}
+
                 <Navbar
                     className="text-black mb-3 mx-0 py-0 fluid"
                     fixed="bottom"
@@ -448,9 +509,11 @@ const DetalhesPedido = () => {
                                             className={
                                                 productFound.length > 0
                                                     ? qtdPaga <=
-                                                          productFound[0]
-                                                              .preco *
-                                                              quantidade &&
+                                                          (
+                                                              productFound[0]
+                                                                  .preco *
+                                                              quantidade
+                                                          ).toFixed(2) &&
                                                       qtdPaga &&
                                                       qtdPaga >= 0
                                                         ? "is-valid"

@@ -71,8 +71,6 @@ const CardPedido = ({
         setProduto(products.find((p) => p._id === produtoId));
     }, [products]);
 
-    console.log(produto);
-
     const handleShow = () => setShow(true);
     const handleClose = () => {
         setShow(false);
@@ -168,19 +166,21 @@ const CardPedido = ({
 
     useEffect(() => {
         if (quantity && qtdPaga) {
-            setPago(valor * quantidade == quantPaga);
+            setPago((valor * quantity).toFixed(1) == quantPaga);
             setAlterado(quantity != quantidade || quantPaga != qtdPaga);
         }
     }, [quantity, quantPaga]);
 
     const statusClass =
-        qtdPaga < quantidade * valor
+        qtdPaga < (quantidade * valor).toFixed(1)
             ? "alert alert-danger"
             : "alert alert-success";
 
-    const status = qtdPaga < quantidade * valor ? "Não pago" : "Pago";
+    const status =
+        qtdPaga < (quantidade * valor).toFixed(2) ? "Não pago" : "Pago";
 
-    const canSave = quantPaga <= quantity * valor && quantPaga >= 0;
+    const canSave =
+        quantPaga <= (quantity * valor).toFixed(2) && quantPaga >= 0;
 
     return (
         <>
@@ -296,8 +296,8 @@ const CardPedido = ({
                             <Form.Control
                                 type="number"
                                 value={quantPaga}
+                                max={(quantity * valor).toFixed(2)}
                                 onChange={(e) => setQuantPaga(e.target.value)}
-                                max={quantity * valor}
                                 className={canSave ? "" : "is-invalid"}
                             ></Form.Control>
                         </Col>
@@ -313,8 +313,7 @@ const CardPedido = ({
                             <Col className="alert alert-danger text-center">
                                 <span>Valor restante a ser pago: </span>
                                 <span className="fw-bold">
-                                    {quantity * valor - quantPaga &&
-                                    quantPaga >= 0
+                                    {quantPaga >= 0
                                         ? formatter.format(
                                               quantity * valor - quantPaga
                                           )

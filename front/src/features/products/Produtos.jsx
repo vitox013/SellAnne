@@ -111,7 +111,7 @@ const Produtos = () => {
                 <h1 className="mt-2 pt-10">Olá, {currentUser}!</h1>
                 <Row>
                     <Form className="d-flex mt-4 align-items-center">
-                        <h2 className="col-5 col-md-7">Produtos</h2>
+                        <h2 className="col-5 col-md-7 fw-bold">Produtos</h2>
                         <Form.Control
                             size="sm"
                             type="search"
