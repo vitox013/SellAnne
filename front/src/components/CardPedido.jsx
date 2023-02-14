@@ -165,12 +165,13 @@ const CardPedido = ({
     ]);
 
     useEffect(() => {
-        if (quantity && qtdPaga) {
+        if (quantity) {
             setPago((valor * quantity).toFixed(1) == quantPaga);
             setAlterado(quantity != quantidade || quantPaga != qtdPaga);
         }
     }, [quantity, quantPaga]);
 
+    console.log(alterado, qtdPaga, quantPaga);
     const statusClass =
         qtdPaga < (quantidade * valor).toFixed(1)
             ? "alert alert-danger"
@@ -297,7 +298,9 @@ const CardPedido = ({
                                 type="number"
                                 value={quantPaga}
                                 max={(quantity * valor).toFixed(2)}
-                                onChange={(e) => setQuantPaga(e.target.value)}
+                                onChange={(e) =>
+                                    setQuantPaga(e.target.value)
+                                }
                                 className={canSave ? "" : "is-invalid"}
                             ></Form.Control>
                         </Col>

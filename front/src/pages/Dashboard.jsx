@@ -1,16 +1,58 @@
 import React, { useEffect } from "react";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { Container, Row, Col, Card, Table } from "react-bootstrap";
 import NavDash from "../components/NavBar";
 import { useState } from "react";
 import useAuth from "../hooks/useAuth";
 import { Link } from "react-router-dom";
-
+import { useGetUserDataQuery } from "../features/users/userApiSlice";
 
 const Dashboard = () => {
-    const { currentUser } = useAuth();
+    const formatter = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+    });
+
+    const { userId, currentUser } = useAuth();
     const [conteudo, setConteudo] = useState([]);
+    const [todosPedidos, setTodosPedidos] = useState([]);
+    const [totalPedidos, setTotalPedidos] = useState("");
+    const [totalPago, setTotalPago] = useState("");
+    const [totalReceber, setTotalReceber] = useState("");
 
+    const { clients } = useGetUserDataQuery(userId, {
+        selectFromResult: ({ data }) => ({
+            clients: data?.clients,
+        }),
+    });
 
+    useEffect(() => {
+        if (clients) {
+            let pedidos = [];
+            clients.map((client) =>
+                client.pedidos.map((pedido) => pedidos.push(pedido))
+            );
+            setTodosPedidos(pedidos);
+        }
+    }, [clients]);
+
+    useEffect(() => {
+        if (todosPedidos) {
+            console.log(todosPedidos);
+            setTotalPedidos(todosPedidos.length);
+            setTotalPago(
+                todosPedidos.reduce((acc, pedido) => acc + pedido.qtdPaga, 0)
+            );
+            setTotalReceber(
+                todosPedidos
+                    .reduce(
+                        (acc, ped) =>
+                            acc + (ped.quantidade * ped.valor - ped.qtdPaga),
+                        0
+                    )
+                    .toFixed(2)
+            );
+        }
+    }, [todosPedidos]);
 
     return (
         <>
@@ -41,14 +83,32 @@ const Dashboard = () => {
                 </Row>
                 <Row className="px-2">{conteudo}</Row>
                 <Card className="mt-4">
-                    <Row>
-                        <Col className="">
-                            <h3>Resumo de suas vendas</h3>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col></Col>
-                    </Row>
+                    <Card.Body>
+                        <Row>
+                            <Col className="mx-2">
+                                <h3 className="fw-bold ">
+                                    Resumo de suas vendas
+                                </h3>
+                            </Col>
+                        </Row>
+
+                        <Table striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>Total vendido</th>
+                                    <th>Total Pago</th>
+                                    <th>A receber</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{totalPedidos}</td>
+                                    <td>{formatter.format(totalPago)}</td>
+                                    <td>{formatter.format(totalReceber)}</td>
+                                </tr>
+                            </tbody>
+                        </Table>
+                    </Card.Body>
                 </Card>
             </Container>
         </>
