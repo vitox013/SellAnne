@@ -25,7 +25,7 @@ const DetalhesPedido = () => {
         style: "currency",
         currency: "BRL",
     });
-    
+
     const [show, setShow] = useState(false);
     const [showPedido, setShowPedido] = useState(false);
     const [errMsg, setErrMsg] = useState("");

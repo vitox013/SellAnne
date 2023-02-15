@@ -12,8 +12,12 @@ function NavBar({ info, icon, fixed, path, page }) {
         useSendLogoutMutation();
 
     useEffect(() => {
-        if (isSuccess) navigate("/");
-    }, [isSuccess, navigate]);
+        if (isSuccess) {
+            navigate("/");
+        } else if (error) {
+            console.log(error);
+        }
+    }, [isSuccess, navigate, error]);
 
     useEffect(() => {
         document.addEventListener("keydown", enterPressed);
@@ -28,7 +32,7 @@ function NavBar({ info, icon, fixed, path, page }) {
     if (page == "public") {
         conteudo = (
             <Link
-                className="text-decoration-none text-black fw-bold fs-5 text-capitalize d-flex align-items-center"
+                className="text-decoration-none text-black fw-bold fs-5 text-capitalize d-flex align-items-center float-end"
                 to="dashboard"
             >
                 {info} <i className={`${icon}`}></i>
@@ -36,12 +40,13 @@ function NavBar({ info, icon, fixed, path, page }) {
         );
     } else if (page == "dashboard") {
         conteudo = (
-            <Nav className="d-flex align-items-center">
+            <Nav className="d-flex align-items-center float-end">
                 <NavDropdown
-                    title={<i className={`${icon} text-black`}></i>}
+                    title={<i className={`${icon} text-black pe-0`}></i>}
                     id="basic-nav-dropdown"
                     drop="down"
                     align="end"
+                    className="pe-0"
                 >
                     <Link
                         to=""
@@ -59,18 +64,19 @@ function NavBar({ info, icon, fixed, path, page }) {
                 </NavDropdown>
             </Nav>
         );
-    } else if (page == "clientes" || page == "produtos") {
+    } else if (
+        page == "clientes" ||
+        page == "fornecedores" ||
+        page == "detalhesFornecedor"
+    ) {
         conteudo = (
-            <Nav className="d-flex align-items-center">
-                {page == "clientes" ? (
-                    <Link to="/produtos" className="text-black fw-bold fs-5">
-                        Produtos
+            <Nav className="align-items-center float-end">
+                {page == "clientes" || page == "detalhesFornecedor" ? (
+                    <Link to="/fornecedores" className="text-black fs-5">
+                        Fornecedores
                     </Link>
                 ) : (
-                    <Link
-                        to="/clientes"
-                        className="text-black ms-1 fw-bold fs-5"
-                    >
+                    <Link to="/clientes" className="text-black ms-1 fs-5">
                         Clientes
                     </Link>
                 )}
@@ -111,17 +117,21 @@ function NavBar({ info, icon, fixed, path, page }) {
             className="text-black mx-0 py-0 fluid bg-light shadow-sm"
             fixed={fixed}
         >
-            <Container className="d-flex align-items-center">
-                <div>
-                    <Link to="/">
-                        <img
-                            alt=""
-                            src={logo}
-                            className="d-inline-block col-7 col-md-12"
-                        />
-                    </Link>
-                </div>
-                {conteudo}
+            <Container>
+                <Row className="d-flex align-items-center w-100">
+                    <Col xs={6} md={2}>
+                        <Link to="/">
+                            <img
+                                alt=""
+                                src={logo}
+                                className="d-inline-block w-75"
+                            />
+                        </Link>
+                    </Col>
+                    <Col xs={6} md={10} className="p-0 float-end">
+                        {conteudo}
+                    </Col>
+                </Row>
             </Container>
         </Navbar>
     );

@@ -74,9 +74,9 @@ const Dashboard = () => {
                         </Link>
                     </Col>
                     <Col>
-                        <Link to="/produtos">
+                        <Link to="/fornecedores">
                             <Card className="text-center text-dark hover-card bg-light shadow-sm fw-bold fs-5 py-3 ">
-                                Ver produtos
+                                Fornecedores
                             </Card>
                         </Link>
                     </Col>

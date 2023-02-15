@@ -24,6 +24,14 @@ const userSchema = new mongoose.Schema({
             },
             pedidos: [
                 {
+                    fornecedor: {
+                        type: String,
+                        required: true,
+                    },
+                    fornecedorId: {
+                        type: String,
+                        required: true,
+                    },
                     produtoId: {
                         type: String,
                         required: true,
@@ -52,26 +60,42 @@ const userSchema = new mongoose.Schema({
             ],
         },
     ],
-    produtos: [
+    fornecedores: [
         {
-            code: {
-                type: Number,
-                required: true,
-            },
-            productName: {
+            nomeFornecedor: {
                 type: String,
                 required: true,
             },
-            estoque: {
-                type: Number,
+            metodo: {
+                type: String,
                 required: true,
-                default: 0,
             },
-            preco: {
+            porcentagemPadrao: {
                 type: Number,
-                required: true,
-                default: 0,
             },
+            produtos: [
+                {
+                    code: {
+                        type: Number,
+                        required: true,
+                    },
+                    productName: {
+                        type: String,
+                        required: true,
+                    },
+                    preco: {
+                        type: Number,
+                        required: true,
+                        default: 0,
+                    },
+                    precoVenda: {
+                        type: Number,
+                    },
+                    porcentagemVenda: {
+                        type: Number,
+                    },
+                },
+            ],
         },
     ],
 });

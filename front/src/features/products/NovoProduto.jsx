@@ -25,6 +25,9 @@ const NovoProduto = () => {
     const [produto, setProduto] = useState("");
     const [estoque, setEstoque] = useState("");
     const [preco, setPreco] = useState("");
+    const [precoVenda, setPrecoVenda] = useState("");
+    const [porcentagemVenda, setPorcentagemVenda] = useState("");
+
     const [errMsg, setErrMsg] = useState("");
     const [duplicated, setDuplicated] = useState("");
 
@@ -60,6 +63,8 @@ const NovoProduto = () => {
     const onProdutoChange = (e) => setProduto(e.target.value);
     const onEstoqueChange = (e) => setEstoque(e.target.value);
     const onPrecoChange = (e) => setPreco(e.target.value);
+    const onPrecoVendaChange = (e) => setPrecoVenda(e.target.value);
+    const onPorcentagemVendaChange = (e) => setPorcentagemVenda(e.target.value);
 
     const canSave = codigo && produto && estoque && preco && !isLoading;
 
@@ -73,6 +78,8 @@ const NovoProduto = () => {
                     productName: produto,
                     estoque: estoque,
                     preco: preco,
+                    precoVenda: preco,
+                    porcentagemVenda: 0,
                 },
             });
         }
@@ -132,16 +139,7 @@ const NovoProduto = () => {
                                     </Form.Text>
                                 )}
                             </Form.Group>
-                            <Form.Group className="mb-3" controlId="estoque">
-                                <Form.Label>Quantidade em estoque</Form.Label>
-                                <Form.Control
-                                    type="number"
-                                    pattern="[0-9]{11}"
-                                    value={estoque}
-                                    onChange={onEstoqueChange}
-                                    required
-                                />
-                            </Form.Group>
+
                             <Form.Group className="mb-3" controlId="preco">
                                 <Form.Label>Preço</Form.Label>
                                 <Form.Control
@@ -149,6 +147,27 @@ const NovoProduto = () => {
                                     value={preco}
                                     onChange={onPrecoChange}
                                     required
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3" controlId="precoVenda">
+                                <Form.Label>Preco de venda</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    value={precoVenda}
+                                    onChange={onPrecoVendaChange}
+                                />
+                            </Form.Group>
+                            <Form.Group
+                                className="mb-3"
+                                controlId="porcentagem"
+                            >
+                                <Form.Label>
+                                    Sua porcentagem na venda
+                                </Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    value={porcentagemVenda}
+                                    onChange={onPorcentagemVendaChange}
                                 />
                             </Form.Group>
 

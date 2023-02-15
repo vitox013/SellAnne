@@ -41,17 +41,21 @@ const Clientes = () => {
     useEffect(() => {
         if (term == "") {
             setConteudo(
-                clientes?.length
-                    ? clientes.map((clientId) => (
-                          <CardClient
-                              key={clientId._id}
-                              clientId={clientId._id}
-                              clientName={clientId.clientName}
-                              qtdPedido={clientId.pedidos.length}
-                              path={clientId._id}
-                          />
-                      ))
-                    : null
+                clientes?.length ? (
+                    clientes.map((clientId) => (
+                        <CardClient
+                            key={clientId._id}
+                            clientId={clientId._id}
+                            clientName={clientId.clientName}
+                            qtdPedido={clientId.pedidos.length}
+                            path={clientId._id}
+                        />
+                    ))
+                ) : (
+                    <p className="alert alert-danger text-center">
+                        Nenhum cliente cadastrado!
+                    </p>
+                )
             );
         }
         if (term) {

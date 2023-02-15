@@ -19,6 +19,10 @@ import ProductsLayout from "./features/products/ProductsLayout";
 import Produtos from "./features/products/Produtos";
 import NovoProduto from "./features/products/NovoProduto";
 import DetalhesProduto from "./features/products/DetalhesProduto";
+import FornecedoresLayout from "./features/fornecedores/FornecedoresLayout";
+import Fornecedores from "./features/fornecedores/Fornecedores";
+import DetalhesFornecedor from "./features/fornecedores/DetalhesFornecedor";
+import NovoFornecedor from "./features/fornecedores/NovoFornecedor";
 
 function App() {
     const { userId } = useAuth();
@@ -54,18 +58,29 @@ function App() {
                                             element={<DetalhesCliente />}
                                         />
                                     </Route>
+
                                     <Route
                                         path="produtos"
                                         element={<ProductsLayout />}
                                     >
                                         <Route index element={<Produtos />} />
+                                    </Route>
+
+                                    <Route
+                                        path="fornecedores"
+                                        element={<FornecedoresLayout />}
+                                    >
                                         <Route
-                                            path=":id"
-                                            element={<DetalhesProduto />}
+                                            index
+                                            element={<Fornecedores />}
                                         />
                                         <Route
-                                            path="novoproduto"
-                                            element={<NovoProduto />}
+                                            path=":id"
+                                            element={<DetalhesFornecedor />}
+                                        />
+                                        <Route
+                                            path="novofornecedor"
+                                            element={<NovoFornecedor />}
                                         />
                                     </Route>
                                 </Route>

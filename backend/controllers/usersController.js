@@ -21,7 +21,7 @@ const getUserData = asyncHandler(async (req, res) => {
 // @acess Private
 
 const updateUser = asyncHandler(async (req, res) => {
-    const { userId, username, email, password, cliente, produto } = req.body;
+    const { userId, username, email, password, cliente, fornecedor } = req.body;
 
     // Atualização dos dados cadastrais do usuário
 
@@ -61,7 +61,7 @@ const updateUser = asyncHandler(async (req, res) => {
         res.json({ message: `${updateUser.username} atualizado!` });
     }
     //Atualização de clientes ou produto
-    if (cliente || produto) {
+    if (cliente || fornecedor) {
         const user = await User.findById(userId).exec();
 
         if (cliente) {
@@ -125,31 +125,50 @@ const updateUser = asyncHandler(async (req, res) => {
                 }
             }
         }
-        if (produto) {
-            const user = await User.findById(userId).exec();
-
-            if (produto._id) {
-                const atualizarProduto = await User.findOneAndUpdate(
-                    {
-                        "produtos._id": produto._id,
-                    },
-                    {
-                        $set: {
-                            "produtos.$[field].estoque": produto.estoque,
-                            "produtos.$[field].preco": produto.preco,
-                            "produtos.$[field].productNome":
-                                produto.productNome,
-                        },
-                    },
-                    {
-                        arrayFilters: [{ "field._id": produto._id }],
-                    }
-                );
-                res.json({ message: `${produto.productNome} atualizado!` });
-            } else {
-                user.produtos.push(produto);
+        if (fornecedor) {
+            //Criação de fornecedor
+            if (!fornecedor._id) {
+                user.fornecedores.push(fornecedor);
                 await user.save();
-                res.json({ message: "Produto Criado" });
+                return res.json({ message: `Fornecedor criado!` });
+            } else if (fornecedor.produto) {
+                const user = await User.findById(userId).exec();
+
+                if (fornecedor.produto._id) {
+                    const atualizarProduto = await User.findOneAndUpdate(
+                        {
+                            "fornecedores.produtos._id": fornecedor.produto._id,
+                        },
+                        {
+                            $set: {
+                                "fornecedores.$.produtos.$[field].precoVenda":
+                                    fornecedor.produto.precoVenda,
+                                "fornecedores.$.produtos.$[field].preco":
+                                    fornecedor.produto.preco,
+                                "fornecedores.$.produtos.$[field].porcentagemVenda":
+                                    fornecedor.produto.porcentagemVenda,
+                            },
+                        },
+                        {
+                            arrayFilters: [
+                                { "field._id": fornecedor.produto._id },
+                            ],
+                        }
+                    );
+                    res.json({ message: `Produto atualizado!` });
+                } else {
+                    const criarProduto = await User.findOneAndUpdate(
+                        { "fornecedores._id": fornecedor._id },
+                        {
+                            $push: {
+                                "fornecedores.$.produtos": fornecedor.produto,
+                            },
+                        }
+                    );
+                    return res.json({
+                        message: `${fornecedor.produto.productName} criado!`,
+                    });
+                }
             }
         }
     }
@@ -159,13 +178,10 @@ const updateUser = asyncHandler(async (req, res) => {
 // @route   DELETE /users
 // @acess Private
 const deleteUser = asyncHandler(async (req, res) => {
-    const { userId, cliente, produto } = req.body;
+    const { userId, cliente, fornecedor } = req.body;
 
     if (cliente) {
         if (cliente.pedido) {
-            console.log(cliente._id);
-            console.log(cliente.pedido._id);
-
             const deletarPedido = await User.findOneAndUpdate(
                 { "clients._id": cliente._id },
                 {
@@ -177,7 +193,6 @@ const deleteUser = asyncHandler(async (req, res) => {
                 },
                 { arrayFilters: [{ "field._id": cliente._id }] }
             );
-            console.log(deletarPedido);
 
             // const deletarPedido = await User.findOneAndUpdate(
             //     {
@@ -206,15 +221,31 @@ const deleteUser = asyncHandler(async (req, res) => {
             );
             return res.status(200).json({ message: "Cliente deletado" });
         }
-    } else if (produto) {
-        const deletarProduto = await User.findByIdAndUpdate(userId, {
-            $pull: { produtos: { _id: produto._id } },
-        });
-
-        return res.status(200).json({ message: "Produto deletado" });
+    } else if (fornecedor) {
+        if (fornecedor._id && !fornecedor.produto) {
+            const deletarFornecedor = await User.findByIdAndUpdate(userId, {
+                $pull: { fornecedores: { _id: fornecedor._id } },
+            });
+            return res.status(200).json({ message: "Fornecedor deletado" });
+        } else {
+            const deletarProduto = await User.findOneAndUpdate(
+                { "fornecedores._id": fornecedor._id },
+                {
+                    $pull: {
+                        "fornecedores.$[field].produtos": {
+                            _id: fornecedor.produto._id,
+                        },
+                    },
+                },
+                { arrayFilters: [{ "field._id": fornecedor._id }] }
+            );
+            return res.json({
+                message: `Produto deletado!`,
+            });
+        }
     }
 
-    if ((userId, !cliente, !produto)) {
+    if ((userId, !cliente, !fornecedor)) {
         const user = await User.findById(userId).exec();
         if (!user) {
             return res.status(400).json({ message: "Usuário não encontrado" });

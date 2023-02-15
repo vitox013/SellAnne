@@ -298,9 +298,7 @@ const CardPedido = ({
                                 type="number"
                                 value={quantPaga}
                                 max={(quantity * valor).toFixed(2)}
-                                onChange={(e) =>
-                                    setQuantPaga(e.target.value)
-                                }
+                                onChange={(e) => setQuantPaga(e.target.value)}
                                 className={canSave ? "" : "is-invalid"}
                             ></Form.Control>
                         </Col>
