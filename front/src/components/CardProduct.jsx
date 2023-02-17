@@ -15,6 +15,7 @@ const CardProduct = ({
     formaLucro,
     preco,
     produtoId,
+    nomeFornecedor,
 }) => {
     const formatter = new Intl.NumberFormat("pt-BR", {
         style: "currency",
@@ -31,11 +32,23 @@ const CardProduct = ({
     const [productName, setProductName] = useState(nomeProduto);
     const [precoBase, setPrecoBase] = useState(preco);
     const [precoVenda, setPrecoVenda] = useState(
-        metodo == "Revenda" ? formaLucro : ""
+        metodo == "Revenda" && formaLucro
     );
     const [porcentagemVenda, setPorcentagemVenda] = useState(
-        metodo == "Porcentagem" ? formaLucro : ""
+        metodo == "Porcentagem" && formaLucro
     );
+    const [duplicatedCode, setDuplicatedCode] = useState(false);
+    const [modificado, setModificado] = useState(false);
+
+    const { produtos } = useGetUserDataQuery(userId, {
+        selectFromResult: ({ data }) => ({
+            produtos: data?.fornecedores.find(
+                (forn) => forn._id == fornecedorId
+            ).produtos,
+        }),
+    });
+
+    console.log(produtos);
 
     const [updateProduct, { isSuccess: isUpdateSuccess, error: errorUpdate }] =
         useUpdateUserMutation();
@@ -43,10 +56,41 @@ const CardProduct = ({
     const [deleteProduct, { isSuccess: isDeleteSuccess, error: errorDelete }] =
         useDeleteUserMutation();
 
+    const defaultStates = () => {
+        setProductName(nomeProduto);
+        setCode(cod);
+        setPrecoBase(preco);
+        setPrecoVenda(metodo == "Revenda" && formaLucro);
+        setPorcentagemVenda(metodo == "Porcentagem" && formaLucro);
+    };
     const handleShow = () => setShow(true);
-    const handleClose = () => setShow(false);
+    const handleClose = () => {
+        setShow(false);
+        defaultStates();
+    };
     const handleShowExcluir = () => setShowExcluir(true);
     const handleCloseExcluir = () => setShowExcluir(false);
+
+    useEffect(() => {
+        setModificado(
+            precoBase != preco ||
+                (metodo == "Revenda"
+                    ? precoVenda != formaLucro
+                    : porcentagemVenda != formaLucro) ||
+                productName != nomeProduto ||
+                code != cod
+        );
+    }, [precoBase, precoVenda, porcentagemVenda, productName, code]);
+
+    useEffect(() => {
+        if (produtos) {
+            setDuplicatedCode(
+                produtos.some((p) => p.code == code && p.code != cod)
+            );
+        }
+    }, [produtos, code]);
+
+    console.log(duplicatedCode);
 
     const onClickDelete = async (e) => {
         await deleteProduct({
@@ -60,11 +104,35 @@ const CardProduct = ({
         });
     };
 
+    const onClickUpdate = async (e) => {
+        await updateProduct({
+            userId,
+            fornecedor: {
+                _id: fornecedorId,
+                produto: {
+                    _id: produtoId,
+                    code,
+                    productName,
+                    preco: precoBase,
+                    precoVenda,
+                    porcentagemVenda,
+                },
+            },
+        });
+    };
     useEffect(() => {
         if (isDeleteSuccess) {
             navigate(`/fornecedores/${fornecedorId}`, {
                 state: { message: "Produto excluído com sucesso" },
             });
+        }
+        if (isUpdateSuccess) {
+            setShow(false);
+            navigate(`/fornecedores/${fornecedorId}`, {
+                state: { message: "Produto editado com sucesso" },
+            });
+        } else if (errorUpdate) {
+            console.log("Erro ao editar produto");
         }
     }, [isUpdateSuccess, isDeleteSuccess, errorUpdate, errorDelete]);
 
@@ -148,11 +216,21 @@ const CardProduct = ({
                                 <Form.Group>
                                     <Form.Label>Codigo</Form.Label>
                                     <Form.Control
+                                        type="number"
+                                        inputMode="numeric"
                                         value={code}
                                         onChange={(e) =>
                                             setCode(e.target.value)
                                         }
+                                        className={
+                                            duplicatedCode && "is-invalid"
+                                        }
                                     ></Form.Control>
+                                    {duplicatedCode && (
+                                        <Form.Text>
+                                            Código já cadastrado
+                                        </Form.Text>
+                                    )}
                                 </Form.Group>
                             </Form>
                         </Col>
@@ -178,6 +256,8 @@ const CardProduct = ({
                                         <Form.Group>
                                             <Form.Label>Preço</Form.Label>
                                             <Form.Control
+                                                type="number"
+                                                inputMode="numeric"
                                                 value={precoBase}
                                                 onChange={(e) =>
                                                     setPrecoBase(e.target.value)
@@ -193,6 +273,8 @@ const CardProduct = ({
                                                 Preço revenda
                                             </Form.Label>
                                             <Form.Control
+                                                type="number"
+                                                inputMode="numeric"
                                                 value={precoVenda}
                                                 onChange={(e) =>
                                                     setPrecoVenda(
@@ -259,6 +341,14 @@ const CardProduct = ({
                                 </Row>
                             </Card>
                         </>
+                    )}
+                    {modificado && (
+                        <Button
+                            className="mt-2 d-flex align-items-center btn-success"
+                            onClick={onClickUpdate}
+                        >
+                            Salvar edição <i className="bx bx-edit ms-1"></i>
+                        </Button>
                     )}
                 </Modal.Body>
             </Modal>

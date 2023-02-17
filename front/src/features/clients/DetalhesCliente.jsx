@@ -28,22 +28,29 @@ const DetalhesPedido = () => {
 
     const [show, setShow] = useState(false);
     const [showPedido, setShowPedido] = useState(false);
+    const [msg, setMsg] = useState([]);
     const [errMsg, setErrMsg] = useState("");
     const [content, setContent] = useState([]);
     const [clienteNome, setClienteNome] = useState("");
-    const [term, setTerm] = useState("");
-    const [debouncedTerm, setDebouncedTerm] = useState(term);
     const [pedidos, setPedidos] = useState([]);
     const [cliente, setCliente] = useState({});
-    const [productFound, setProductFound] = useState([]);
+    const [fornecedor, setFornecedor] = useState({});
+    const [produtosFornecedor, setProdutosFornecedor] = useState([]);
+    const [prodFound, setProdFound] = useState({});
     const [list, setList] = useState([]);
     const [produtoId, setProdutoId] = useState("");
+    const [code, setCode] = useState("");
+    const [productName, setProductName] = useState("");
+    const [preco, setPreco] = useState("");
+    const [precoVenda, setPrecoVenda] = useState("");
+    const [porcentagem, setPorcentagem] = useState("");
     const [qtdPaga, setQtdPaga] = useState("");
     const [quantidade, setQuantidade] = useState("");
-    const [msg, setMsg] = useState([]);
     const [totalPago, setTotalPago] = useState("");
     const [aPagar, setAPagar] = useState(false);
     const [showStats, setShowStats] = useState(false);
+    const [optionSelected, setOptionSelected] = useState("");
+    const [options, setOptions] = useState([]);
 
     const { id: clientId } = useParams();
 
@@ -56,10 +63,10 @@ const DetalhesPedido = () => {
         message = location.state.message;
     }
 
-    const { clients, products } = useGetUserDataQuery(userId, {
+    const { clients, fornecedores } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
             clients: data?.clients,
-            products: data?.produtos,
+            fornecedores: data?.fornecedores,
         }),
     });
 
@@ -70,6 +77,9 @@ const DetalhesPedido = () => {
         useUpdateUserMutation();
 
     const [updateProduct, { isSuccess: updateIsSuccess, error: errorUpdate }] =
+        useUpdateUserMutation();
+
+    const [createProduct, { isSuccess: createIsSuccess, error: errorCreate }] =
         useUpdateUserMutation();
 
     useEffect(() => {
@@ -86,6 +96,8 @@ const DetalhesPedido = () => {
                         <CardPedido
                             key={ped._id}
                             produtoId={ped.produtoId}
+                            fornecedor={ped.fornecedor}
+                            fornecedorId={ped.fornecedorId}
                             pedidoId={ped._id}
                             nomeProduto={ped.nomeProduto}
                             codigo={ped.codigoProduto}
@@ -96,7 +108,6 @@ const DetalhesPedido = () => {
                         />
                     ))
                 );
-                console.log(pedidos);
                 setTotalPago(
                     pedidos.reduce((acc, ped) => acc + ped.qtdPaga, 0)
                 );
@@ -117,39 +128,31 @@ const DetalhesPedido = () => {
         }
     }, [clients, cliente, pedidos]);
 
-    console.log(totalPago);
-    console.log(aPagar);
+    useEffect(() => {
+        if (optionSelected != "Selecione fornecedor" && fornecedores) {
+            let forn = fornecedores.filter(
+                (forn) => forn.nomeFornecedor == optionSelected
+            );
+            forn
+                ? forn.length > 0
+                    ? setProdutosFornecedor(forn[0].produtos)
+                    : null
+                : null;
+            setFornecedor(
+                fornecedores.find(
+                    (forn) => forn.nomeFornecedor === optionSelected
+                )
+            );
+        }
+    }, [optionSelected]);
 
     useEffect(() => {
-        if (deleteIsSuccess) {
-            navigate("/clientes");
+        if (code && produtosFornecedor) {
+            setProdFound(produtosFornecedor.find((prod) => prod.code == code));
         }
-        if (errorDelete) {
-            setErrMsg("Erro ao deletar cliente");
-        }
-    }, [
-        navigate,
-        addIsSuccess,
-        updateIsSuccess,
-        addIsSuccess,
-        errorDelete,
-        errorNewPedido,
-        errorUpdate,
-        deleteIsSuccess,
-    ]);
-
-    useEffect(() => {
-        const timer = setTimeout(() => setTerm(debouncedTerm), 1000);
-        return () => clearTimeout(timer);
-    }, [debouncedTerm]);
-
-    useEffect(() => {
-        if (term && products) {
-            setProductFound(products.filter((prod) => prod.code == term));
-        }
-        if (products) {
+        if (produtosFornecedor) {
             setList(
-                products.map((prod) => (
+                produtosFornecedor.map((prod) => (
                     <option value={prod.code} key={prod.code}>
                         {`${prod.productName} | ${formatter.format(
                             prod.preco
@@ -158,32 +161,42 @@ const DetalhesPedido = () => {
                 ))
             );
         }
-        if (productFound.length > 0) {
-            setProdutoId(productFound[0]._id);
-        }
-
         setMsg(
             <h2 key={uuidv4()} className="mt-5 text-center">
                 Nenhum pedido cadastrado
             </h2>
         );
-    }, [term, products, quantidade]);
+    }, [code, fornecedores, quantidade, optionSelected, produtosFornecedor]);
 
     useEffect(() => {
-        if (addIsSuccess) {
-            setProdutoId("");
-            setQtdPaga("");
-            setQuantidade("");
-            setDebouncedTerm("");
-            setShowPedido(false);
-            setProductFound([]);
+        if (fornecedores) {
+            setOptions(
+                fornecedores.map((forn) => (
+                    <option value={forn.nomeFornecedor} key={forn._id}>
+                        {forn.nomeFornecedor}
+                    </option>
+                ))
+            );
         }
-    }, [addIsSuccess]);
+    }, [fornecedores]);
+    const clearFields = () => {
+        setPreco("");
+        setPrecoVenda("");
+        setProductName("");
+        setQtdPaga("");
+        setQuantidade("");
+        setCode("");
+        setProdFound({});
+    };
 
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
     const handleShowPedido = () => setShowPedido(true);
-    const handleClosePedido = () => setShowPedido(false);
+    const handleClosePedido = () => {
+        setShowPedido(false);
+        setOptionSelected("");
+        clearFields();
+    };
     const handleShowStats = () => setShowStats(true);
     const handleCloseStats = () => setShowStats(false);
 
@@ -196,42 +209,122 @@ const DetalhesPedido = () => {
         });
     };
 
+    const canSave =
+        code &&
+        preco &&
+        quantidade &&
+        productName &&
+        (precoVenda || porcentagem) &&
+        qtdPaga &&
+        optionSelected != "Selecione fornecedor" &&
+        qtdPaga >= 0 &&
+        qtdPaga <= (quantidade * precoVenda).toFixed(2);
+
     const handleAddNewPedido = async (e) => {
         e.preventDefault();
 
-        if (productFound.length > 0 && produtoId) {
-            const canSave =
-                productFound[0].estoque >= quantidade &&
-                qtdPaga <= (productFound[0].preco * quantidade).toFixed(2) &&
-                qtdPaga >= 0;
-
-            if (canSave) {
+        if (canSave) {
+            if (prodFound) {
                 await addNewPedido({
                     cliente: {
                         _id: clientId,
                         pedido: {
-                            produtoId: productFound[0]._id,
-                            codigoProduto: productFound[0].code,
-                            nomeProduto: productFound[0].productName,
+                            fornecedor: fornecedor.nomeFornecedor,
+                            fornecedorId: fornecedor._id,
+                            produtoId: prodFound._id,
+                            codigoProduto: prodFound.code,
+                            nomeProduto: prodFound.productName,
                             quantidade,
                             qtdPaga,
-                            valor: productFound[0].preco,
+                            valor: prodFound.preco,
                         },
                     },
                 });
-                await updateProduct({
+                // await updateProduct({
+                //     userId,
+                //     produto: {
+                //         _id: produtoId,
+                //         code: prodFound.code,
+                //         productName: prodFound.productName,
+                //         preco: prodFound.preco,
+                //     },
+                // });
+            } else {
+                await createProduct({
                     userId,
-                    produto: {
-                        _id: produtoId,
-                        code: productFound[0].code,
-                        productName: productFound[0].productName,
-                        estoque: productFound[0].estoque - quantidade,
-                        preco: productFound[0].preco,
+                    fornecedor: {
+                        _id: fornecedor._id,
+                        produto: {
+                            code,
+                            productName,
+                            preco,
+                            precoVenda,
+                            porcentagem,
+                        },
+                    },
+                });
+                await addNewPedido({
+                    cliente: {
+                        _id: clientId,
+                        pedido: {
+                            fornecedor: fornecedor.nomeFornecedor,
+                            fornecedorId: fornecedor._id,
+                            produtoId: code.toString(),
+                            codigoProduto: code,
+                            nomeProduto: productName,
+                            quantidade,
+                            qtdPaga,
+                            valor: preco,
+                        },
                     },
                 });
             }
         }
     };
+
+    useEffect(() => {
+        if (prodFound) {
+            setPreco(prodFound.preco);
+            setPrecoVenda(prodFound.precoVenda);
+            setProductName(prodFound.productName);
+        }
+    }, [prodFound]);
+
+    useEffect(() => {
+        if (deleteIsSuccess) {
+            navigate("/clientes");
+        }
+        if (errorDelete) {
+            setErrMsg("Erro ao deletar cliente");
+        }
+        if (addIsSuccess) {
+            setProdutoId("");
+            clearFields();
+            setShowPedido(false);
+            setProdFound({});
+        } else if (errorNewPedido) {
+            setErrMsg("Erro ao adicionar pedido");
+        }
+        if (createIsSuccess) {
+            setProdutoId("");
+            clearFields();
+            setShowPedido(false);
+            setProdFound({});
+        } else if (errorCreate) {
+            setErrMsg("Erro ao adicionar produto");
+        }
+    }, [
+        navigate,
+        addIsSuccess,
+        updateIsSuccess,
+        addIsSuccess,
+        createIsSuccess,
+        errorDelete,
+        errorNewPedido,
+        errorUpdate,
+        errorCreate,
+        deleteIsSuccess,
+    ]);
 
     return (
         <>
@@ -290,7 +383,7 @@ const DetalhesPedido = () => {
                         )}
                     </Col>
                 </Row>
-                {showStats ? (
+                {showStats && (
                     <>
                         <Row>
                             <Col xs={6} md={2}>
@@ -311,8 +404,6 @@ const DetalhesPedido = () => {
                             </Col>
                         </Row>
                     </>
-                ) : (
-                    ""
                 )}
                 <Card className=" px-2 py-2 mt-3 text-black shadow-sm fw-bold">
                     <Row>
@@ -351,194 +442,380 @@ const DetalhesPedido = () => {
                             </Modal.Header>
                             <Modal.Body>
                                 <Form>
-                                    <Form.Group
-                                        className="mb-3"
-                                        controlId="codigo"
-                                    >
-                                        <Form.Label>Código produto</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            pattern="[0-9]{20}"
-                                            inputMode="numeric"
-                                            placeholder="Código"
-                                            autoFocus
-                                            value={debouncedTerm}
-                                            onChange={(e) =>
-                                                setDebouncedTerm(e.target.value)
-                                            }
-                                            className={
-                                                productFound.length > 0
-                                                    ? "is-valid"
-                                                    : "is-invalid"
-                                            }
-                                            required
-                                            list="listaProdutos"
-                                        />
-                                        <datalist id="listaProdutos">
-                                            {list.length > 0 && list}
-                                        </datalist>
+                                    <Form.Group className="mb-3">
+                                        {options &&
+                                            (options.length > 0 ? (
+                                                <>
+                                                    <Form.Label>
+                                                        Fornecedor
+                                                    </Form.Label>
+                                                    <Form.Select
+                                                        className="w-75"
+                                                        onChange={(e) =>
+                                                            setOptionSelected(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    >
+                                                        <option>
+                                                            Selecione fornecedor
+                                                        </option>
+                                                        {options}
+                                                    </Form.Select>
+                                                </>
+                                            ) : (
+                                                <div className="text-center">
+                                                    {" "}
+                                                    <p className="alert alert-danger text-center">
+                                                        Nenhum fornecedor
+                                                        cadastrado
+                                                    </p>
+                                                    <Link to="/fornecedores/novofornecedor">
+                                                        <Button variant="success">
+                                                            Criar fornecedor
+                                                        </Button>
+                                                    </Link>
+                                                </div>
+                                            ))}
+                                    </Form.Group>
 
-                                        <Form.Text>
-                                            {productFound.length > 0
-                                                ? "Produto encontrado!"
-                                                : "Os dados serão preenchidos automaticamente"}
-                                        </Form.Text>
-                                    </Form.Group>
-                                    <Form.Group
-                                        className="mb-3"
-                                        controlId="nomeProduto"
-                                    >
-                                        <Form.Label>Nome produto</Form.Label>
-                                        <Form.Control
-                                            value={
-                                                productFound.length > 0
-                                                    ? productFound[0]
-                                                          .productName
-                                                    : ""
-                                            }
-                                            readOnly
-                                            disabled
-                                        />
-                                    </Form.Group>
-                                    <Form.Group
-                                        className="mb-3"
-                                        controlId="produtoId"
-                                    >
-                                        <Form.Control
-                                            type="hidden"
-                                            value={
-                                                productFound.length > 0
-                                                    ? productFound[0]._id
-                                                    : ""
-                                            }
-                                        />
-                                    </Form.Group>
-                                    <Form.Group
-                                        className="mb-3"
-                                        controlId="quantidade"
-                                    >
-                                        <Form.Label>Quantidade</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            required
-                                            inputMode="numeric"
-                                            max={
-                                                productFound.length > 0
-                                                    ? productFound[0].estoque
-                                                    : ""
-                                            }
-                                            value={quantidade}
-                                            onChange={(e) =>
-                                                setQuantidade(e.target.value)
-                                            }
-                                            className={
-                                                productFound.length > 0
-                                                    ? productFound[0].estoque >=
-                                                          quantidade &&
-                                                      quantidade > 0
-                                                        ? "is-valid"
-                                                        : "is-invalid"
-                                                    : ""
-                                            }
-                                        />
-                                        <Form.Text>
-                                            {productFound.length > 0
-                                                ? productFound[0].estoque > 0
-                                                    ? productFound[0].estoque +
-                                                      " restantes"
-                                                    : "SEM ESTOQUE"
-                                                : ""}
-                                        </Form.Text>
-                                    </Form.Group>
-                                    <Form.Group
-                                        className="mb-3"
-                                        controlId="valor"
-                                    >
-                                        <Form.Label>Valor unidade</Form.Label>
-                                        <Form.Control
-                                            readOnly
-                                            value={
-                                                productFound.length > 0
-                                                    ? formatter.format(
-                                                          productFound[0].preco
-                                                      )
-                                                    : ""
-                                            }
-                                            disabled
-                                        />
-                                    </Form.Group>
-                                    <Form.Group
-                                        className="mb-3"
-                                        controlId="valorTotal"
-                                    >
-                                        <Form.Label>
-                                            Valor total pedido
-                                        </Form.Label>
-                                        <Form.Control
-                                            readOnly
-                                            value={
-                                                productFound.length > 0
-                                                    ? formatter.format(
-                                                          productFound[0]
-                                                              .preco *
-                                                              quantidade
-                                                      )
-                                                    : ""
-                                            }
-                                            disabled
-                                        />
-                                    </Form.Group>
-                                    <Form.Group
-                                        className="mb-3"
-                                        controlId="qtdPaga"
-                                    >
-                                        <Form.Label>Valor já pago</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            inputMode="numeric"
-                                            max={
-                                                productFound.length > 0
-                                                    ? productFound[0].preco *
-                                                      quantidade
-                                                    : ""
-                                            }
-                                            required
-                                            value={qtdPaga}
-                                            onChange={(e) =>
-                                                setQtdPaga(e.target.value)
-                                            }
-                                            className={
-                                                productFound.length > 0
-                                                    ? qtdPaga <=
-                                                          (
-                                                              productFound[0]
-                                                                  .preco *
-                                                              quantidade
-                                                          ).toFixed(2) &&
-                                                      qtdPaga &&
-                                                      qtdPaga >= 0
-                                                        ? "is-valid"
-                                                        : "is-invalid"
-                                                    : ""
-                                            }
-                                        />
-                                    </Form.Group>
+                                    {options &&
+                                        options.length > 0 &&
+                                        optionSelected !=
+                                            "Selecione fornecedor" &&
+                                        optionSelected && (
+                                            <>
+                                                <Row>
+                                                    <Col>
+                                                        <Form.Group
+                                                            className="mb-3"
+                                                            controlId="codigo"
+                                                        >
+                                                            <Form.Label>
+                                                                Código
+                                                            </Form.Label>
+                                                            <Form.Control
+                                                                type="text"
+                                                                pattern="[0-9]{20}"
+                                                                inputMode="numeric"
+                                                                placeholder="Código"
+                                                                autoFocus
+                                                                value={code}
+                                                                onChange={(e) =>
+                                                                    setCode(
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                                required
+                                                                list="listaProdutos"
+                                                            />
+                                                            <datalist id="listaProdutos">
+                                                                {list.length >
+                                                                    0 && list}
+                                                            </datalist>
+
+                                                            <Form.Text>
+                                                                {prodFound >
+                                                                    0 &&
+                                                                    "Produto encontrado!"}
+                                                            </Form.Text>
+                                                        </Form.Group>
+                                                    </Col>
+                                                    <Col>
+                                                        <Form.Group
+                                                            className="mb-3"
+                                                            controlId="nomeProduto"
+                                                        >
+                                                            <Form.Label>
+                                                                Nome produto
+                                                            </Form.Label>
+                                                            <Form.Control
+                                                                value={
+                                                                    prodFound
+                                                                        ? prodFound.productName
+                                                                        : productName
+                                                                }
+                                                                disabled={
+                                                                    prodFound
+                                                                        ? true
+                                                                        : false
+                                                                }
+                                                                onChange={(e) =>
+                                                                    setProductName(
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                            />
+                                                        </Form.Group>
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col>
+                                                        <Form.Group
+                                                            className="mb-3"
+                                                            controlId="valor"
+                                                        >
+                                                            <Form.Label>
+                                                                Preço
+                                                            </Form.Label>
+                                                            <Form.Control
+                                                                type="number"
+                                                                inputMode="numeric"
+                                                                value={
+                                                                    prodFound
+                                                                        ? Number(
+                                                                              prodFound.preco
+                                                                          ).toString()
+                                                                        : Number(
+                                                                              preco
+                                                                          ).toString()
+                                                                }
+                                                                disabled={
+                                                                    prodFound
+                                                                        ? true
+                                                                        : false
+                                                                }
+                                                                onChange={(e) =>
+                                                                    setPreco(
+                                                                        Number(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    )
+                                                                }
+                                                                className="CurrencyInput"
+                                                            />
+                                                        </Form.Group>
+                                                    </Col>
+
+                                                    {fornecedor &&
+                                                        (fornecedor.metodo ==
+                                                        "Revenda" ? (
+                                                            <Col>
+                                                                <Form.Group
+                                                                    className="mb-3"
+                                                                    controlId="precoVenda"
+                                                                >
+                                                                    <Form.Label>
+                                                                        Preço
+                                                                        venda
+                                                                    </Form.Label>
+                                                                    <Form.Control
+                                                                        type="number"
+                                                                        inputMode="numeric"
+                                                                        pattern="[0-9]*"
+                                                                        required
+                                                                        disabled={
+                                                                            prodFound
+                                                                                ? true
+                                                                                : false
+                                                                        }
+                                                                        value={
+                                                                            prodFound
+                                                                                ? Number(
+                                                                                      prodFound.precoVenda
+                                                                                  ).toString()
+                                                                                : Number(
+                                                                                      precoVenda
+                                                                                  ).toString()
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            setPrecoVenda(
+                                                                                Number(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value
+                                                                                )
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </Form.Group>
+                                                            </Col>
+                                                        ) : (
+                                                            <Col xs={6}>
+                                                                <Form.Group
+                                                                    className="mb-3"
+                                                                    controlId="porcentagem"
+                                                                >
+                                                                    <Form.Label>
+                                                                        Porcentagem
+                                                                        %
+                                                                    </Form.Label>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        inputMode="numeric"
+                                                                        pattern="[0-9]*"
+                                                                        max="100"
+                                                                        required
+                                                                        value={
+                                                                            porcentagem
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            setPorcentagem(
+                                                                                e
+                                                                                    .target
+                                                                                    .value
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </Form.Group>
+                                                            </Col>
+                                                        ))}
+                                                </Row>
+                                                <Row>
+                                                    <Col>
+                                                        <Form.Group
+                                                            className="mb-3"
+                                                            controlId="quantidade"
+                                                        >
+                                                            <Form.Label>
+                                                                Quantidade
+                                                            </Form.Label>
+                                                            <Form.Control
+                                                                type="text"
+                                                                pattern="[0-9]*"
+                                                                required
+                                                                inputMode="numeric"
+                                                                value={
+                                                                    quantidade
+                                                                }
+                                                                onChange={(e) =>
+                                                                    setQuantidade(
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                            />
+                                                        </Form.Group>
+                                                    </Col>
+                                                    <Col>
+                                                        <Form.Group
+                                                            className="mb-3"
+                                                            controlId="qtdPaga"
+                                                        >
+                                                            <Form.Label>
+                                                                Valor já pago
+                                                            </Form.Label>
+                                                            <Form.Control
+                                                                type="number"
+                                                                inputMode="numeric"
+                                                                pattern="[0-9]*"
+                                                                required
+                                                                value={qtdPaga}
+                                                                onChange={(e) =>
+                                                                    setQtdPaga(
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                                className={
+                                                                    (precoVenda ||
+                                                                        porcentagem) &&
+                                                                    preco &&
+                                                                    quantidade &&
+                                                                    qtdPaga &&
+                                                                    !(
+                                                                        qtdPaga <=
+                                                                        (precoVenda
+                                                                            ? quantidade *
+                                                                              precoVenda
+                                                                            : quantidade *
+                                                                              preco)
+                                                                    ) &&
+                                                                    "is-invalid"
+                                                                }
+                                                            />
+
+                                                            {(precoVenda ||
+                                                                porcentagem) &&
+                                                                quantidade && (
+                                                                    <Form.Text>
+                                                                        Total
+                                                                        pedido:
+                                                                        R${" "}
+                                                                        {(porcentagem
+                                                                            ? preco
+                                                                            : quantidade *
+                                                                              precoVenda
+                                                                        ).toFixed(
+                                                                            2
+                                                                        )}
+                                                                    </Form.Text>
+                                                                )}
+                                                        </Form.Group>
+                                                    </Col>
+                                                </Row>
+                                                {(precoVenda || porcentagem) &&
+                                                    preco &&
+                                                    quantidade && (
+                                                        <Card className="text-center bg-success bg-opacity-50">
+                                                            <Row>
+                                                                <Col className="fw-bold">
+                                                                    Lucro com a
+                                                                    venda:{" "}
+                                                                </Col>
+                                                            </Row>
+                                                            <Row>
+                                                                {porcentagem ? (
+                                                                    <Col className="fw-bold">
+                                                                        {formatter.format(
+                                                                            (
+                                                                                ((preco *
+                                                                                    porcentagem) /
+                                                                                    100) *
+                                                                                quantidade
+                                                                            ).toFixed(
+                                                                                2
+                                                                            )
+                                                                        )}
+                                                                    </Col>
+                                                                ) : (
+                                                                    <Col className="fw-bold">
+                                                                        {formatter.format(
+                                                                            (
+                                                                                (precoVenda -
+                                                                                    preco) *
+                                                                                quantidade
+                                                                            ).toFixed(
+                                                                                2
+                                                                            )
+                                                                        )}
+                                                                    </Col>
+                                                                )}
+                                                            </Row>
+                                                        </Card>
+                                                    )}
+                                            </>
+                                        )}
                                 </Form>
                             </Modal.Body>
-                            <Modal.Footer>
-                                <Button
-                                    variant="danger"
-                                    onClick={handleClosePedido}
-                                >
-                                    Fechar
-                                </Button>
-                                <Button
-                                    variant="success"
-                                    onClick={handleAddNewPedido}
-                                >
-                                    Criar pedido
-                                </Button>
-                            </Modal.Footer>
+                            {options && options.length > 0 && (
+                                <>
+                                    {" "}
+                                    <Modal.Footer>
+                                        <Button
+                                            variant="danger"
+                                            onClick={handleClosePedido}
+                                        >
+                                            Fechar
+                                        </Button>
+                                        <Button
+                                            variant="success"
+                                            onClick={handleAddNewPedido}
+                                            disabled={!canSave}
+                                        >
+                                            Criar pedido
+                                        </Button>
+                                    </Modal.Footer>
+                                </>
+                            )}
                         </Modal>
                     </Container>
                 </Navbar>

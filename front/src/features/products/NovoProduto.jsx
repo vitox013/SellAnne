@@ -3,7 +3,7 @@ import { Col, Container, Row, Form, Button } from "react-bootstrap";
 import Back from "../../components/Back";
 import useAuth from "../../hooks/useAuth";
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
     useUpdateUserMutation,
     useGetUserDataQuery,
@@ -19,11 +19,13 @@ const NovoProduto = () => {
 
     const navigate = useNavigate();
     const { userId } = useAuth();
+    const { id: fornecedorId } = useParams();
 
     const errRef = useRef();
     const [codigo, setCodigo] = useState("");
     const [produto, setProduto] = useState("");
     const [estoque, setEstoque] = useState("");
+    const [fornecedor, setFornecedor] = useState("");
     const [preco, setPreco] = useState("");
     const [precoVenda, setPrecoVenda] = useState("");
     const [porcentagemVenda, setPorcentagemVenda] = useState("");
@@ -40,24 +42,25 @@ const NovoProduto = () => {
         }),
     });
 
-    useEffect(() => {
-        if (isSuccess) {
-            setCodigo("");
-            setProduto("");
-            setEstoque("");
-            setPreco("");
-            navigate("/produtos");
-        }
-        if (error) {
-            setErrMsg(error.data.message);
-        }
-    }, [isSuccess, navigate, error]);
+    const { fornecedores } = useGetUserDataQuery(userId, {
+        selectFromResult: ({ data }) => ({
+            fornecedores: data?.fornecedores,
+        }),
+    });
 
     useEffect(() => {
         if (products) {
             setDuplicated(products.find((prod) => prod.code == codigo));
         }
     }, [codigo]);
+
+    useEffect(() => {
+        if (fornecedores) {
+            setFornecedor(
+                fornecedores.find((fornecedor) => fornecedor_id == fornecedorId)
+            );
+        }
+    }, [fornecedores]);
 
     const onCodigoChange = (e) => setCodigo(e.target.value);
     const onProdutoChange = (e) => setProduto(e.target.value);
@@ -84,6 +87,21 @@ const NovoProduto = () => {
             });
         }
     };
+
+    useEffect(() => {
+        if (isSuccess) {
+            setCodigo("");
+            setProduto("");
+            setEstoque("");
+            setPreco("");
+            navigate("/produtos");
+        }
+        if (error) {
+            setErrMsg(error.data.message);
+        }
+    }, [isSuccess, navigate, error]);
+
+    console.log(fornecedores)
 
     const errClass = errMsg ? "alert alert-danger" : "d-none";
 
@@ -166,7 +184,11 @@ const NovoProduto = () => {
                                 </Form.Label>
                                 <Form.Control
                                     type="number"
-                                    value={porcentagemVenda}
+                                    value={
+                                        fornecedor
+                                            ? fornecedor.porcentagemPadrao
+                                            : porcentagemVenda
+                                    }
                                     onChange={onPorcentagemVendaChange}
                                 />
                             </Form.Group>

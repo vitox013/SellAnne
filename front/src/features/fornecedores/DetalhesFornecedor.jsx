@@ -103,6 +103,7 @@ const DetalhesFornecedor = () => {
                             metodo={fornecedor.metodo}
                             preco={prod.preco}
                             produtoId={prod._id}
+                            nomeFornecedor={fornecedor.nomeFornecedor}
                         />
                     ))
                 ) : (
@@ -162,7 +163,9 @@ const DetalhesFornecedor = () => {
         !duplicatedCode &&
         code &&
         productName &&
-        ((preco && precoVenda && preco < precoVenda) || porcentagemVenda);
+        preco &&
+        ((precoVenda && preco < precoVenda) ||
+            (fornecedor ? fornecedor.porcentagemPadrao : 0));
 
     const onSaveProduct = async (e) => {
         if (canSave) {
@@ -232,7 +235,7 @@ const DetalhesFornecedor = () => {
             <Container>
                 <Row>
                     <h1 className="mt-2 pt-10 d-flex align-items-center">
-                        {fornecedor ? fornecedor.nomeFornecedor : ""}{" "}
+                        {fornecedor && fornecedor.nomeFornecedor}{" "}
                         <i
                             className="bx bx-trash ms-2 pointer"
                             onClick={handShowExcluir}
@@ -296,11 +299,9 @@ const DetalhesFornecedor = () => {
                             <Col xs={4}>Nome</Col>
                             <Col xs={3}>Valor</Col>
                             <Col xs={3} className="ps-0">
-                                {fornecedor
-                                    ? fornecedor.metodo == "Revenda"
-                                        ? "Revenda"
-                                        : "%"
-                                    : ""}
+                                {fornecedor && fornecedor.metodo == "Revenda"
+                                    ? "Revenda"
+                                    : "%"}
                             </Col>
                         </Row>
                     </Card>
@@ -341,7 +342,7 @@ const DetalhesFornecedor = () => {
                                 autoFocus
                                 value={code}
                                 onChange={(e) => setCode(e.target.value)}
-                                className={duplicatedCode ? "is-invalid" : ""}
+                                className={duplicatedCode && "is-invalid"}
                                 required
                             />
                             {duplicatedCode && (
@@ -367,12 +368,14 @@ const DetalhesFornecedor = () => {
                                 type="number"
                                 required
                                 inputMode="numeric"
-                                value={preco}
-                                onChange={(e) => setPreco(e.target.value)}
+                                value={Number(preco).toString()}
+                                onChange={(e) =>
+                                    setPreco(Number(e.target.value))
+                                }
                             />
                         </Form.Group>
-                        {fornecedor ? (
-                            fornecedor.metodo == "Revenda" ? (
+                        {fornecedor &&
+                            (fornecedor.metodo == "Revenda" ? (
                                 <Form.Group
                                     className="mb-3 fw-bold"
                                     controlId="precoVenda"
@@ -383,14 +386,15 @@ const DetalhesFornecedor = () => {
                                         value={precoVenda}
                                         inputMode="numeric"
                                         className={
-                                            preco > precoVenda
-                                                ? "is-invalid"
-                                                : ""
+                                            preco > precoVenda && "is-invalid"
                                         }
                                         onChange={(e) =>
-                                            setPrecoVenda(e.target.value)
+                                            setPrecoVenda(
+                                                Number(e.target.value)
+                                            )
                                         }
                                     />
+                                    {console.log(preco, precoVenda)}
                                 </Form.Group>
                             ) : (
                                 <Form.Group
@@ -402,16 +406,14 @@ const DetalhesFornecedor = () => {
                                     </Form.Label>
                                     <Form.Control
                                         inputMode="numeric"
-                                        value={porcentagemVenda}
-                                        onChange={(e) =>
-                                            setPorcentagemVenda(e.target.value)
+                                        value={
+                                            fornecedor &&
+                                            fornecedor.porcentagemPadrao
                                         }
+                                        readOnly
                                     />
                                 </Form.Group>
-                            )
-                        ) : (
-                            ""
-                        )}
+                            ))}
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>

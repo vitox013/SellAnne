@@ -133,14 +133,19 @@ const updateUser = asyncHandler(async (req, res) => {
                 return res.json({ message: `Fornecedor criado!` });
             } else if (fornecedor.produto) {
                 const user = await User.findById(userId).exec();
-
+                console.log("bucetinha")
                 if (fornecedor.produto._id) {
+                    console.log("entrei kkk");
                     const atualizarProduto = await User.findOneAndUpdate(
                         {
                             "fornecedores.produtos._id": fornecedor.produto._id,
                         },
                         {
                             $set: {
+                                "fornecedores.$.produtos.$[field].code":
+                                    fornecedor.produto.code,
+                                "fornecedores.$.produtos.$[field].productName":
+                                    fornecedor.produto.productName,
                                 "fornecedores.$.produtos.$[field].precoVenda":
                                     fornecedor.produto.precoVenda,
                                 "fornecedores.$.produtos.$[field].preco":

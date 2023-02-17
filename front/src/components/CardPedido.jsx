@@ -27,6 +27,8 @@ const CardPedido = ({
     codigo,
     qtdPaga,
     clientNome,
+    fornecedor,
+    fornecedorId,
 }) => {
     const formatter = new Intl.NumberFormat("pt-BR", {
         style: "currency",
@@ -63,13 +65,15 @@ const CardPedido = ({
 
     const { products } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
-            products: data.produtos,
+            products: data?.fornecedores,
         }),
     });
 
-    useEffect(() => {
-        setProduto(products.find((p) => p._id === produtoId));
-    }, [products]);
+    console.log(products);
+
+    // useEffect(() => {
+    //     setProduto(products.find((p) => p._id === produtoId));
+    // }, [products]);
 
     const handleShow = () => setShow(true);
     const handleClose = () => {
@@ -171,7 +175,6 @@ const CardPedido = ({
         }
     }, [quantity, quantPaga]);
 
-    console.log(alterado, qtdPaga, quantPaga);
     const statusClass =
         qtdPaga < (quantidade * valor).toFixed(1)
             ? "alert alert-danger"

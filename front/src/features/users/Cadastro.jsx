@@ -7,8 +7,7 @@ import Form from "react-bootstrap/Form";
 import NavDash from "../../components/NavBar";
 import { useAddNewUserMutation } from "./newUserApiSlice";
 
-
-const USER_REGEX = /^[A-z]{3,20}$/;
+const USER_REGEX = /^[A-z\ ]{3,20}$/;
 const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/;
 
 const Cadastro = () => {
@@ -52,6 +51,7 @@ const Cadastro = () => {
     const canSave =
         [validUsername, validPassword, email].every(Boolean) && !isLoading;
 
+    console.log(canSave);
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
         try {

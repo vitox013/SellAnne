@@ -72,6 +72,7 @@ const NovoFornecedor = () => {
                 fornecedor: {
                     nomeFornecedor,
                     metodo: opcao,
+                    porcentagemPadrao: porcentagem,
                 },
             });
         }
