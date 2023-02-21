@@ -40,7 +40,12 @@ const NovoCliente = () => {
 
     useEffect(() => {
         setValidNome(USER_REGEX.test(nome));
-        setDuplicatedName(clientes.some((client) => client.clientName == nome));
+
+        clientes.map((client) => {
+            client.clientName.toLowerCase() === nome.toLowerCase()
+                ? setDuplicatedName(true)
+                : setDuplicatedName(false);
+        });
     }, [nome]);
 
     useEffect(() => {
@@ -101,7 +106,7 @@ const NovoCliente = () => {
                                 <Form.Control
                                     type="text"
                                     onChange={onNomeChange}
-                                    className={`${alertClass} text-capitalize`}
+                                    className={`${alertClass}`}
                                 />
 
                                 {duplicatedName && (

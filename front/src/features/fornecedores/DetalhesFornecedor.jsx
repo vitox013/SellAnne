@@ -21,12 +21,19 @@ import {
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CardProduct from "../../components/CardProduct";
 import Message from "../../components/Message";
+import DeleteModal from "../../components/DeleteModal";
+import EditModal from "../../components/EditModal";
 
 const DetalhesFornecedor = () => {
     const { currentUser, userId, username } = useAuth();
     const { id: fornecedorId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
+
+    const formatter = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+    });
 
     let message = "";
 
@@ -49,6 +56,7 @@ const DetalhesFornecedor = () => {
 
     const [show, setShow] = useState(false);
     const [showExcluir, setShowExcluir] = useState(false);
+    const [showEdit, setShowEdit] = useState(false);
 
     const { fornecedor } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
@@ -66,11 +74,6 @@ const DetalhesFornecedor = () => {
         { isSuccess: isDeleteSuccess, error: errorDelete },
     ] = useDeleteUserMutation();
 
-    const [
-        deleteProduto,
-        { isSuccess: isDeleteProdutoSuccess, error: errorDeleteProduto },
-    ] = useDeleteUserMutation();
-
     useEffect(() => {
         if (fornecedor) {
             setProdutosFornecedor(
@@ -78,6 +81,9 @@ const DetalhesFornecedor = () => {
                     .slice()
                     .sort((a, b) => (a.productName > b.productName ? 1 : -1))
             );
+
+            !porcentagemVenda &&
+                setPorcentagemVenda(fornecedor.porcentagemPadrao);
         }
     }, [fornecedor]);
 
@@ -131,6 +137,7 @@ const DetalhesFornecedor = () => {
                                         ? prod.precoVenda
                                         : prod.porcentagemVenda
                                 }
+                                metodo={fornecedor.metodo}
                                 cod={prod.code}
                                 preco={prod.preco}
                                 produtoId={prod._id}
@@ -194,6 +201,8 @@ const DetalhesFornecedor = () => {
         });
     };
 
+    const onEditClick = async () => {};
+
     useEffect(() => {
         if (isAddSuccess) {
             setShow(false);
@@ -215,13 +224,16 @@ const DetalhesFornecedor = () => {
     const handleClose = () => {
         setShow(false);
         setShowExcluir(false);
+        setShowEdit(false);
         setCode("");
         setPorcentagemVenda("");
         setProductName("");
         setPreco("");
         setPrecoVenda("");
+        setDuplicatedCode(false);
     };
-    const handShowExcluir = () => setShowExcluir(true);
+    const handleShowExcluir = () => setShowExcluir(true);
+    const handleShowEdit = () => setShowEdit(true);
 
     return (
         <>
@@ -237,31 +249,29 @@ const DetalhesFornecedor = () => {
                     <h1 className="mt-2 pt-10 d-flex align-items-center">
                         {fornecedor && fornecedor.nomeFornecedor}{" "}
                         <i
-                            className="bx bx-trash ms-2 pointer"
-                            onClick={handShowExcluir}
+                            className="bx bxs-edit-alt ms-3 pointer fs-3"
+                            onClick={handleShowEdit}
+                        ></i>
+                        <i
+                            className="bx bx-trash ms-3 pointer fs-3"
+                            onClick={handleShowExcluir}
                         ></i>
                     </h1>
                 </Row>
 
-                <Modal show={showExcluir} onHide={handleClose}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Tem certeza?</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        Ao confirmar, o fornecedor será excluído.
-                        {errMsg && (
-                            <p className="alert alert-danger">{errMsg}</p>
-                        )}
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="danger" onClick={onDeleteClick}>
-                            Excluir
-                        </Button>
-                        <Button variant="secondary" onClick={handleClose}>
-                            Cancelar
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
+                <DeleteModal
+                    errMsg={errMsg}
+                    handleClose={handleClose}
+                    showExcluir={showExcluir}
+                    onDeleteClick={onDeleteClick}
+                />
+
+                <EditModal
+                    errMsg={errMsg}
+                    handleClose={handleClose}
+                    showEdit={showEdit}
+                    onEditClick={onEditClick}
+                />
 
                 {/* ----------------CONTENT------------------ */}
                 <Row>
@@ -374,6 +384,7 @@ const DetalhesFornecedor = () => {
                                 }
                             />
                         </Form.Group>
+
                         {fornecedor &&
                             (fornecedor.metodo == "Revenda" ? (
                                 <Form.Group
@@ -383,7 +394,7 @@ const DetalhesFornecedor = () => {
                                     <Form.Label>Preço venda</Form.Label>
                                     <Form.Control
                                         type="number"
-                                        value={precoVenda}
+                                        value={Number(precoVenda).toString()}
                                         inputMode="numeric"
                                         className={
                                             preco > precoVenda && "is-invalid"
@@ -394,7 +405,6 @@ const DetalhesFornecedor = () => {
                                             )
                                         }
                                     />
-                                    {console.log(preco, precoVenda)}
                                 </Form.Group>
                             ) : (
                                 <Form.Group
@@ -405,15 +415,32 @@ const DetalhesFornecedor = () => {
                                         Sua porcentagem na venda %
                                     </Form.Label>
                                     <Form.Control
+                                        type="number"
                                         inputMode="numeric"
-                                        value={
-                                            fornecedor &&
-                                            fornecedor.porcentagemPadrao
+                                        value={porcentagemVenda}
+                                        onChange={(e) =>
+                                            setPorcentagemVenda(e.target.value)
                                         }
-                                        readOnly
                                     />
                                 </Form.Group>
                             ))}
+
+                        <Card className="text-center bg-success bg-opacity-50">
+                            <Row>
+                                <Col className="fw-bold">
+                                    Lucro com a venda:{" "}
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col className="fw-bold">
+                                    {formatter.format(
+                                        !porcentagemVenda
+                                            ? precoVenda - preco
+                                            : (preco * porcentagemVenda) / 100
+                                    )}
+                                </Col>
+                            </Row>
+                        </Card>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>

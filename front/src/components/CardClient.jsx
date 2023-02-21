@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 const CardClient = ({ clientId, userId, clientName, qtdPedido }) => {
     const [content, setContent] = useState(null);
 
-    // console.log(qtdPedido);
+
 
     useEffect(() => {
         qtdPedido != 1

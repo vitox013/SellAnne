@@ -48,7 +48,7 @@ const CardProduct = ({
         }),
     });
 
-    console.log(produtos);
+    // console.log(produtos);
 
     const [updateProduct, { isSuccess: isUpdateSuccess, error: errorUpdate }] =
         useUpdateUserMutation();
@@ -90,7 +90,7 @@ const CardProduct = ({
         }
     }, [produtos, code]);
 
-    console.log(duplicatedCode);
+    // console.log(duplicatedCode);
 
     const onClickDelete = async (e) => {
         await deleteProduct({
@@ -153,6 +153,7 @@ const CardProduct = ({
                         {formatter.format(preco)}
                     </Col>
                     <Col xs={3} md={3} className="ps-0">
+                        {console.log(metodo)}
                         {metodo == "Revenda"
                             ? formatter.format(formaLucro)
                             : `${formaLucro} %`}

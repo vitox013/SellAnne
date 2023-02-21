@@ -40,6 +40,7 @@ const DetalhesPedido = () => {
     const [list, setList] = useState([]);
     const [produtoId, setProdutoId] = useState("");
     const [code, setCode] = useState("");
+    const [debouncedCode, setDebouncedCode] = useState("");
     const [productName, setProductName] = useState("");
     const [preco, setPreco] = useState("");
     const [precoVenda, setPrecoVenda] = useState("");
@@ -133,16 +134,14 @@ const DetalhesPedido = () => {
             let forn = fornecedores.filter(
                 (forn) => forn.nomeFornecedor == optionSelected
             );
-            forn
-                ? forn.length > 0
-                    ? setProdutosFornecedor(forn[0].produtos)
-                    : null
-                : null;
+            forn && forn.length > 0 && setProdutosFornecedor(forn[0].produtos);
+
             setFornecedor(
                 fornecedores.find(
                     (forn) => forn.nomeFornecedor === optionSelected
                 )
             );
+            clearFields()
         }
     }, [optionSelected]);
 
@@ -179,6 +178,13 @@ const DetalhesPedido = () => {
             );
         }
     }, [fornecedores]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setCode(debouncedCode), 1000);
+        debouncedCode == "" && clearFields();
+        return () => clearTimeout(timer);
+    }, [debouncedCode]);
+
     const clearFields = () => {
         setPreco("");
         setPrecoVenda("");
@@ -187,6 +193,7 @@ const DetalhesPedido = () => {
         setQuantidade("");
         setCode("");
         setProdFound({});
+        setPorcentagem("")
     };
 
     const handleShow = () => setShow(true);
@@ -197,6 +204,7 @@ const DetalhesPedido = () => {
         setOptionSelected("");
         clearFields();
     };
+
     const handleShowStats = () => setShowStats(true);
     const handleCloseStats = () => setShowStats(false);
 
@@ -240,15 +248,6 @@ const DetalhesPedido = () => {
                         },
                     },
                 });
-                // await updateProduct({
-                //     userId,
-                //     produto: {
-                //         _id: produtoId,
-                //         code: prodFound.code,
-                //         productName: prodFound.productName,
-                //         preco: prodFound.preco,
-                //     },
-                // });
             } else {
                 await createProduct({
                     userId,
@@ -287,6 +286,7 @@ const DetalhesPedido = () => {
             setPreco(prodFound.preco);
             setPrecoVenda(prodFound.precoVenda);
             setProductName(prodFound.productName);
+            setPorcentagem(prodFound.porcentagemVenda);
         }
     }, [prodFound]);
 
@@ -500,9 +500,11 @@ const DetalhesPedido = () => {
                                                                 inputMode="numeric"
                                                                 placeholder="Código"
                                                                 autoFocus
-                                                                value={code}
+                                                                value={
+                                                                    debouncedCode
+                                                                }
                                                                 onChange={(e) =>
-                                                                    setCode(
+                                                                    setDebouncedCode(
                                                                         e.target
                                                                             .value
                                                                     )
@@ -532,9 +534,7 @@ const DetalhesPedido = () => {
                                                             </Form.Label>
                                                             <Form.Control
                                                                 value={
-                                                                    prodFound
-                                                                        ? prodFound.productName
-                                                                        : productName
+                                                                    productName
                                                                 }
                                                                 disabled={
                                                                     prodFound
@@ -563,15 +563,9 @@ const DetalhesPedido = () => {
                                                             <Form.Control
                                                                 type="number"
                                                                 inputMode="numeric"
-                                                                value={
-                                                                    prodFound
-                                                                        ? Number(
-                                                                              prodFound.preco
-                                                                          ).toString()
-                                                                        : Number(
-                                                                              preco
-                                                                          ).toString()
-                                                                }
+                                                                value={Number(
+                                                                    preco
+                                                                ).toString()}
                                                                 disabled={
                                                                     prodFound
                                                                         ? true
@@ -613,15 +607,9 @@ const DetalhesPedido = () => {
                                                                                 ? true
                                                                                 : false
                                                                         }
-                                                                        value={
-                                                                            prodFound
-                                                                                ? Number(
-                                                                                      prodFound.precoVenda
-                                                                                  ).toString()
-                                                                                : Number(
-                                                                                      precoVenda
-                                                                                  ).toString()
-                                                                        }
+                                                                        value={Number(
+                                                                            precoVenda
+                                                                        ).toString()}
                                                                         onChange={(
                                                                             e
                                                                         ) =>
@@ -652,6 +640,11 @@ const DetalhesPedido = () => {
                                                                         pattern="[0-9]*"
                                                                         max="100"
                                                                         required
+                                                                        disabled={
+                                                                            prodFound
+                                                                                ? true
+                                                                                : false
+                                                                        }
                                                                         value={
                                                                             porcentagem
                                                                         }
@@ -741,7 +734,8 @@ const DetalhesPedido = () => {
                                                                         pedido:
                                                                         R${" "}
                                                                         {(porcentagem
-                                                                            ? preco
+                                                                            ? preco *
+                                                                              quantidade
                                                                             : quantidade *
                                                                               precoVenda
                                                                         ).toFixed(

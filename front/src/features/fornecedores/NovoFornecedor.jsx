@@ -61,7 +61,6 @@ const NovoFornecedor = () => {
     const onNomeChange = (e) => setNomeFornecedor(e.target.value);
     const onSelectOption = (e) => setOpcao(e.target.value);
 
-    console.log(opcao);
     const canSave = opcao != "Selecione método" && nomeFornecedor;
 
     const onSaveUserClicked = async (e) => {
