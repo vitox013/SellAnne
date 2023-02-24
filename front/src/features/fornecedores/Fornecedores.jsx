@@ -19,7 +19,7 @@ const Fornecedores = () => {
     const { currentUser, userId, username } = useAuth();
     const { id: fornecedorId } = useParams();
 
-    const location = useLocation();
+
 
     let message = useSelector((state) => state.infoMsg.msg);
 

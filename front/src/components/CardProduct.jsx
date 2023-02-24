@@ -1,5 +1,14 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Col, Row, Card, Modal, Button, Form } from "react-bootstrap";
+import {
+    Col,
+    Row,
+    Card,
+    Modal,
+    Button,
+    Form,
+    InputGroup,
+    Alert
+} from "react-bootstrap";
 import { useState, useEffect, React } from "react";
 import {
     useGetUserDataQuery,
@@ -9,6 +18,7 @@ import {
 import useAuth from "../hooks/useAuth";
 import { useDispatch } from "react-redux";
 import { setMsg } from "../features/infoMsg/msgSlice";
+import { toNumber, toBRL, currency } from "./Currency";
 
 const CardProduct = ({
     cod,
@@ -34,15 +44,16 @@ const CardProduct = ({
     const [showExcluir, setShowExcluir] = useState(false);
     const [code, setCode] = useState(cod);
     const [productName, setProductName] = useState(nomeProduto);
-    const [precoBase, setPrecoBase] = useState(preco);
+    const [precoBase, setPrecoBase] = useState(toBRL(preco.toFixed(2)));
     const [precoVenda, setPrecoVenda] = useState(
-        metodo == "Revenda" && formaLucro
+        metodo == "Revenda" && toBRL(formaLucro.toFixed(2))
     );
     const [porcentagemVenda, setPorcentagemVenda] = useState(
         metodo == "Porcentagem" && formaLucro
     );
     const [duplicatedCode, setDuplicatedCode] = useState(false);
     const [modificado, setModificado] = useState(false);
+    const [errMsg, setErrMsg] = useState("");
 
     const { produtos } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
@@ -61,8 +72,10 @@ const CardProduct = ({
     const defaultStates = () => {
         setProductName(nomeProduto);
         setCode(cod);
-        setPrecoBase(preco);
-        setPrecoVenda(metodo == "Revenda" && formaLucro);
+        setPrecoBase(toBRL(preco.toFixed(2)));
+
+        setPrecoVenda(metodo == "Revenda" && toBRL(formaLucro.toFixed(2)));
+
         setPorcentagemVenda(metodo == "Porcentagem" && formaLucro);
     };
     const handleShow = () => setShow(true);
@@ -73,11 +86,15 @@ const CardProduct = ({
     const handleShowExcluir = () => setShowExcluir(true);
     const handleCloseExcluir = () => setShowExcluir(false);
 
+    const handlePrice = (e) => {
+        setPrecoBase(e.target.value);
+    };
+
     useEffect(() => {
         setModificado(
-            precoBase != preco ||
+            toNumber(precoBase) != preco ||
                 (metodo == "Revenda"
-                    ? precoVenda != formaLucro
+                    ? toNumber(precoVenda) != formaLucro
                     : porcentagemVenda != formaLucro) ||
                 productName != nomeProduto ||
                 code != cod
@@ -92,8 +109,6 @@ const CardProduct = ({
         }
     }, [produtos, code]);
 
-    // console.log(duplicatedCode);
-
     const onClickDelete = async (e) => {
         await deleteProduct({
             userId,
@@ -106,21 +121,33 @@ const CardProduct = ({
         });
     };
 
+    const canSave =
+        code &&
+        precoBase &&
+        (metodo == "Porcentagem"
+            ? porcentagemVenda > 0
+            : toNumber(precoVenda) > toNumber(precoBase)) &&
+        productName;
+
     const onClickUpdate = async (e) => {
-        await updateProduct({
-            userId,
-            fornecedor: {
-                _id: fornecedorId,
-                produto: {
-                    _id: produtoId,
-                    code,
-                    productName,
-                    preco: precoBase,
-                    precoVenda,
-                    porcentagemVenda,
+        let preco = toNumber(precoBase);
+        let priceVenda = toNumber(precoVenda);
+
+        canSave &&
+            (await updateProduct({
+                userId,
+                fornecedor: {
+                    _id: fornecedorId,
+                    produto: {
+                        _id: produtoId,
+                        code,
+                        productName,
+                        preco,
+                        precoVenda: priceVenda,
+                        porcentagemVenda,
+                    },
                 },
-            },
-        });
+            }));
     };
     useEffect(() => {
         if (isDeleteSuccess) {
@@ -130,7 +157,7 @@ const CardProduct = ({
             setShow(false);
             dispatch(setMsg("Produto editado com sucesso"));
         } else if (errorUpdate) {
-            console.log("Erro ao editar produto");
+            setErrMsg("Erro ao editar produto");
         }
     }, [isUpdateSuccess, isDeleteSuccess, errorUpdate, errorDelete]);
 
@@ -208,6 +235,8 @@ const CardProduct = ({
                             </Col>
                         </Row>
                     )}
+                    {errMsg && <Alert variant="danger">{errMsg}</Alert>}
+
                     <Row className="mb-3 fw-bold">
                         <Col>
                             <Form>
@@ -223,7 +252,7 @@ const CardProduct = ({
                                         className={
                                             duplicatedCode && "is-invalid"
                                         }
-                                    ></Form.Control>
+                                    />
                                     {duplicatedCode && (
                                         <Form.Text>
                                             Código já cadastrado
@@ -237,71 +266,81 @@ const CardProduct = ({
                                 <Form.Group>
                                     <Form.Label>Nome Produto</Form.Label>
                                     <Form.Control
+                                        maxLength={30}
                                         value={productName}
                                         onChange={(e) =>
                                             setProductName(e.target.value)
                                         }
-                                    ></Form.Control>
+                                    />
                                 </Form.Group>
                             </Form>
                         </Col>
                     </Row>
-                    {metodo == "Revenda" ? (
-                        <>
-                            <Row className="mb-3 fw-bold">
-                                <Col>
-                                    <Form>
-                                        <Form.Group>
-                                            <Form.Label>Preço</Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                inputMode="numeric"
-                                                value={precoBase}
-                                                onChange={(e) =>
-                                                    setPrecoBase(e.target.value)
-                                                }
-                                            ></Form.Control>
-                                        </Form.Group>
-                                    </Form>
-                                </Col>
+                    <Row className="mb-3 fw-bold">
+                        <Col>
+                            <Form>
+                                <Form.Group>
+                                    <Form.Label>Preço</Form.Label>
+                                    <InputGroup>
+                                        <InputGroup.Text>R$</InputGroup.Text>
+                                        <Form.Control
+                                            type="text"
+                                            inputMode="numeric"
+                                            value={precoBase}
+                                            onChange={(e) =>
+                                                handlePrice(currency(e))
+                                            }
+                                        />
+                                    </InputGroup>
+                                </Form.Group>
+                            </Form>
+                        </Col>
+                        {metodo == "Revenda" ? (
+                            <>
                                 <Col>
                                     <Form>
                                         <Form.Group>
                                             <Form.Label>
                                                 Preço revenda
                                             </Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                inputMode="numeric"
-                                                value={precoVenda}
-                                                onChange={(e) =>
-                                                    setPrecoVenda(
-                                                        e.target.value
-                                                    )
-                                                }
-                                            ></Form.Control>
+                                            <InputGroup>
+                                                <InputGroup.Text>
+                                                    R$
+                                                </InputGroup.Text>
+
+                                                <Form.Control
+                                                    type="text"
+                                                    inputMode="numeric"
+                                                    value={precoVenda}
+                                                    onChange={(e) =>
+                                                        setPrecoVenda(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                            </InputGroup>
                                         </Form.Group>
                                     </Form>
                                 </Col>
-                            </Row>
-                            <Card className="text-center bg-success bg-opacity-50">
-                                <Row>
-                                    <Col className="fw-bold">
-                                        Lucro com a venda:{" "}
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col className="fw-bold">
-                                        {formatter.format(
-                                            (precoVenda - precoBase).toFixed(2)
-                                        )}
-                                    </Col>
-                                </Row>
-                            </Card>
-                        </>
-                    ) : (
-                        <>
-                            <Row className="mb-4 fw-bold">
+
+                                <Card className="text-center bg-success bg-opacity-50 mt-4">
+                                    <Row>
+                                        <Col className="fw-bold">
+                                            Lucro com a venda:{" "}
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col className="fw-bold">
+                                            {formatter.format(
+                                                toNumber(precoVenda) -
+                                                    toNumber(precoBase)
+                                            )}
+                                        </Col>
+                                    </Row>
+                                </Card>
+                            </>
+                        ) : (
+                            <>
                                 <Col xs={6}>
                                     <Form>
                                         <Form.Group>
@@ -316,34 +355,35 @@ const CardProduct = ({
                                                         e.target.value
                                                     )
                                                 }
-                                            ></Form.Control>
+                                            />
                                         </Form.Group>
                                     </Form>
                                 </Col>
-                            </Row>
-                            <Card className="text-center bg-success bg-opacity-50">
-                                <Row>
-                                    <Col className="fw-bold">
-                                        Lucro com a venda:{" "}
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col className="fw-bold">
-                                        {formatter.format(
-                                            (
-                                                (precoBase * porcentagemVenda) /
-                                                100
-                                            ).toFixed(2)
-                                        )}
-                                    </Col>
-                                </Row>
-                            </Card>
-                        </>
-                    )}
+
+                                <Card className="text-center bg-success bg-opacity-50 mt-4">
+                                    <Row>
+                                        <Col className="fw-bold">
+                                            Lucro com a venda:{" "}
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col className="fw-bold">
+                                            {formatter.format(
+                                                (toNumber(precoBase) *
+                                                    porcentagemVenda) /
+                                                    100
+                                            )}
+                                        </Col>
+                                    </Row>
+                                </Card>
+                            </>
+                        )}
+                    </Row>
                     {modificado && (
                         <Button
                             className="mt-2 d-flex align-items-center btn-success"
                             onClick={onClickUpdate}
+                            disabled={!canSave || duplicatedCode}
                         >
                             Salvar edição <i className="bx bx-edit ms-1"></i>
                         </Button>

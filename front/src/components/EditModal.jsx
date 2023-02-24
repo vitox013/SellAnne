@@ -66,10 +66,10 @@ const EditModal = ({
         }
     }, [nomeFornecedor, nomesForn, porcentagem]);
 
-    console.log(alterado, duplicated, porcentagem, porcentagemPadrao);
     const onNomeChange = (e) => setNomeFornecedor(e.target.value);
 
-    const canSave = nomeFornecedor && (metodo == "Porcentagem" ? porcentagem > 0: true);
+    const canSave =
+        nomeFornecedor && (metodo == "Porcentagem" ? porcentagem > 0 : true);
 
     const onEditClick = async () => {
         if (canSave) {
@@ -78,7 +78,6 @@ const EditModal = ({
                 fornecedor: {
                     _id: fornecedorId,
                     nomeFornecedor,
-                    // metodo,
                     porcentagemPadrao: porcentagem,
                 },
             });
@@ -147,7 +146,6 @@ const EditModal = ({
                                             setPorcentagem(e.target.value)
                                         }
                                     ></Form.Control>
-                                    
                                 </Form.Group>
                             </Col>
                         </Row>

@@ -8,6 +8,7 @@ import {
     Card,
     Modal,
     Navbar,
+    InputGroup,
 } from "react-bootstrap";
 
 import NavBar from "../../components/NavBar";
@@ -25,6 +26,7 @@ import DeleteModal from "../../components/DeleteModal";
 import EditModal from "../../components/EditModal";
 import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
+import { currency, toNumber } from "../../components/Currency";
 
 const DetalhesFornecedor = () => {
     const { currentUser, userId, username } = useAuth();
@@ -119,7 +121,10 @@ const DetalhesFornecedor = () => {
         if (term) {
             const filteredProdutosFornecedor = produtosFornecedor.filter(
                 (prod) =>
-                    prod.productName.toLowerCase().includes(term.toLowerCase())
+                    prod.productName
+                        .toLowerCase()
+                        .includes(term.toLowerCase()) ||
+                    prod.code.toString().includes(term)
             );
 
             if (filteredProdutosFornecedor) {
@@ -173,6 +178,10 @@ const DetalhesFornecedor = () => {
 
     const onSaveProduct = async (e) => {
         if (canSave) {
+            let price = toNumber(preco);
+            let priceVenda = toNumber(precoVenda);
+            console.log(price, priceVenda);
+
             await addProduct({
                 userId,
                 fornecedor: {
@@ -180,8 +189,8 @@ const DetalhesFornecedor = () => {
                     produto: {
                         code,
                         productName,
-                        preco,
-                        precoVenda,
+                        preco: price,
+                        precoVenda: priceVenda,
                         porcentagemVenda,
                     },
                 },
@@ -201,6 +210,7 @@ const DetalhesFornecedor = () => {
     useEffect(() => {
         if (isAddSuccess) {
             setShow(false);
+            clearFields()
             setMsg("Produto adicionado com sucesso!");
         } else if (errorAdd) {
             setErrMsg("Erro ao adicionar produto!");
@@ -214,9 +224,7 @@ const DetalhesFornecedor = () => {
         }
     }, [isAddSuccess, errorAdd, isDeleteSuccess, errorDelete]);
 
-    const handleShow = () => setShow(true);
-    const handleClose = () => {
-        setShow(false);
+    const clearFields = () => {
         setShowExcluir(false);
         setShowEdit(false);
         setCode("");
@@ -225,8 +233,20 @@ const DetalhesFornecedor = () => {
         setPrecoVenda("");
         setDuplicatedCode(false);
     };
+    const handleShow = () => setShow(true);
+    const handleClose = () => {
+        setShow(false);
+        clearFields();
+    };
     const handleShowExcluir = () => setShowExcluir(true);
     const handleShowEdit = () => setShowEdit(true);
+    const handlePrice = (e) => {
+        setPreco(e.target.value);
+    };
+
+    const handlePriceVenda = (e) => {
+        setPrecoVenda(e.target.value);
+    };
 
     return (
         <>
@@ -334,7 +354,10 @@ const DetalhesFornecedor = () => {
             {/* --------------- MODAL NOVO PRODUTO--------------- */}
             <Modal show={show} onHide={handleClose} backdrop="static">
                 <Modal.Header closeButton>
-                    <Modal.Title>Cadastre novo produto</Modal.Title>
+                    <Modal.Title>
+                        <p>Cadastre novo produto</p>
+                        {fornecedor && fornecedor.nomeFornecedor}
+                    </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
@@ -370,15 +393,16 @@ const DetalhesFornecedor = () => {
 
                         <Form.Group className="mb-3 fw-bold" controlId="preco">
                             <Form.Label>Preço base</Form.Label>
-                            <Form.Control
-                                type="number"
-                                required
-                                inputMode="numeric"
-                                value={Number(preco).toString()}
-                                onChange={(e) =>
-                                    setPreco(Number(e.target.value))
-                                }
-                            />
+                            <InputGroup>
+                                <InputGroup.Text>R$</InputGroup.Text>
+                                <Form.Control
+                                    type="text"
+                                    required
+                                    inputMode="numeric"
+                                    value={preco}
+                                    onChange={(e) => handlePrice(currency(e))}
+                                />
+                            </InputGroup>
                         </Form.Group>
 
                         {fornecedor &&
@@ -388,19 +412,21 @@ const DetalhesFornecedor = () => {
                                     controlId="precoVenda"
                                 >
                                     <Form.Label>Preço venda</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        value={Number(precoVenda).toString()}
-                                        inputMode="numeric"
-                                        className={
-                                            preco > precoVenda && "is-invalid"
-                                        }
-                                        onChange={(e) =>
-                                            setPrecoVenda(
-                                                Number(e.target.value)
-                                            )
-                                        }
-                                    />
+                                    <InputGroup>
+                                        <InputGroup.Text>R$</InputGroup.Text>
+                                        <Form.Control
+                                            type="text"
+                                            value={precoVenda}
+                                            inputMode="numeric"
+                                            className={
+                                                preco > precoVenda &&
+                                                "is-invalid"
+                                            }
+                                            onChange={(e) =>
+                                                handlePriceVenda(currency(e))
+                                            }
+                                        />
+                                    </InputGroup>
                                 </Form.Group>
                             ) : (
                                 <Form.Group
@@ -433,8 +459,11 @@ const DetalhesFornecedor = () => {
                                     {formatter.format(
                                         fornecedor &&
                                             fornecedor.metodo == "Revenda"
-                                            ? precoVenda - preco
-                                            : (preco * porcentagemVenda) / 100
+                                            ? toNumber(precoVenda) -
+                                                  toNumber(preco)
+                                            : (toNumber(preco) *
+                                                  porcentagemVenda) /
+                                                  100
                                     )}
                                 </Col>
                             </Row>
