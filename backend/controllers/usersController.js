@@ -131,11 +131,23 @@ const updateUser = asyncHandler(async (req, res) => {
                 user.fornecedores.push(fornecedor);
                 await user.save();
                 return res.json({ message: `Fornecedor criado!` });
+            } else if (
+                fornecedor._id &&
+                (fornecedor.nomeFornecedor || fornecedor.metodo)
+            ) {
+                const atualizarFornecedor = await User.findOneAndUpdate(
+                    { "fornecedores._id": fornecedor._id },
+                    {
+                        $set: {
+                            "fornecedores.$.nomeFornecedor":
+                                fornecedor.nomeFornecedor,
+                        },
+                    }
+                );
+                res.json({ message: `Fornecedor atualizado!` });
             } else if (fornecedor.produto) {
                 const user = await User.findById(userId).exec();
-                console.log("bucetinha")
                 if (fornecedor.produto._id) {
-                    console.log("entrei kkk");
                     const atualizarProduto = await User.findOneAndUpdate(
                         {
                             "fornecedores.produtos._id": fornecedor.produto._id,

@@ -7,6 +7,8 @@ import {
     useUpdateUserMutation,
 } from "../features/users/userApiSlice";
 import useAuth from "../hooks/useAuth";
+import { useDispatch } from "react-redux";
+import { setMsg } from "../features/infoMsg/msgSlice";
 
 const CardProduct = ({
     cod,
@@ -21,6 +23,8 @@ const CardProduct = ({
         style: "currency",
         currency: "BRL",
     });
+
+    const dispatch = useDispatch();
 
     const { userId } = useAuth();
     const { id: fornecedorId } = useParams();
@@ -47,8 +51,6 @@ const CardProduct = ({
             ).produtos,
         }),
     });
-
-    // console.log(produtos);
 
     const [updateProduct, { isSuccess: isUpdateSuccess, error: errorUpdate }] =
         useUpdateUserMutation();
@@ -122,15 +124,11 @@ const CardProduct = ({
     };
     useEffect(() => {
         if (isDeleteSuccess) {
-            navigate(`/fornecedores/${fornecedorId}`, {
-                state: { message: "Produto excluído com sucesso" },
-            });
+            dispatch(setMsg("Produto excluído com sucesso"));
         }
         if (isUpdateSuccess) {
             setShow(false);
-            navigate(`/fornecedores/${fornecedorId}`, {
-                state: { message: "Produto editado com sucesso" },
-            });
+            dispatch(setMsg("Produto editado com sucesso"));
         } else if (errorUpdate) {
             console.log("Erro ao editar produto");
         }
@@ -153,7 +151,6 @@ const CardProduct = ({
                         {formatter.format(preco)}
                     </Col>
                     <Col xs={3} md={3} className="ps-0">
-                        {console.log(metodo)}
                         {metodo == "Revenda"
                             ? formatter.format(formaLucro)
                             : `${formaLucro} %`}

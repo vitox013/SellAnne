@@ -23,23 +23,22 @@ import CardProduct from "../../components/CardProduct";
 import Message from "../../components/Message";
 import DeleteModal from "../../components/DeleteModal";
 import EditModal from "../../components/EditModal";
+import { useDispatch, useSelector } from "react-redux";
+import { setMsg } from "../infoMsg/msgSlice";
 
 const DetalhesFornecedor = () => {
     const { currentUser, userId, username } = useAuth();
     const { id: fornecedorId } = useParams();
     const navigate = useNavigate();
-    const location = useLocation();
 
     const formatter = new Intl.NumberFormat("pt-BR", {
         style: "currency",
         currency: "BRL",
     });
 
-    let message = "";
+    const dispatch = useDispatch();
 
-    if (location.state) {
-        message = location.state.message;
-    }
+    let message = useSelector((state) => state.infoMsg.msg);
 
     const [term, setTerm] = useState("");
     const [debouncedTerm, setDebouncedTerm] = useState(term);
@@ -51,7 +50,6 @@ const DetalhesFornecedor = () => {
     const [preco, setPreco] = useState("");
     const [precoVenda, setPrecoVenda] = useState("");
     const [porcentagemVenda, setPorcentagemVenda] = useState("");
-    const [msg, setMsg] = useState("");
     const [errMsg, setErrMsg] = useState("");
 
     const [show, setShow] = useState(false);
@@ -82,8 +80,7 @@ const DetalhesFornecedor = () => {
                     .sort((a, b) => (a.productName > b.productName ? 1 : -1))
             );
 
-            !porcentagemVenda &&
-                setPorcentagemVenda(fornecedor.porcentagemPadrao);
+            setPorcentagemVenda(fornecedor.porcentagemPadrao);
         }
     }, [fornecedor]);
 
@@ -201,8 +198,6 @@ const DetalhesFornecedor = () => {
         });
     };
 
-    const onEditClick = async () => {};
-
     useEffect(() => {
         if (isAddSuccess) {
             setShow(false);
@@ -212,9 +207,9 @@ const DetalhesFornecedor = () => {
         }
         if (isDeleteSuccess) {
             setShowExcluir(false);
-            navigate("/fornecedores", {
-                state: { message: "Fornecedor deletado com sucesso!" },
-            });
+            navigate("/fornecedores");
+            
+            dispatch(setMsg("Fornecedor deletado com sucesso"));
         } else if (errorDelete) {
             setErrMsg("Erro ao excluir fornecedor!");
         }
@@ -267,10 +262,13 @@ const DetalhesFornecedor = () => {
                 />
 
                 <EditModal
-                    errMsg={errMsg}
+                    nomeForn={fornecedor && fornecedor.nomeFornecedor}
+                    method={fornecedor && fornecedor.metodo}
+                    porcentagemPadrao={
+                        fornecedor && fornecedor.porcentagemPadrao
+                    }
                     handleClose={handleClose}
                     showEdit={showEdit}
-                    onEditClick={onEditClick}
                 />
 
                 {/* ----------------CONTENT------------------ */}
@@ -335,7 +333,7 @@ const DetalhesFornecedor = () => {
                 </Row>
             </Container>
 
-            {/* --------------- MODAL--------------- */}
+            {/* --------------- MODAL NOVO PRODUTO--------------- */}
             <Modal show={show} onHide={handleClose} backdrop="static">
                 <Modal.Header closeButton>
                     <Modal.Title>Cadastre novo produto</Modal.Title>
@@ -434,7 +432,8 @@ const DetalhesFornecedor = () => {
                             <Row>
                                 <Col className="fw-bold">
                                     {formatter.format(
-                                        !porcentagemVenda
+                                        fornecedor &&
+                                            fornecedor.metodo == "Revenda"
                                             ? precoVenda - preco
                                             : (preco * porcentagemVenda) / 100
                                     )}

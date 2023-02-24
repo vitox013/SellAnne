@@ -4,7 +4,6 @@ import { Modal, Button } from "react-bootstrap";
 const DeleteModal = ( {showExcluir, handleClose, onDeleteClick, errMsg}) => {
 
     
-
     return (
         <Modal show={showExcluir} onHide={handleClose}>
             <Modal.Header closeButton>

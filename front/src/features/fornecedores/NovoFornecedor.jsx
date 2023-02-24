@@ -35,9 +35,9 @@ const NovoFornecedor = () => {
     const [addFornecedor, { isSuccess, isLoading, error }] =
         useUpdateUserMutation();
 
-    const { products } = useGetUserDataQuery(userId, {
+    const { fornecedores } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
-            products: data?.produtos,
+            fornecedores: data?.fornecedores,
         }),
     });
 
@@ -53,19 +53,30 @@ const NovoFornecedor = () => {
     }, [isSuccess, navigate, error]);
 
     useEffect(() => {
-        if (products) {
-            setDuplicated(products.find((prod) => prod.code == codigo));
+        // if (fornecedores) {
+        //     setDuplicated(fornecedores.find((forn) => forn.nome == codigo));
+        // }
+        if (fornecedores) {
+            fornecedores.map((forn) =>
+                forn.nomeFornecedor == nomeFornecedor
+                    ? setDuplicated(true)
+                    : setDuplicated(false)
+            );
         }
-    }, [codigo]);
+    }, [nomeFornecedor]);
 
     const onNomeChange = (e) => setNomeFornecedor(e.target.value);
     const onSelectOption = (e) => setOpcao(e.target.value);
 
-    const canSave = opcao != "Selecione método" && nomeFornecedor;
+    const canSave =
+        opcao != "Selecione método" &&
+        opcao != "" &&
+        nomeFornecedor &&
+        (opcao == "Porcentagem" ? porcentagem > 0 : true);
 
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
-        if (canSave) {
+        if (canSave && !duplicated) {
             await addFornecedor({
                 userId,
                 fornecedor: {
@@ -109,9 +120,14 @@ const NovoFornecedor = () => {
                                     type="text"
                                     value={nomeFornecedor}
                                     onChange={onNomeChange}
-                                    className="text-capitalize"
+                                    className={duplicated && "is-invalid"}
                                     required
                                 />
+                                {duplicated && (
+                                    <Form.Text className="text-danger">
+                                        Nome já cadastrado!
+                                    </Form.Text>
+                                )}
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="metodo">
@@ -144,9 +160,10 @@ const NovoFornecedor = () => {
                                     />
                                 </Form.Group>
                             )}
-
+                            {console.log(!canSave, duplicated)}
                             <Button
                                 variant="success"
+                                disabled={!canSave || duplicated}
                                 type="submit"
                                 onClick={onSaveUserClicked}
                             >

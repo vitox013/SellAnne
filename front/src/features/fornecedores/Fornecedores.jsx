@@ -12,6 +12,8 @@ import {
 import CardFornecedor from "../../components/CardFornecedor";
 import { useParams, useLocation } from "react-router-dom";
 import Message from "../../components/Message";
+import { useSelector } from "react-redux";
+import { setMsg } from "../infoMsg/msgSlice";
 
 const Fornecedores = () => {
     const { currentUser, userId, username } = useAuth();
@@ -19,11 +21,7 @@ const Fornecedores = () => {
 
     const location = useLocation();
 
-    let message = "";
-
-    if (location.state) {
-        message = location.state.message;
-    }
+    let message = useSelector((state) => state.infoMsg.msg);
 
     const [term, setTerm] = useState("");
     const [debouncedTerm, setDebouncedTerm] = useState(term);
@@ -149,7 +147,9 @@ const Fornecedores = () => {
                         </Row>
                     </Card>
                 </Row>
-                {message && <Message type="alert alert-success" msg={message}/>}
+                {message && (
+                    <Message type="alert alert-success" msg={message} />
+                )}
                 <Row className="px-2">{conteudo}</Row>
                 <Row>
                     <NavFooter
