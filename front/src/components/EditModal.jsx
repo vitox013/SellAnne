@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import { useDispatch } from "react-redux";
 import { setMsg } from "../features/infoMsg/msgSlice";
+import { useGetUserDataQuery } from "../features/users/userApiSlice";
 
 const EditModal = ({
     showEdit,
@@ -15,11 +16,12 @@ const EditModal = ({
     handleClose,
 }) => {
     const [errMsg, setErrMsg] = useState("");
-    const [opcao, setOpcao] = useState("");
+    const [nomesForn, setNomesForn] = useState([]);
     const [nomeFornecedor, setNomeFornecedor] = useState("");
-    const [porcentagem, setPorcentagem] = useState("");
     const [metodo, setMetodo] = useState("");
+    const [duplicated, setDuplicated] = useState(false);
     const [show, setShow] = useState();
+    const [porcentagem, setPorcentagem] = useState(porcentagemPadrao);
     const [alterado, setAlterado] = useState(false);
 
     const navigate = useNavigate();
@@ -28,30 +30,46 @@ const EditModal = ({
     const { id: fornecedorId } = useParams();
     const dispatch = useDispatch();
 
+    const { fornecedores } = useGetUserDataQuery(userId, {
+        selectFromResult: ({ data }) => ({
+            fornecedores: data?.fornecedores,
+        }),
+    });
+
+    useEffect(() => {
+        fornecedores &&
+            fornecedores.map((forn) =>
+                setNomesForn((nomesForn) => [...nomesForn, forn.nomeFornecedor])
+            );
+    }, [fornecedores]);
+
     const [updateFornecedor, { isSuccess, error }] = useUpdateUserMutation();
 
     useEffect(() => {
         setNomeFornecedor(nomeForn);
         setMetodo(method);
         setPorcentagem(porcentagemPadrao);
-        setOpcao("");
     }, [method, nomeForn, porcentagemPadrao, handleClose]);
 
     useEffect(() => {
         setAlterado(
-            nomeForn != nomeFornecedor ||
-                porcentagem != porcentagemPadrao ||
-                metodo != method
+            nomeForn != nomeFornecedor || porcentagem != porcentagemPadrao
         );
-    }, [nomeFornecedor, metodo, porcentagem]);
 
+        if (nomesForn) {
+            setDuplicated(
+                nomesForn.some(
+                    (forn) =>
+                        forn.toLowerCase() === nomeFornecedor.toLowerCase()
+                ) && nomeForn != nomeFornecedor
+            );
+        }
+    }, [nomeFornecedor, nomesForn, porcentagem]);
+
+    console.log(alterado, duplicated, porcentagem, porcentagemPadrao);
     const onNomeChange = (e) => setNomeFornecedor(e.target.value);
-    const onSelectOption = (e) => {
-        setOpcao(e.target.value);
-        setMetodo(e.target.value);
-    };
 
-    const canSave = nomeFornecedor && metodo;
+    const canSave = nomeFornecedor && (metodo == "Porcentagem" ? porcentagem > 0: true);
 
     const onEditClick = async () => {
         if (canSave) {
@@ -61,7 +79,7 @@ const EditModal = ({
                     _id: fornecedorId,
                     nomeFornecedor,
                     // metodo,
-                    // porcentagemPadrao: porcentagem,
+                    porcentagemPadrao: porcentagem,
                 },
             });
         }
@@ -93,7 +111,13 @@ const EditModal = ({
                                 <Form.Control
                                     value={nomeFornecedor}
                                     onChange={onNomeChange}
+                                    className={duplicated && "is-invalid"}
                                 ></Form.Control>
+                                {duplicated && (
+                                    <Form.Text className="text-danger">
+                                        Nome já cadastrado
+                                    </Form.Text>
+                                )}
                             </Form.Group>
                         </Col>
                     </Row>
@@ -106,16 +130,27 @@ const EditModal = ({
                         <Col>{method}</Col>
                     </Row>
                     {method == "Porcentagem" && (
-                        <>
-                            <Row className="mt-3">
-                                <Col>
-                                    <strong>Sua porcentagem na venda</strong>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col>{porcentagemPadrao} %</Col>
-                            </Row>
-                        </>
+                        <Row className="mt-3">
+                            <Col>
+                                <Form.Group>
+                                    <Form.Label>
+                                        <strong>
+                                            Sua porcentagem na venda %
+                                        </strong>
+                                    </Form.Label>
+                                    <Form.Control
+                                        className="w-25"
+                                        type="number"
+                                        inputMode="numeric"
+                                        value={porcentagem}
+                                        onChange={(e) =>
+                                            setPorcentagem(e.target.value)
+                                        }
+                                    ></Form.Control>
+                                    
+                                </Form.Group>
+                            </Col>
+                        </Row>
                     )}
                     {/* <Form.Group className="mb-3" controlId="metodo">
                         <Form.Label>
@@ -149,7 +184,7 @@ const EditModal = ({
             <Modal.Footer>
                 <Button
                     variant="success"
-                    disabled={!alterado || !canSave}
+                    disabled={!alterado || !canSave || duplicated}
                     onClick={onEditClick}
                 >
                     Salvar edição

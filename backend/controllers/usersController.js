@@ -141,6 +141,8 @@ const updateUser = asyncHandler(async (req, res) => {
                         $set: {
                             "fornecedores.$.nomeFornecedor":
                                 fornecedor.nomeFornecedor,
+                            "fornecedores.$.porcentagemPadrao":
+                                fornecedor.porcentagemPadrao,
                         },
                     }
                 );

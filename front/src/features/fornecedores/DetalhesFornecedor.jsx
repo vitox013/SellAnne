@@ -208,7 +208,6 @@ const DetalhesFornecedor = () => {
         if (isDeleteSuccess) {
             setShowExcluir(false);
             navigate("/fornecedores");
-            
             dispatch(setMsg("Fornecedor deletado com sucesso"));
         } else if (errorDelete) {
             setErrMsg("Erro ao excluir fornecedor!");
@@ -221,7 +220,6 @@ const DetalhesFornecedor = () => {
         setShowExcluir(false);
         setShowEdit(false);
         setCode("");
-        setPorcentagemVenda("");
         setProductName("");
         setPreco("");
         setPrecoVenda("");
@@ -419,6 +417,7 @@ const DetalhesFornecedor = () => {
                                         onChange={(e) =>
                                             setPorcentagemVenda(e.target.value)
                                         }
+                                        className="w-25"
                                     />
                                 </Form.Group>
                             ))}
