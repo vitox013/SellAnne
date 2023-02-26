@@ -1,5 +1,5 @@
 import React from "react";
-import { Col, Container, Row, Form, Button } from "react-bootstrap";
+import { Col, Container, Row, Form, Button, InputGroup } from "react-bootstrap";
 import Back from "../../components/Back";
 import useAuth from "../../hooks/useAuth";
 import { useState, useEffect, useRef } from "react";
@@ -121,6 +121,7 @@ const NovoFornecedor = () => {
                                     value={nomeFornecedor}
                                     onChange={onNomeChange}
                                     className={duplicated && "is-invalid"}
+                                    maxLength="25"
                                     required
                                 />
                                 {duplicated && (
@@ -144,21 +145,36 @@ const NovoFornecedor = () => {
                                 </Form.Select>
                             </Form.Group>
                             {opcao == "Porcentagem" && (
-                                <Form.Group className="mb-3" controlId="metodo">
-                                    <Form.Label>
-                                        Defina a porcentagem padrão
-                                    </Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        max="100"
-                                        className="w-75"
-                                        value={porcentagem}
-                                        onChange={(e) =>
-                                            setPorcentagem(e.target.value)
-                                        }
-                                        required
-                                    />
-                                </Form.Group>
+                                <Row>
+                                    <Form.Group
+                                        className="mb-3"
+                                        controlId="metodo"
+                                    >
+                                        <Form.Label>
+                                            Defina a porcentagem padrão
+                                        </Form.Label>
+                                        <Row>
+                                            <Col xs={4}>
+                                                <InputGroup>
+                                                    <Form.Control
+                                                        type="number"
+                                                        max="100"
+                                                        value={porcentagem}
+                                                        onChange={(e) =>
+                                                            setPorcentagem(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        required
+                                                    />
+                                                    <InputGroup.Text>
+                                                        %
+                                                    </InputGroup.Text>
+                                                </InputGroup>
+                                            </Col>
+                                        </Row>
+                                    </Form.Group>
+                                </Row>
                             )}
                             {console.log(!canSave, duplicated)}
                             <Button

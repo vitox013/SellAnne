@@ -9,6 +9,7 @@ import {
     Row,
     Col,
     Form,
+    InputGroup,
 } from "react-bootstrap";
 import Message from "../../components/Message";
 import useAuth from "../../hooks/useAuth";
@@ -141,7 +142,7 @@ const DetalhesPedido = () => {
                     (forn) => forn.nomeFornecedor === optionSelected
                 )
             );
-            clearFields()
+            clearFields();
         }
     }, [optionSelected]);
 
@@ -193,7 +194,7 @@ const DetalhesPedido = () => {
         setQuantidade("");
         setCode("");
         setProdFound({});
-        setPorcentagem("")
+        setPorcentagem("");
     };
 
     const handleShow = () => setShow(true);
@@ -465,7 +466,6 @@ const DetalhesPedido = () => {
                                                 </>
                                             ) : (
                                                 <div className="text-center">
-                                                    {" "}
                                                     <p className="alert alert-danger text-center">
                                                         Nenhum fornecedor
                                                         cadastrado
@@ -536,6 +536,7 @@ const DetalhesPedido = () => {
                                                                 value={
                                                                     productName
                                                                 }
+                                                                maxLength="25"
                                                                 disabled={
                                                                     prodFound
                                                                         ? true
@@ -560,28 +561,35 @@ const DetalhesPedido = () => {
                                                             <Form.Label>
                                                                 Preço
                                                             </Form.Label>
-                                                            <Form.Control
-                                                                type="number"
-                                                                inputMode="numeric"
-                                                                value={Number(
-                                                                    preco
-                                                                ).toString()}
-                                                                disabled={
-                                                                    prodFound
-                                                                        ? true
-                                                                        : false
-                                                                }
-                                                                onChange={(e) =>
-                                                                    setPreco(
-                                                                        Number(
-                                                                            e
-                                                                                .target
-                                                                                .value
+                                                            <InputGroup>
+                                                                <InputGroup.Text>
+                                                                    R$
+                                                                </InputGroup.Text>
+                                                                <Form.Control
+                                                                    type="number"
+                                                                    inputMode="numeric"
+                                                                    value={Number(
+                                                                        preco
+                                                                    ).toString()}
+                                                                    disabled={
+                                                                        prodFound
+                                                                            ? true
+                                                                            : false
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setPreco(
+                                                                            Number(
+                                                                                e
+                                                                                    .target
+                                                                                    .value
+                                                                            )
                                                                         )
-                                                                    )
-                                                                }
-                                                                className="CurrencyInput"
-                                                            />
+                                                                    }
+                                                                    className="CurrencyInput"
+                                                                />
+                                                            </InputGroup>
                                                         </Form.Group>
                                                     </Col>
 
@@ -597,31 +605,36 @@ const DetalhesPedido = () => {
                                                                         Preço
                                                                         venda
                                                                     </Form.Label>
-                                                                    <Form.Control
-                                                                        type="number"
-                                                                        inputMode="numeric"
-                                                                        pattern="[0-9]*"
-                                                                        required
-                                                                        disabled={
-                                                                            prodFound
-                                                                                ? true
-                                                                                : false
-                                                                        }
-                                                                        value={Number(
-                                                                            precoVenda
-                                                                        ).toString()}
-                                                                        onChange={(
-                                                                            e
-                                                                        ) =>
-                                                                            setPrecoVenda(
-                                                                                Number(
-                                                                                    e
-                                                                                        .target
-                                                                                        .value
+                                                                    <InputGroup>
+                                                                        <InputGroup.Text>
+                                                                            R$
+                                                                        </InputGroup.Text>
+                                                                        <Form.Control
+                                                                            type="number"
+                                                                            inputMode="numeric"
+                                                                            pattern="[0-9]*"
+                                                                            required
+                                                                            disabled={
+                                                                                prodFound
+                                                                                    ? true
+                                                                                    : false
+                                                                            }
+                                                                            value={Number(
+                                                                                precoVenda
+                                                                            ).toString()}
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                setPrecoVenda(
+                                                                                    Number(
+                                                                                        e
+                                                                                            .target
+                                                                                            .value
+                                                                                    )
                                                                                 )
-                                                                            )
-                                                                        }
-                                                                    />
+                                                                            }
+                                                                        />
+                                                                    </InputGroup>
                                                                 </Form.Group>
                                                             </Col>
                                                         ) : (
@@ -634,30 +647,35 @@ const DetalhesPedido = () => {
                                                                         Porcentagem
                                                                         %
                                                                     </Form.Label>
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        inputMode="numeric"
-                                                                        pattern="[0-9]*"
-                                                                        max="100"
-                                                                        required
-                                                                        disabled={
-                                                                            prodFound
-                                                                                ? true
-                                                                                : false
-                                                                        }
-                                                                        value={
-                                                                            porcentagem
-                                                                        }
-                                                                        onChange={(
-                                                                            e
-                                                                        ) =>
-                                                                            setPorcentagem(
+                                                                    <InputGroup>
+                                                                        <Form.Control
+                                                                            type="text"
+                                                                            inputMode="numeric"
+                                                                            pattern="[0-9]*"
+                                                                            max="100"
+                                                                            required
+                                                                            disabled={
+                                                                                prodFound
+                                                                                    ? true
+                                                                                    : false
+                                                                            }
+                                                                            value={
+                                                                                porcentagem
+                                                                            }
+                                                                            onChange={(
                                                                                 e
-                                                                                    .target
-                                                                                    .value
-                                                                            )
-                                                                        }
-                                                                    />
+                                                                            ) =>
+                                                                                setPorcentagem(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                        <InputGroup.Text>
+                                                                            %
+                                                                        </InputGroup.Text>
+                                                                    </InputGroup>
                                                                 </Form.Group>
                                                             </Col>
                                                         ))}
@@ -672,7 +690,8 @@ const DetalhesPedido = () => {
                                                                 Quantidade
                                                             </Form.Label>
                                                             <Form.Control
-                                                                type="text"
+                                                            className="w-50"
+                                                                type="number"
                                                                 pattern="[0-9]*"
                                                                 required
                                                                 inputMode="numeric"
@@ -696,35 +715,45 @@ const DetalhesPedido = () => {
                                                             <Form.Label>
                                                                 Valor já pago
                                                             </Form.Label>
-                                                            <Form.Control
-                                                                type="number"
-                                                                inputMode="numeric"
-                                                                pattern="[0-9]*"
-                                                                required
-                                                                value={qtdPaga}
-                                                                onChange={(e) =>
-                                                                    setQtdPaga(
-                                                                        e.target
-                                                                            .value
-                                                                    )
-                                                                }
-                                                                className={
-                                                                    (precoVenda ||
-                                                                        porcentagem) &&
-                                                                    preco &&
-                                                                    quantidade &&
-                                                                    qtdPaga &&
-                                                                    !(
-                                                                        qtdPaga <=
-                                                                        (precoVenda
-                                                                            ? quantidade *
-                                                                              precoVenda
-                                                                            : quantidade *
-                                                                              preco)
-                                                                    ) &&
-                                                                    "is-invalid"
-                                                                }
-                                                            />
+                                                            <InputGroup>
+                                                                <InputGroup.Text>
+                                                                    R$
+                                                                </InputGroup.Text>
+                                                                <Form.Control
+                                                                    type="number"
+                                                                    inputMode="numeric"
+                                                                    pattern="[0-9]*"
+                                                                    required
+                                                                    value={
+                                                                        qtdPaga
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setQtdPaga(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                    className={
+                                                                        (precoVenda ||
+                                                                            porcentagem) &&
+                                                                        preco &&
+                                                                        quantidade &&
+                                                                        qtdPaga &&
+                                                                        !(
+                                                                            qtdPaga <=
+                                                                            (precoVenda
+                                                                                ? quantidade *
+                                                                                  precoVenda
+                                                                                : quantidade *
+                                                                                  preco)
+                                                                        ) &&
+                                                                        "is-invalid"
+                                                                    }
+                                                                />
+                                                            </InputGroup>
 
                                                             {(precoVenda ||
                                                                 porcentagem) &&
@@ -791,24 +820,21 @@ const DetalhesPedido = () => {
                                 </Form>
                             </Modal.Body>
                             {options && options.length > 0 && (
-                                <>
-                                    {" "}
-                                    <Modal.Footer>
-                                        <Button
-                                            variant="danger"
-                                            onClick={handleClosePedido}
-                                        >
-                                            Fechar
-                                        </Button>
-                                        <Button
-                                            variant="success"
-                                            onClick={handleAddNewPedido}
-                                            disabled={!canSave}
-                                        >
-                                            Criar pedido
-                                        </Button>
-                                    </Modal.Footer>
-                                </>
+                                <Modal.Footer>
+                                    <Button
+                                        variant="danger"
+                                        onClick={handleClosePedido}
+                                    >
+                                        Fechar
+                                    </Button>
+                                    <Button
+                                        variant="success"
+                                        onClick={handleAddNewPedido}
+                                        disabled={!canSave}
+                                    >
+                                        Criar pedido
+                                    </Button>
+                                </Modal.Footer>
                             )}
                         </Modal>
                     </Container>

@@ -210,7 +210,7 @@ const DetalhesFornecedor = () => {
     useEffect(() => {
         if (isAddSuccess) {
             setShow(false);
-            clearFields()
+            clearFields();
             setMsg("Produto adicionado com sucesso!");
         } else if (errorAdd) {
             setErrMsg("Erro ao adicionar produto!");
@@ -386,6 +386,7 @@ const DetalhesFornecedor = () => {
                         >
                             <Form.Label>Nome produto</Form.Label>
                             <Form.Control
+                                maxLength="25"
                                 value={productName}
                                 onChange={(e) => setProductName(e.target.value)}
                             />
@@ -393,7 +394,7 @@ const DetalhesFornecedor = () => {
 
                         <Form.Group className="mb-3 fw-bold" controlId="preco">
                             <Form.Label>Preço base</Form.Label>
-                            <InputGroup>
+                            <InputGroup className="w-50">
                                 <InputGroup.Text>R$</InputGroup.Text>
                                 <Form.Control
                                     type="text"
@@ -412,7 +413,7 @@ const DetalhesFornecedor = () => {
                                     controlId="precoVenda"
                                 >
                                     <Form.Label>Preço venda</Form.Label>
-                                    <InputGroup>
+                                    <InputGroup className="w-50">
                                         <InputGroup.Text>R$</InputGroup.Text>
                                         <Form.Control
                                             type="text"
@@ -429,23 +430,38 @@ const DetalhesFornecedor = () => {
                                     </InputGroup>
                                 </Form.Group>
                             ) : (
-                                <Form.Group
-                                    className="mb-3 fw-bold"
-                                    controlId="porcentagem"
-                                >
-                                    <Form.Label>
-                                        Sua porcentagem na venda %
-                                    </Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        inputMode="numeric"
-                                        value={porcentagemVenda}
-                                        onChange={(e) =>
-                                            setPorcentagemVenda(e.target.value)
-                                        }
-                                        className="w-25"
-                                    />
-                                </Form.Group>
+                                <Row>
+                                    <Form.Group
+                                        className="mb-3 fw-bold"
+                                        controlId="porcentagem"
+                                    >
+                                        <Row>
+                                            <Form.Label>
+                                                Sua porcentagem na venda %
+                                            </Form.Label>
+                                        </Row>
+                                        <Row>
+                                            <Col xs={5} md={4}>
+                                                <InputGroup>
+                                                    <Form.Control
+                                                        type="number"
+                                                        inputMode="numeric"
+                                                        value={porcentagemVenda}
+                                                        onChange={(e) =>
+                                                            setPorcentagemVenda(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className="w-25"
+                                                    />
+                                                    <InputGroup.Text>
+                                                        %
+                                                    </InputGroup.Text>
+                                                </InputGroup>
+                                            </Col>
+                                        </Row>
+                                    </Form.Group>
+                                </Row>
                             ))}
 
                         <Card className="text-center bg-success bg-opacity-50">

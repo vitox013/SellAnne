@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col, InputGroup } from "react-bootstrap";
 import { useUpdateUserMutation } from "../features/users/userApiSlice";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -108,6 +108,7 @@ const EditModal = ({
                                     <strong>Nome</strong>
                                 </Form.Label>
                                 <Form.Control
+                                    maxLength="25"
                                     value={nomeFornecedor}
                                     onChange={onNomeChange}
                                     className={duplicated && "is-invalid"}
@@ -137,15 +138,20 @@ const EditModal = ({
                                             Sua porcentagem na venda %
                                         </strong>
                                     </Form.Label>
-                                    <Form.Control
-                                        className="w-25"
-                                        type="number"
-                                        inputMode="numeric"
-                                        value={porcentagem}
-                                        onChange={(e) =>
-                                            setPorcentagem(e.target.value)
-                                        }
-                                    ></Form.Control>
+                                    <Col xs={4} md={3}>
+                                        <InputGroup>
+                                            <Form.Control
+                                                type="number"
+                                                inputMode="numeric"
+                                                max="100"
+                                                value={porcentagem}
+                                                onChange={(e) =>
+                                                    setPorcentagem(e.target.value)
+                                                }
+                                            />
+                                            <InputGroup.Text>%</InputGroup.Text>
+                                        </InputGroup>
+                                    </Col >
                                 </Form.Group>
                             </Col>
                         </Row>

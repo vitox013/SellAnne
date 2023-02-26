@@ -7,7 +7,7 @@ import {
     Button,
     Form,
     InputGroup,
-    Alert
+    Alert,
 } from "react-bootstrap";
 import { useState, useEffect, React } from "react";
 import {
@@ -186,21 +186,16 @@ const CardProduct = ({
             </Card>
 
             <Modal show={show} onHide={handleClose} backdrop="static">
-                <Modal.Header closeButton>
-                    <Modal.Title>
-                        <Row>
-                            <Col
-                                xs={12}
-                                className="d-flex align-items-center gap-4"
-                            >
-                                <span>Detalhes {nomeProduto} </span>
-                                <i
-                                    className="bx bx-trash fs-3 pointer"
-                                    onClick={handleShowExcluir}
-                                ></i>
-                            </Col>
-                        </Row>
-                    </Modal.Title>
+                <Modal.Header
+                    className="d-flex align-items-center gap-4"
+                    closeButton
+                >
+                    <h3>{nomeProduto}</h3>
+
+                    <i
+                        className="bx bx-trash fs-2 pointer"
+                        onClick={handleShowExcluir}
+                    ></i>
                 </Modal.Header>
                 <Modal.Body>
                     <Row>
@@ -347,15 +342,21 @@ const CardProduct = ({
                                             <Form.Label>
                                                 Porcentagem %
                                             </Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                value={porcentagemVenda}
-                                                onChange={(e) =>
-                                                    setPorcentagemVenda(
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
+                                            <InputGroup>
+                                                <Form.Control
+                                                    className="w-25"
+                                                    type="number"
+                                                    value={porcentagemVenda}
+                                                    onChange={(e) =>
+                                                        setPorcentagemVenda(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                                <InputGroup.Text>
+                                                    %
+                                                </InputGroup.Text>
+                                            </InputGroup>
                                         </Form.Group>
                                     </Form>
                                 </Col>
