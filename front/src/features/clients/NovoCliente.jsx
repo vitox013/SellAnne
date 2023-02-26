@@ -105,6 +105,7 @@ const NovoCliente = () => {
                                 <Form.Label>Nome</Form.Label>
                                 <Form.Control
                                     type="text"
+                                    maxLength={18}
                                     onChange={onNomeChange}
                                     className={`${alertClass}`}
                                 />

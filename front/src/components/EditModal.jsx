@@ -108,7 +108,7 @@ const EditModal = ({
                                     <strong>Nome</strong>
                                 </Form.Label>
                                 <Form.Control
-                                    maxLength="25"
+                                    maxLength={18}
                                     value={nomeFornecedor}
                                     onChange={onNomeChange}
                                     className={duplicated && "is-invalid"}
@@ -146,12 +146,14 @@ const EditModal = ({
                                                 max="100"
                                                 value={porcentagem}
                                                 onChange={(e) =>
-                                                    setPorcentagem(e.target.value)
+                                                    setPorcentagem(
+                                                        e.target.value
+                                                    )
                                                 }
                                             />
                                             <InputGroup.Text>%</InputGroup.Text>
                                         </InputGroup>
-                                    </Col >
+                                    </Col>
                                 </Form.Group>
                             </Col>
                         </Row>

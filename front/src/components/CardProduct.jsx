@@ -19,6 +19,7 @@ import useAuth from "../hooks/useAuth";
 import { useDispatch } from "react-redux";
 import { setMsg } from "../features/infoMsg/msgSlice";
 import { toNumber, toBRL, currency } from "./Currency";
+import { OnlyNumber } from "./OnlyNumber";
 
 const CardProduct = ({
     cod,
@@ -85,6 +86,7 @@ const CardProduct = ({
     };
     const handleShowExcluir = () => setShowExcluir(true);
     const handleCloseExcluir = () => setShowExcluir(false);
+    const handleCode = (e) => setCode(e.target.value);
 
     const handlePrice = (e) => {
         setPrecoBase(e.target.value);
@@ -187,10 +189,10 @@ const CardProduct = ({
 
             <Modal show={show} onHide={handleClose} backdrop="static">
                 <Modal.Header
-                    className="d-flex align-items-center gap-4"
+                    className="d-flex align-items-center gap-3"
                     closeButton
                 >
-                    <h3>{nomeProduto}</h3>
+                    <h3 className="mb-0">{nomeProduto}</h3>
 
                     <i
                         className="bx bx-trash fs-2 pointer"
@@ -238,11 +240,12 @@ const CardProduct = ({
                                 <Form.Group>
                                     <Form.Label>Codigo</Form.Label>
                                     <Form.Control
-                                        type="number"
+                                        type="text"
+                                        maxLength={18}
                                         inputMode="numeric"
                                         value={code}
                                         onChange={(e) =>
-                                            setCode(e.target.value)
+                                            handleCode(OnlyNumber(e))
                                         }
                                         className={
                                             duplicatedCode && "is-invalid"
@@ -261,7 +264,7 @@ const CardProduct = ({
                                 <Form.Group>
                                     <Form.Label>Nome Produto</Form.Label>
                                     <Form.Control
-                                        maxLength={30}
+                                        maxLength={18}
                                         value={productName}
                                         onChange={(e) =>
                                             setProductName(e.target.value)

@@ -27,6 +27,7 @@ import EditModal from "../../components/EditModal";
 import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
 import { currency, toNumber } from "../../components/Currency";
+import { OnlyNumber } from "../../components/OnlyNumber";
 
 const DetalhesFornecedor = () => {
     const { currentUser, userId, username } = useAuth();
@@ -248,6 +249,10 @@ const DetalhesFornecedor = () => {
         setPrecoVenda(e.target.value);
     };
 
+    const handleCode = (e) => {
+        setCode(e.target.value);
+    };
+
     return (
         <>
             <NavBar
@@ -364,13 +369,14 @@ const DetalhesFornecedor = () => {
                         <Form.Group className="mb-3 fw-bold" controlId="code">
                             <Form.Label>Código produto</Form.Label>
                             <Form.Control
-                                type="number"
-                                pattern="[0-9]{20}"
+                                type="text"
+                                pattern="[0-9]{18}"
                                 inputMode="numeric"
                                 placeholder="Código"
                                 autoFocus
+                                maxLength={18}
                                 value={code}
-                                onChange={(e) => setCode(e.target.value)}
+                                onChange={(e) => handleCode(OnlyNumber(e))}
                                 className={duplicatedCode && "is-invalid"}
                                 required
                             />
@@ -386,7 +392,7 @@ const DetalhesFornecedor = () => {
                         >
                             <Form.Label>Nome produto</Form.Label>
                             <Form.Control
-                                maxLength="25"
+                                maxLength={18}
                                 value={productName}
                                 onChange={(e) => setProductName(e.target.value)}
                             />

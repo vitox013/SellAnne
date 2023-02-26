@@ -20,6 +20,7 @@ import {
     useUpdateUserMutation,
     useDeleteUserMutation,
 } from "../users/userApiSlice";
+import { OnlyNumber } from "../../components/OnlyNumber";
 
 const DetalhesPedido = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
@@ -195,6 +196,7 @@ const DetalhesPedido = () => {
         setCode("");
         setProdFound({});
         setPorcentagem("");
+        setDebouncedCode("")
     };
 
     const handleShow = () => setShow(true);
@@ -205,9 +207,9 @@ const DetalhesPedido = () => {
         setOptionSelected("");
         clearFields();
     };
-
     const handleShowStats = () => setShowStats(true);
     const handleCloseStats = () => setShowStats(false);
+    const handleCode = (e) => setDebouncedCode(e.target.value);
 
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
@@ -496,7 +498,7 @@ const DetalhesPedido = () => {
                                                             </Form.Label>
                                                             <Form.Control
                                                                 type="text"
-                                                                pattern="[0-9]{20}"
+                                                                maxLength={18}
                                                                 inputMode="numeric"
                                                                 placeholder="Código"
                                                                 autoFocus
@@ -504,9 +506,10 @@ const DetalhesPedido = () => {
                                                                     debouncedCode
                                                                 }
                                                                 onChange={(e) =>
-                                                                    setDebouncedCode(
-                                                                        e.target
-                                                                            .value
+                                                                    handleCode(
+                                                                        OnlyNumber(
+                                                                            e
+                                                                        )
                                                                     )
                                                                 }
                                                                 required
@@ -536,7 +539,7 @@ const DetalhesPedido = () => {
                                                                 value={
                                                                     productName
                                                                 }
-                                                                maxLength="25"
+                                                                maxLength={18}
                                                                 disabled={
                                                                     prodFound
                                                                         ? true
@@ -690,7 +693,7 @@ const DetalhesPedido = () => {
                                                                 Quantidade
                                                             </Form.Label>
                                                             <Form.Control
-                                                            className="w-50"
+                                                                className="w-50"
                                                                 type="number"
                                                                 pattern="[0-9]*"
                                                                 required
