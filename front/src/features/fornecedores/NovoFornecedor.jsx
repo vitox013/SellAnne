@@ -53,14 +53,15 @@ const NovoFornecedor = () => {
     }, [isSuccess, navigate, error]);
 
     useEffect(() => {
-        // if (fornecedores) {
-        //     setDuplicated(fornecedores.find((forn) => forn.nome == codigo));
-        // }
         if (fornecedores) {
-            fornecedores.map((forn) =>
-                forn.nomeFornecedor == nomeFornecedor
-                    ? setDuplicated(true)
-                    : setDuplicated(false)
+            setDuplicated(
+                fornecedores
+                    .map((fornecedor) => fornecedor.nomeFornecedor)
+                    .some(
+                        (nome) =>
+                            nome.toLowerCase() ===
+                            nomeFornecedor.toLowerCase().trim()
+                    )
             );
         }
     }, [nomeFornecedor]);
@@ -80,7 +81,7 @@ const NovoFornecedor = () => {
             await addFornecedor({
                 userId,
                 fornecedor: {
-                    nomeFornecedor,
+                    nomeFornecedor: nomeFornecedor.trim(),
                     metodo: opcao,
                     porcentagemPadrao: porcentagem,
                 },
@@ -121,7 +122,7 @@ const NovoFornecedor = () => {
                                     value={nomeFornecedor}
                                     onChange={onNomeChange}
                                     className={duplicated && "is-invalid"}
-                                    maxLength="25"
+                                    maxLength="18"
                                     required
                                 />
                                 {duplicated && (
