@@ -9,6 +9,7 @@ import {
     Row,
     Col,
     Form,
+    InputGroup,
 } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -17,16 +18,21 @@ import {
     useUpdateUserMutation,
 } from "../features/users/userApiSlice";
 import useAuth from "../hooks/useAuth";
+import { onlyNumber } from "./OnlyNumber";
+import { currency, toBRL, toNumber } from "./Currency";
+import { useDispatch } from "react-redux";
+import { setMsg } from "../features/infoMsg/msgSlice";
 
 const CardPedido = ({
     pedidoId,
-    produtoId,
     nomeProduto,
     quantidade,
     valor,
     codigo,
     qtdPaga,
-    clientNome,
+    metodo,
+    valorVenda,
+    porcentagem,
     fornecedor,
     fornecedorId,
 }) => {
@@ -42,18 +48,14 @@ const CardPedido = ({
     const [show, setShow] = useState(false);
     const [showExcluir, setShowExcluir] = useState(false);
     const [quantity, setQuantity] = useState(quantidade);
-    const [quantPaga, setQuantPaga] = useState(qtdPaga);
+    const [quantPaga, setQuantPaga] = useState(toBRL(qtdPaga.toFixed(2)));
     const [pago, setPago] = useState(false);
     const [produto, setProduto] = useState();
     const [alterado, setAlterado] = useState(false);
-    const [canUpdateProduto, setCanUpdateProduto] = useState(false);
     const [errMsg, setErrMsg] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
 
-    const [
-        updateProduct,
-        { isSuccess: isUpdateProductSuccess, error: errorUpdateProduct },
-    ] = useUpdateUserMutation();
+    const dispatch = useDispatch();
 
     const [
         updatePedido,
@@ -63,28 +65,17 @@ const CardPedido = ({
     const [deletePedido, { isSuccess: isDeleteSuccess, error: errorDelete }] =
         useDeleteUserMutation();
 
-    const { products } = useGetUserDataQuery(userId, {
-        selectFromResult: ({ data }) => ({
-            products: data?.fornecedores,
-        }),
-    });
-
-    console.log(products);
-
-    // useEffect(() => {
-    //     setProduto(products.find((p) => p._id === produtoId));
-    // }, [products]);
-
     const handleShow = () => setShow(true);
     const handleClose = () => {
         setShow(false);
         setQuantity(quantidade);
-        setQuantPaga(qtdPaga);
+        setQuantPaga(toBRL(qtdPaga.toFixed(2)));
         setShowExcluir(false);
     };
 
     const handleShowExcluir = () => setShowExcluir(true);
     const handleCloseExcluir = () => setShowExcluir(false);
+    const handleQtdPaga = (e) => setQuantPaga(e.target.value);
 
     const onClickDelete = async () => {
         await deletePedido({
@@ -98,45 +89,23 @@ const CardPedido = ({
         });
     };
 
-    useEffect(() => {
-        if (produto) {
-            setCanUpdateProduto(produto.estoque >= quantity - quantidade);
-        } else {
-            setCanUpdateProduto(false);
-        }
-    }, [produto, quantity]);
+    const canSave =
+        toNumber(quantPaga) <=
+            (quantity * (metodo == "Revenda" ? valorVenda : valor)).toFixed(
+                2
+            ) && toNumber(quantPaga) >= 0;
 
     const onClickUpdate = async () => {
-        if (produto && canUpdateProduto) {
-            let estoqueAtt =
-                quantity >= quantidade
-                    ? produto.estoque - (quantity - quantidade)
-                    : produto.estoque + (quantidade - quantity);
+        if (canSave) {
+            let numberQtdPaga = toNumber(quantPaga);
 
-            await updateProduct({
-                userId,
-                produto: {
-                    _id: produtoId,
-                    estoque: estoqueAtt,
-                },
-            });
             await updatePedido({
                 userId,
                 cliente: {
                     pedido: {
                         _id: pedidoId,
                         quantidade: quantity,
-                        qtdPaga: quantPaga,
-                    },
-                },
-            });
-        } else if (!produto) {
-            await updatePedido({
-                userId,
-                cliente: {
-                    pedido: {
-                        _id: pedidoId,
-                        qtdPaga: quantPaga,
+                        qtdPaga: numberQtdPaga,
                     },
                 },
             });
@@ -146,17 +115,15 @@ const CardPedido = ({
     useEffect(() => {
         if (isDeleteSuccess) {
             setShow(false);
-            navigate(`/clientes/${clientId}`, {
-                state: { message: "Pedido DELETADO com sucesso!" },
-            });
+            dispatch(setMsg("Pedido excluído com sucesso!"));
+            navigate(`/clientes/${clientId}`);
         } else if (errorDelete) {
             setErrMsg("Erro ao excluir o pedido!");
         }
         if (isUpdatePedidoSuccess) {
             setShow(false);
-            navigate(`/clientes/${clientId}`, {
-                state: { message: "Pedido atualizado com sucesso!" },
-            });
+            dispatch(setMsg("Pedido atualizado com sucesso!"));
+            navigate(`/clientes/${clientId}`);
         } else if (errorUpdatePedido) {
             setErrMsg("Erro ao editar pedido!");
         }
@@ -164,14 +131,21 @@ const CardPedido = ({
         isDeleteSuccess,
         errorDelete,
         isUpdatePedidoSuccess,
-        isUpdateProductSuccess,
         errorUpdatePedido,
     ]);
 
     useEffect(() => {
         if (quantity) {
-            setPago((valor * quantity).toFixed(1) == quantPaga);
-            setAlterado(quantity != quantidade || quantPaga != qtdPaga);
+            setPago(
+                toBRL(
+                    (
+                        (metodo == "Revenda" ? valorVenda : valor) * quantity
+                    ).toFixed(2)
+                ) == quantPaga
+            );
+            setAlterado(
+                quantity != quantidade || quantPaga != toBRL(qtdPaga.toFixed(2))
+            );
         }
     }, [quantity, quantPaga]);
 
@@ -181,10 +155,10 @@ const CardPedido = ({
             : "alert alert-success";
 
     const status =
-        qtdPaga < (quantidade * valor).toFixed(2) ? "Não pago" : "Pago";
-
-    const canSave =
-        quantPaga <= (quantity * valor).toFixed(2) && quantPaga >= 0;
+        qtdPaga <
+        (quantidade * (metodo == "Revenda" ? valorVenda : valor)).toFixed(2)
+            ? "Não pago"
+            : "Pago";
 
     return (
         <>
@@ -199,7 +173,10 @@ const CardPedido = ({
                     </Col>
                     <Col className="ps-3 pe-0">{quantidade}</Col>
                     <Col className="px-0">
-                        {formatter.format(valor * quantidade)}
+                        {formatter.format(
+                            quantidade *
+                                (metodo == "Revenda" ? valorVenda : valor)
+                        )}
                     </Col>
                     <Col className="ps-4">{status}</Col>
                 </Row>
@@ -228,6 +205,17 @@ const CardPedido = ({
                                 {nomeProduto} | {formatter.format(valor)}
                             </h5>
                             <small>cod: {codigo}</small>
+                            <br></br>
+                            <small>
+                                Metodo:{" "}
+                                <span className="fw-bold">
+                                    {metodo == "Revenda"
+                                        ? `${metodo} por ${formatter.format(
+                                              valorVenda
+                                          )}`
+                                        : metodo}
+                                </span>
+                            </small>
                         </Col>
                     </Row>
                     {showExcluir && (
@@ -266,44 +254,40 @@ const CardPedido = ({
                             <Form>
                                 <Form.Group>
                                     <Form.Control
+                                        type="number"
+                                        inputMode="numeric"
                                         value={quantity}
                                         onChange={(e) =>
                                             setQuantity(e.target.value)
                                         }
-                                        className={
-                                            produto
-                                                ? produto.estoque >=
-                                                  quantity - quantidade
-                                                    ? ""
-                                                    : "is-invalid"
-                                                : ""
-                                        }
-                                        disabled={!produto}
+                                        className="w-50"
                                     ></Form.Control>
-                                    {produto ? (
-                                        <Form.Text className="text-muted">
-                                            {produto.estoque} em estoque
-                                        </Form.Text>
-                                    ) : (
-                                        "Produto não cadastrado ou excluído"
-                                    )}
                                 </Form.Group>
                             </Form>
                         </Col>
-                        <Col xs={6}>{formatter.format(quantity * valor)}</Col>
+                        <Col xs={6}>
+                            {formatter.format(
+                                quantity *
+                                    (metodo == "Revenda" ? valorVenda : valor)
+                            )}
+                        </Col>
                     </Row>
                     <Row className="mt-3 fw-bold ">
                         <Col>Valor pago</Col>
                     </Row>
                     <Row className="mt-1 d-flex align-items-center">
                         <Col xs={6}>
-                            <Form.Control
-                                type="number"
-                                value={quantPaga}
-                                max={(quantity * valor).toFixed(2)}
-                                onChange={(e) => setQuantPaga(e.target.value)}
-                                className={canSave ? "" : "is-invalid"}
-                            ></Form.Control>
+                            <InputGroup>
+                                <InputGroup.Text>R$</InputGroup.Text>
+                                <Form.Control
+                                    type="text"
+                                    value={quantPaga}
+                                    onChange={(e) => handleQtdPaga(currency(e))}
+                                    className={`${
+                                        canSave ? "" : "is-invalid"
+                                    } w-25`}
+                                ></Form.Control>
+                            </InputGroup>
                         </Col>
                     </Row>
                     {pago ? (
@@ -317,15 +301,20 @@ const CardPedido = ({
                             <Col className="alert alert-danger text-center">
                                 <span>Valor restante a ser pago: </span>
                                 <span className="fw-bold">
-                                    {quantPaga >= 0
+                                    {toNumber(quantPaga) >= 0
                                         ? formatter.format(
-                                              quantity * valor - quantPaga
+                                              metodo == "Revenda"
+                                                  ? quantity * valorVenda -
+                                                        toNumber(quantPaga)
+                                                  : quantity * valor -
+                                                        toNumber(quantPaga)
                                           )
                                         : "-----"}
                                 </span>
                             </Col>
                         </Row>
                     )}
+
                     {alterado && (
                         <Row className="mt-1">
                             <Col>
@@ -333,6 +322,7 @@ const CardPedido = ({
                                     variant="success"
                                     onClick={onClickUpdate}
                                     className="me-2"
+                                    disabled={!canSave}
                                 >
                                     Salvar edição
                                 </Button>

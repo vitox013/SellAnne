@@ -8,6 +8,7 @@ import useAuth from "../../hooks/useAuth";
 import { useDispatch } from "react-redux";
 import { useGetUserDataQuery } from "../users/userApiSlice";
 
+
 const Clientes = () => {
     const { currentUser, userId, username } = useAuth();
     const [term, setTerm] = useState("");
@@ -20,8 +21,6 @@ const Clientes = () => {
             clients: data?.clients,
         }),
     });
-
-    console.log(clients);
 
     useEffect(() => {
         if (clients) {

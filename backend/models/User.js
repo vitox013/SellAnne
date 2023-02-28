@@ -32,6 +32,10 @@ const userSchema = new mongoose.Schema({
                         type: String,
                         required: true,
                     },
+                    metodo: {
+                        type: String,
+                        required: true,
+                    },
                     produtoId: {
                         type: String,
                         required: true,
@@ -55,6 +59,12 @@ const userSchema = new mongoose.Schema({
                     valor: {
                         type: Number,
                         required: true,
+                    },
+                    valorVenda: {
+                        type: Number,
+                    },
+                    porcentagem: {
+                        type: Number,
                     },
                 },
             ],

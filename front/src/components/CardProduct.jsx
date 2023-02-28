@@ -19,7 +19,7 @@ import useAuth from "../hooks/useAuth";
 import { useDispatch } from "react-redux";
 import { setMsg } from "../features/infoMsg/msgSlice";
 import { toNumber, toBRL, currency } from "./Currency";
-import { OnlyNumber } from "./OnlyNumber";
+import { onlyNumber } from "./OnlyNumber";
 
 const CardProduct = ({
     cod,
@@ -245,7 +245,7 @@ const CardProduct = ({
                                         inputMode="numeric"
                                         value={code}
                                         onChange={(e) =>
-                                            handleCode(OnlyNumber(e))
+                                            handleCode(onlyNumber(e))
                                         }
                                         className={
                                             duplicatedCode && "is-invalid"

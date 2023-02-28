@@ -20,7 +20,8 @@ import {
     useUpdateUserMutation,
     useDeleteUserMutation,
 } from "../users/userApiSlice";
-import { OnlyNumber } from "../../components/OnlyNumber";
+import { onlyNumber } from "../../components/OnlyNumber";
+import { currency, toNumber } from "../../components/Currency";
 
 const DetalhesPedido = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
@@ -86,52 +87,6 @@ const DetalhesPedido = () => {
         useUpdateUserMutation();
 
     useEffect(() => {
-        if (clients) {
-            setCliente(clients.find((client) => client._id === clientId));
-        }
-
-        if (cliente) {
-            setPedidos(cliente.pedidos);
-
-            if (pedidos) {
-                setContent(
-                    pedidos.map((ped) => (
-                        <CardPedido
-                            key={ped._id}
-                            produtoId={ped.produtoId}
-                            fornecedor={ped.fornecedor}
-                            fornecedorId={ped.fornecedorId}
-                            pedidoId={ped._id}
-                            nomeProduto={ped.nomeProduto}
-                            codigo={ped.codigoProduto}
-                            quantidade={ped.quantidade}
-                            valor={ped.valor}
-                            qtdPaga={ped.qtdPaga}
-                            clientNome={cliente.clientName}
-                        />
-                    ))
-                );
-                setTotalPago(
-                    pedidos.reduce((acc, ped) => acc + ped.qtdPaga, 0)
-                );
-                setAPagar(
-                    pedidos
-                        .reduce(
-                            (acc, ped) =>
-                                acc +
-                                (ped.quantidade * ped.valor - ped.qtdPaga),
-                            0
-                        )
-                        .toFixed(2)
-                );
-            }
-        }
-        if (cliente) {
-            setClienteNome(cliente.clientName);
-        }
-    }, [clients, cliente, pedidos]);
-
-    useEffect(() => {
         if (optionSelected != "Selecione fornecedor" && fornecedores) {
             let forn = fornecedores.filter(
                 (forn) => forn.nomeFornecedor == optionSelected
@@ -182,6 +137,57 @@ const DetalhesPedido = () => {
     }, [fornecedores]);
 
     useEffect(() => {
+        if (clients) {
+            setCliente(clients.find((client) => client._id === clientId));
+        }
+
+        if (cliente) {
+            setPedidos(cliente.pedidos);
+
+            if (pedidos) {
+                setContent(
+                    pedidos.map((ped) => (
+                        <CardPedido
+                            key={ped._id}
+                            fornecedor={ped.fornecedor}
+                            fornecedorId={ped.fornecedorId}
+                            pedidoId={ped._id}
+                            nomeProduto={ped.nomeProduto}
+                            codigo={ped.codigoProduto}
+                            quantidade={ped.quantidade}
+                            valor={ped.valor}
+                            valorVenda={ped.valorVenda}
+                            porcentagem={ped.porcentagem}
+                            qtdPaga={ped.qtdPaga}
+                            metodo={ped.metodo}
+                        />
+                    ))
+                );
+                console.log(pedidos);
+                setTotalPago(
+                    pedidos.reduce((acc, ped) => acc + ped.qtdPaga, 0)
+                );
+                setAPagar(
+                    pedidos
+                        .reduce(
+                            (acc, ped) =>
+                                acc +
+                                ((ped.metodo == "Revenda"
+                                    ? ped.quantidade * ped.valorVenda
+                                    : ped.quantidade * ped.valor) -
+                                    ped.qtdPaga),
+                            0
+                        )
+                        .toFixed(2)
+                );
+            }
+        }
+        if (cliente) {
+            setClienteNome(cliente.clientName);
+        }
+    }, [clients, cliente, pedidos]);
+
+    useEffect(() => {
         const timer = setTimeout(() => setCode(debouncedCode), 1000);
         debouncedCode == "" && clearFields();
         return () => clearTimeout(timer);
@@ -196,7 +202,7 @@ const DetalhesPedido = () => {
         setCode("");
         setProdFound({});
         setPorcentagem("");
-        setDebouncedCode("")
+        setDebouncedCode("");
     };
 
     const handleShow = () => setShow(true);
@@ -210,6 +216,9 @@ const DetalhesPedido = () => {
     const handleShowStats = () => setShowStats(true);
     const handleCloseStats = () => setShowStats(false);
     const handleCode = (e) => setDebouncedCode(e.target.value);
+    const handlePrice = (e) => setPreco(e.target.value);
+
+    const handleQtdPaga = (e) => setQtdPaga(e.target.value);
 
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
@@ -226,15 +235,18 @@ const DetalhesPedido = () => {
         quantidade &&
         productName &&
         (precoVenda || porcentagem) &&
-        qtdPaga &&
+        toNumber(qtdPaga) &&
         optionSelected != "Selecione fornecedor" &&
-        qtdPaga >= 0 &&
-        qtdPaga <= (quantidade * precoVenda).toFixed(2);
+        toNumber(qtdPaga) >= 0 &&
+        (fornecedor.metodo == "Porcentagem"
+            ? toNumber(qtdPaga) <= quantidade * preco
+            : toNumber(qtdPaga) <= (quantidade * precoVenda).toFixed(2));
 
     const handleAddNewPedido = async (e) => {
         e.preventDefault();
 
         if (canSave) {
+            let quantPaga = toNumber(qtdPaga);
             if (prodFound) {
                 await addNewPedido({
                     cliente: {
@@ -246,8 +258,11 @@ const DetalhesPedido = () => {
                             codigoProduto: prodFound.code,
                             nomeProduto: prodFound.productName,
                             quantidade,
-                            qtdPaga,
+                            qtdPaga: quantPaga,
                             valor: prodFound.preco,
+                            valorVenda: prodFound.precoVenda,
+                            porcentagem: fornecedor.porcentagemPadrao,
+                            metodo: fornecedor.metodo,
                         },
                     },
                 });
@@ -275,8 +290,9 @@ const DetalhesPedido = () => {
                             codigoProduto: code,
                             nomeProduto: productName,
                             quantidade,
-                            qtdPaga,
+                            qtdPaga: quantPaga,
                             valor: preco,
+                            metodo: fornecedor.metodo,
                         },
                     },
                 });
@@ -412,7 +428,7 @@ const DetalhesPedido = () => {
                     <Row>
                         <Col xs={4}>Item</Col>
                         <Col className="ps-0">Qtd</Col>
-                        <Col className="ps-0">Valor</Col>
+                        <Col className="ps-0">Valor Total</Col>
                         <Col>Situação</Col>
                     </Row>
                 </Card>
@@ -507,7 +523,7 @@ const DetalhesPedido = () => {
                                                                 }
                                                                 onChange={(e) =>
                                                                     handleCode(
-                                                                        OnlyNumber(
+                                                                        onlyNumber(
                                                                             e
                                                                         )
                                                                     )
@@ -569,11 +585,11 @@ const DetalhesPedido = () => {
                                                                     R$
                                                                 </InputGroup.Text>
                                                                 <Form.Control
-                                                                    type="number"
+                                                                    type="text"
                                                                     inputMode="numeric"
-                                                                    value={Number(
+                                                                    value={
                                                                         preco
-                                                                    ).toString()}
+                                                                    }
                                                                     disabled={
                                                                         prodFound
                                                                             ? true
@@ -582,11 +598,9 @@ const DetalhesPedido = () => {
                                                                     onChange={(
                                                                         e
                                                                     ) =>
-                                                                        setPreco(
-                                                                            Number(
+                                                                        handlePrice(
+                                                                            currency(
                                                                                 e
-                                                                                    .target
-                                                                                    .value
                                                                             )
                                                                         )
                                                                     }
@@ -723,9 +737,8 @@ const DetalhesPedido = () => {
                                                                     R$
                                                                 </InputGroup.Text>
                                                                 <Form.Control
-                                                                    type="number"
+                                                                    type="text"
                                                                     inputMode="numeric"
-                                                                    pattern="[0-9]*"
                                                                     required
                                                                     value={
                                                                         qtdPaga
@@ -733,10 +746,10 @@ const DetalhesPedido = () => {
                                                                     onChange={(
                                                                         e
                                                                     ) =>
-                                                                        setQtdPaga(
-                                                                            e
-                                                                                .target
-                                                                                .value
+                                                                        handleQtdPaga(
+                                                                            currency(
+                                                                                e
+                                                                            )
                                                                         )
                                                                     }
                                                                     className={
@@ -744,9 +757,13 @@ const DetalhesPedido = () => {
                                                                             porcentagem) &&
                                                                         preco &&
                                                                         quantidade &&
-                                                                        qtdPaga &&
+                                                                        toNumber(
+                                                                            qtdPaga
+                                                                        ) &&
                                                                         !(
-                                                                            qtdPaga <=
+                                                                            toNumber(
+                                                                                qtdPaga
+                                                                            ) <=
                                                                             (precoVenda
                                                                                 ? quantidade *
                                                                                   precoVenda

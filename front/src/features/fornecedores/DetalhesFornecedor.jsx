@@ -27,7 +27,7 @@ import EditModal from "../../components/EditModal";
 import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
 import { currency, toNumber } from "../../components/Currency";
-import { OnlyNumber } from "../../components/OnlyNumber";
+import { onlyNumber } from "../../components/OnlyNumber";
 
 const DetalhesFornecedor = () => {
     const { currentUser, userId, username } = useAuth();
@@ -376,7 +376,7 @@ const DetalhesFornecedor = () => {
                                 autoFocus
                                 maxLength={18}
                                 value={code}
-                                onChange={(e) => handleCode(OnlyNumber(e))}
+                                onChange={(e) => handleCode(onlyNumber(e))}
                                 className={duplicatedCode && "is-invalid"}
                                 required
                             />
