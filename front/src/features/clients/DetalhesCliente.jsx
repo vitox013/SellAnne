@@ -85,11 +85,6 @@ const DetalhesPedido = () => {
     const [createProduct, { isSuccess: createIsSuccess, error: errorCreate }] =
         useUpdateUserMutation();
 
-    const [
-        updateClient,
-        { isSuccess: updateClientIsSuccess, error: errorClientUpdate },
-    ] = useUpdateUserMutation();
-
     useEffect(() => {
         if (optionSelected != "Selecione fornecedor" && fornecedores) {
             let forn = fornecedores.filter(
@@ -102,9 +97,17 @@ const DetalhesPedido = () => {
                     (forn) => forn.nomeFornecedor === optionSelected
                 )
             );
-            clearFields();
         }
     }, [optionSelected]);
+
+    useEffect(() => {
+        if (fornecedor?.porcentagemPadrao) {
+            setPorcentagem(fornecedor?.porcentagemPadrao);
+        }
+        clearFields();
+    }, [fornecedor]);
+
+    console.log(porcentagem);
 
     useEffect(() => {
         if (code && produtosFornecedor) {
@@ -204,7 +207,6 @@ const DetalhesPedido = () => {
         setQuantidade("");
         setCode("");
         setProdFound({});
-        setPorcentagem("");
         setDebouncedCode("");
     };
 
@@ -308,6 +310,7 @@ const DetalhesPedido = () => {
 
     useEffect(() => {
         if (prodFound?.code) {
+            console.log("Entrei prod found");
             setPreco(toBRL(prodFound.preco.toFixed(2)));
             setPrecoVenda(prodFound.precoVenda);
             setProductName(prodFound.productName);
@@ -623,7 +626,6 @@ const DetalhesPedido = () => {
                                                                             )
                                                                         )
                                                                     }
-                                                                    className="CurrencyInput"
                                                                 />
                                                             </InputGroup>
                                                         </Form.Group>
@@ -685,11 +687,6 @@ const DetalhesPedido = () => {
                                                                         pattern="[0-9]*"
                                                                         max="100"
                                                                         required
-                                                                        disabled={
-                                                                            prodFound
-                                                                                ? true
-                                                                                : false
-                                                                        }
                                                                         value={
                                                                             porcentagem
                                                                         }
