@@ -107,8 +107,6 @@ const DetalhesPedido = () => {
         clearFields();
     }, [fornecedor]);
 
-    console.log(porcentagem);
-
     useEffect(() => {
         if (code && produtosFornecedor) {
             setProdFound(produtosFornecedor.find((prod) => prod.code == code));
@@ -310,7 +308,6 @@ const DetalhesPedido = () => {
 
     useEffect(() => {
         if (prodFound?.code) {
-            console.log("Entrei prod found");
             setPreco(toBRL(prodFound.preco.toFixed(2)));
             setPrecoVenda(prodFound.precoVenda);
             setProductName(prodFound.productName);
