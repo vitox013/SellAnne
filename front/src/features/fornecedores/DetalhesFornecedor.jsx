@@ -180,7 +180,6 @@ const DetalhesFornecedor = () => {
         if (canSave) {
             let price = toNumber(preco);
             let priceVenda = toNumber(precoVenda);
-            console.log(price, priceVenda);
 
             await addProduct({
                 userId,

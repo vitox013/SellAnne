@@ -2,7 +2,6 @@ import { apiSlice } from "../../app/api/apiSlice";
 import { logOut, setCredentials } from "./authSlice";
 import { useNavigate } from "react-router-dom";
 
-
 export const authApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         login: builder.mutation({
@@ -21,7 +20,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 try {
                     //const { data } =
                     await queryFulfilled;
-                    //console.log(data)
+
                     dispatch(logOut());
                     dispatch(apiSlice.util.resetApiState());
                 } catch (err) {
@@ -40,7 +39,6 @@ export const authApiSlice = apiSlice.injectEndpoints({
                     const { accessToken } = data;
                     dispatch(setCredentials({ accessToken }));
                 } catch (err) {
-
                     console.log(err);
                 }
             },

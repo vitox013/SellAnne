@@ -37,7 +37,6 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (todosPedidos) {
-            console.log(todosPedidos);
             setTotalPedidos(todosPedidos.length);
             setTotalPago(
                 todosPedidos.reduce((acc, pedido) => acc + pedido.qtdPaga, 0)

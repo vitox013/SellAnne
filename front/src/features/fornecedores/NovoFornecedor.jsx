@@ -176,7 +176,6 @@ const NovoFornecedor = () => {
                                     </Form.Group>
                                 </Row>
                             )}
-                            {console.log(!canSave, duplicated)}
                             <Button
                                 variant="success"
                                 disabled={!canSave || duplicated}

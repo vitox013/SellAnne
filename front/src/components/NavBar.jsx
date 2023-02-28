@@ -15,6 +15,7 @@ function NavBar({ info, icon, fixed, path, page }) {
         if (isSuccess) {
             navigate("/");
         } else if (error) {
+            navigate("/");
             console.log(error);
         }
     }, [isSuccess, navigate, error]);

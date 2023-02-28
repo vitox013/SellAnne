@@ -51,7 +51,7 @@ const Cadastro = () => {
     const canSave =
         [validUsername, validPassword, email].every(Boolean) && !isLoading;
 
-    console.log(canSave);
+    
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
         try {
