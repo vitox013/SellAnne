@@ -41,11 +41,14 @@ const NovoCliente = () => {
     useEffect(() => {
         setValidNome(USER_REGEX.test(nome));
 
-        clientes.map((client) => {
-            client.clientName.toLowerCase() === nome.toLowerCase()
-                ? setDuplicatedName(true)
-                : setDuplicatedName(false);
-        });
+        setDuplicatedName(
+            clientes
+                .map((cliente) => cliente.clientName)
+                .some(
+                    (clientName) =>
+                        clientName.toLowerCase() === nome.toLowerCase()
+                )
+        );
     }, [nome]);
 
     useEffect(() => {

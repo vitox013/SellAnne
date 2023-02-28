@@ -150,16 +150,16 @@ const CardPedido = ({
     }, [quantity, quantPaga]);
 
     const statusClass =
-        qtdPaga < (quantidade * valor).toFixed(1)
+        qtdPaga <
+        (quantidade * (metodo == "Revenda" ? valorVenda : valor)).toFixed(2)
             ? "alert alert-danger"
             : "alert alert-success";
-
     const status =
         qtdPaga <
         (quantidade * (metodo == "Revenda" ? valorVenda : valor)).toFixed(2)
             ? "Não pago"
             : "Pago";
-
+    
     return (
         <>
             <Card
@@ -169,7 +169,7 @@ const CardPedido = ({
                 <Row className="d-flex align-items-center">
                     <Col xs={4} className="d-flex flex-column fw">
                         <span className="fw-bold">{nomeProduto}</span>
-                        <small>cod: {codigo}</small>
+                        <small>cod: {codigo} | {fornecedor}</small>
                     </Col>
                     <Col className="ps-3 pe-0">{quantidade}</Col>
                     <Col className="px-0">
@@ -276,16 +276,14 @@ const CardPedido = ({
                         <Col>Valor pago</Col>
                     </Row>
                     <Row className="mt-1 d-flex align-items-center">
-                        <Col xs={6}>
+                        <Col xs={6} md={5}>
                             <InputGroup>
                                 <InputGroup.Text>R$</InputGroup.Text>
                                 <Form.Control
                                     type="text"
                                     value={quantPaga}
                                     onChange={(e) => handleQtdPaga(currency(e))}
-                                    className={`${
-                                        canSave ? "" : "is-invalid"
-                                    } w-25`}
+                                    className={`${canSave ? "" : "is-invalid"}`}
                                 ></Form.Control>
                             </InputGroup>
                         </Col>

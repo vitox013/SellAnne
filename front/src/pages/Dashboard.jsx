@@ -59,12 +59,12 @@ const Dashboard = () => {
             <NavDash
                 info=""
                 icon="bx bx-user-circle fs-1 expand"
-                fixed="top"
+                fixed=""
                 path="dash"
                 page="dashboard"
             />
             <Container>
-                <h1 className="mt-2 pt-10 text-center">Olá, {currentUser}!</h1>
+                <h1 className="text-center">Olá, {currentUser}!</h1>
                 <Row>
                     <Col>
                         <Link to="/clientes">

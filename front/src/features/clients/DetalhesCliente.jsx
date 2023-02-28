@@ -21,7 +21,9 @@ import {
     useDeleteUserMutation,
 } from "../users/userApiSlice";
 import { onlyNumber } from "../../components/OnlyNumber";
-import { currency, toNumber } from "../../components/Currency";
+import { currency, toBRL, toNumber } from "../../components/Currency";
+import { useSelector } from "react-redux";
+import { setMsg } from "../infoMsg/msgSlice";
 
 const DetalhesPedido = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
@@ -62,10 +64,7 @@ const DetalhesPedido = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    let message = "";
-    if (location.state) {
-        message = location.state.message;
-    }
+    let message = useSelector((state) => state.infoMsg.msg);
 
     const { clients, fornecedores } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
@@ -163,7 +162,6 @@ const DetalhesPedido = () => {
                         />
                     ))
                 );
-                console.log(pedidos);
                 setTotalPago(
                     pedidos.reduce((acc, ped) => acc + ped.qtdPaga, 0)
                 );
@@ -217,6 +215,7 @@ const DetalhesPedido = () => {
     const handleCloseStats = () => setShowStats(false);
     const handleCode = (e) => setDebouncedCode(e.target.value);
     const handlePrice = (e) => setPreco(e.target.value);
+    const handlePriceVenda = (e) => setPrecoVenda(e.target.value);
 
     const handleQtdPaga = (e) => setQtdPaga(e.target.value);
 
@@ -234,20 +233,21 @@ const DetalhesPedido = () => {
         preco &&
         quantidade &&
         productName &&
+        qtdPaga &&
         (precoVenda || porcentagem) &&
-        toNumber(qtdPaga) &&
         optionSelected != "Selecione fornecedor" &&
         toNumber(qtdPaga) >= 0 &&
         (fornecedor.metodo == "Porcentagem"
-            ? toNumber(qtdPaga) <= quantidade * preco
-            : toNumber(qtdPaga) <= (quantidade * precoVenda).toFixed(2));
+            ? toNumber(qtdPaga) <= quantidade * toNumber(preco)
+            : toNumber(qtdPaga) <= quantidade * toNumber(precoVenda));
 
     const handleAddNewPedido = async (e) => {
         e.preventDefault();
 
         if (canSave) {
             let quantPaga = toNumber(qtdPaga);
-            if (prodFound) {
+
+            if (prodFound?.code) {
                 await addNewPedido({
                     cliente: {
                         _id: clientId,
@@ -274,9 +274,9 @@ const DetalhesPedido = () => {
                         produto: {
                             code,
                             productName,
-                            preco,
-                            precoVenda,
-                            porcentagem,
+                            preco: toNumber(preco),
+                            precoVenda: toNumber(precoVenda),
+                            porcentagemVenda: porcentagem,
                         },
                     },
                 });
@@ -291,7 +291,9 @@ const DetalhesPedido = () => {
                             nomeProduto: productName,
                             quantidade,
                             qtdPaga: quantPaga,
-                            valor: preco,
+                            valor: toNumber(preco),
+                            valorVenda: toNumber(precoVenda),
+                            porcentagem,
                             metodo: fornecedor.metodo,
                         },
                     },
@@ -301,8 +303,8 @@ const DetalhesPedido = () => {
     };
 
     useEffect(() => {
-        if (prodFound) {
-            setPreco(prodFound.preco);
+        if (prodFound?.code) {
+            setPreco(toBRL(prodFound.preco.toFixed(2)));
             setPrecoVenda(prodFound.precoVenda);
             setProductName(prodFound.productName);
             setPorcentagem(prodFound.porcentagemVenda);
@@ -435,7 +437,7 @@ const DetalhesPedido = () => {
                 {message && (
                     <Message msg={message} type="alert alert-success" />
                 )}
-                {pedidos ? (pedidos.length > 0 ? [content] : [msg]) : null}
+                {pedidos && (pedidos.length > 0 ? [content] : [msg])}
 
                 <Navbar
                     className="text-black mb-3 mx-0 py-0 fluid"
@@ -627,26 +629,23 @@ const DetalhesPedido = () => {
                                                                             R$
                                                                         </InputGroup.Text>
                                                                         <Form.Control
-                                                                            type="number"
+                                                                            type="text"
                                                                             inputMode="numeric"
-                                                                            pattern="[0-9]*"
                                                                             required
                                                                             disabled={
                                                                                 prodFound
                                                                                     ? true
                                                                                     : false
                                                                             }
-                                                                            value={Number(
+                                                                            value={
                                                                                 precoVenda
-                                                                            ).toString()}
+                                                                            }
                                                                             onChange={(
                                                                                 e
                                                                             ) =>
-                                                                                setPrecoVenda(
-                                                                                    Number(
+                                                                                handlePriceVenda(
+                                                                                    currency(
                                                                                         e
-                                                                                            .target
-                                                                                            .value
                                                                                     )
                                                                                 )
                                                                             }
@@ -757,18 +756,20 @@ const DetalhesPedido = () => {
                                                                             porcentagem) &&
                                                                         preco &&
                                                                         quantidade &&
-                                                                        toNumber(
-                                                                            qtdPaga
-                                                                        ) &&
+                                                                        qtdPaga &&
                                                                         !(
                                                                             toNumber(
                                                                                 qtdPaga
                                                                             ) <=
                                                                             (precoVenda
                                                                                 ? quantidade *
-                                                                                  precoVenda
+                                                                                  toNumber(
+                                                                                      precoVenda
+                                                                                  )
                                                                                 : quantidade *
-                                                                                  preco)
+                                                                                  toNumber(
+                                                                                      preco
+                                                                                  ))
                                                                         ) &&
                                                                         "is-invalid"
                                                                     }
@@ -783,10 +784,14 @@ const DetalhesPedido = () => {
                                                                         pedido:
                                                                         R${" "}
                                                                         {(porcentagem
-                                                                            ? preco *
+                                                                            ? toNumber(
+                                                                                  preco
+                                                                              ) *
                                                                               quantidade
                                                                             : quantidade *
-                                                                              precoVenda
+                                                                              toNumber(
+                                                                                  precoVenda
+                                                                              )
                                                                         ).toFixed(
                                                                             2
                                                                         )}
@@ -810,7 +815,9 @@ const DetalhesPedido = () => {
                                                                     <Col className="fw-bold">
                                                                         {formatter.format(
                                                                             (
-                                                                                ((preco *
+                                                                                ((toNumber(
+                                                                                    preco
+                                                                                ) *
                                                                                     porcentagem) /
                                                                                     100) *
                                                                                 quantidade
@@ -823,8 +830,12 @@ const DetalhesPedido = () => {
                                                                     <Col className="fw-bold">
                                                                         {formatter.format(
                                                                             (
-                                                                                (precoVenda -
-                                                                                    preco) *
+                                                                                (toNumber(
+                                                                                    precoVenda
+                                                                                ) -
+                                                                                    toNumber(
+                                                                                        preco
+                                                                                    )) *
                                                                                 quantidade
                                                                             ).toFixed(
                                                                                 2
