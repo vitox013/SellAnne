@@ -75,7 +75,7 @@ const updateUser = asyncHandler(async (req, res) => {
                 }
                 // Atualizando dados de cliente existente
                 else {
-                    const doc = await User.findOneAndUpdate(
+                    const atualizarCliente = await User.findOneAndUpdate(
                         { "clients._id": cliente._id },
                         {
                             $set: {
@@ -84,7 +84,6 @@ const updateUser = asyncHandler(async (req, res) => {
                             },
                         }
                     );
-                    await user.save();
 
                     return res.json({
                         message: `${cliente.clientName} atualizado!`,

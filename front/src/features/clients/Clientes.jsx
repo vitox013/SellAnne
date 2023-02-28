@@ -5,9 +5,10 @@ import NavDash from "../../components/NavBar";
 import NavFooter from "../../components/NavFooter";
 import { useState } from "react";
 import useAuth from "../../hooks/useAuth";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useGetUserDataQuery } from "../users/userApiSlice";
-
+import { setMsg } from "../infoMsg/msgSlice";
+import Message from "../../components/Message";
 
 const Clientes = () => {
     const { currentUser, userId, username } = useAuth();
@@ -15,6 +16,8 @@ const Clientes = () => {
     const [debouncedTerm, setDebouncedTerm] = useState(term);
     const [conteudo, setConteudo] = useState([]);
     const [clientes, setClientes] = useState([]);
+
+    let message = useSelector((state) => state.infoMsg.msg);
 
     const { clients } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
@@ -118,6 +121,11 @@ const Clientes = () => {
                             <i className="bx bx-search"></i>
                         </Button>
                     </Form>
+                </Row>
+                <Row>
+                    {message && (
+                        <Message type="alert alert-success" msg={message} />
+                    )}
                 </Row>
                 <Row className="px-2">{conteudo}</Row>
                 <Row>

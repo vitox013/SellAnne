@@ -23,7 +23,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CardProduct from "../../components/CardProduct";
 import Message from "../../components/Message";
 import DeleteModal from "../../components/DeleteModal";
-import EditModal from "../../components/EditModal";
+import EditFornecedor from "./EditFornecedor";
 import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
 import { currency, toNumber } from "../../components/Currency";
@@ -124,7 +124,7 @@ const DetalhesFornecedor = () => {
                 (prod) =>
                     prod.productName
                         .toLowerCase()
-                        .includes(term.toLowerCase()) ||
+                        .includes(term.toLowerCase().trim()) ||
                     prod.code.toString().includes(term)
             );
 
@@ -174,8 +174,7 @@ const DetalhesFornecedor = () => {
         code &&
         productName &&
         preco &&
-        ((precoVenda && preco < precoVenda) ||
-            (fornecedor ? fornecedor.porcentagemPadrao : 0));
+        ((precoVenda && preco < precoVenda) || fornecedor?.porcentagemPadrao);
 
     const onSaveProduct = async (e) => {
         if (canSave) {
@@ -189,7 +188,8 @@ const DetalhesFornecedor = () => {
                     _id: fornecedorId,
                     produto: {
                         code,
-                        productName,
+                        productName: productName.trim(),
+
                         preco: price,
                         precoVenda: priceVenda,
                         porcentagemVenda,
@@ -265,7 +265,7 @@ const DetalhesFornecedor = () => {
             <Container>
                 <Row>
                     <h1 className="mt-2 pt-10 d-flex align-items-center">
-                        {fornecedor && fornecedor.nomeFornecedor}{" "}
+                        {fornecedor?.nomeFornecedor}{" "}
                         <i
                             className="bx bxs-edit-alt ms-3 pointer fs-3"
                             onClick={handleShowEdit}
@@ -284,12 +284,10 @@ const DetalhesFornecedor = () => {
                     onDeleteClick={onDeleteClick}
                 />
 
-                <EditModal
-                    nomeForn={fornecedor && fornecedor.nomeFornecedor}
-                    method={fornecedor && fornecedor.metodo}
-                    porcentagemPadrao={
-                        fornecedor && fornecedor.porcentagemPadrao
-                    }
+                <EditFornecedor
+                    nomeForn={fornecedor?.nomeFornecedor}
+                    method={fornecedor?.metodo}
+                    porcentagemPadrao={fornecedor?.porcentagemPadrao}
                     handleClose={handleClose}
                     showEdit={showEdit}
                 />
@@ -330,7 +328,7 @@ const DetalhesFornecedor = () => {
                             <Col xs={4}>Nome</Col>
                             <Col xs={3}>Valor</Col>
                             <Col xs={3} className="ps-0">
-                                {fornecedor && fornecedor.metodo == "Revenda"
+                                {fornecedor?.metodo == "Revenda"
                                     ? "Revenda"
                                     : "%"}
                             </Col>
@@ -361,7 +359,7 @@ const DetalhesFornecedor = () => {
                 <Modal.Header closeButton>
                     <Modal.Title>
                         <p>Cadastre novo produto</p>
-                        {fornecedor && fornecedor.nomeFornecedor}
+                        {fornecedor?.nomeFornecedor}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -412,63 +410,61 @@ const DetalhesFornecedor = () => {
                             </InputGroup>
                         </Form.Group>
 
-                        {fornecedor &&
-                            (fornecedor.metodo == "Revenda" ? (
+                        {fornecedor?.metodo == "Revenda" ? (
+                            <Form.Group
+                                className="mb-3 fw-bold"
+                                controlId="precoVenda"
+                            >
+                                <Form.Label>Preço venda</Form.Label>
+                                <InputGroup className="w-50">
+                                    <InputGroup.Text>R$</InputGroup.Text>
+                                    <Form.Control
+                                        type="text"
+                                        value={precoVenda}
+                                        inputMode="numeric"
+                                        className={
+                                            preco > precoVenda && "is-invalid"
+                                        }
+                                        onChange={(e) =>
+                                            handlePriceVenda(currency(e))
+                                        }
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                        ) : (
+                            <Row>
                                 <Form.Group
                                     className="mb-3 fw-bold"
-                                    controlId="precoVenda"
+                                    controlId="porcentagem"
                                 >
-                                    <Form.Label>Preço venda</Form.Label>
-                                    <InputGroup className="w-50">
-                                        <InputGroup.Text>R$</InputGroup.Text>
-                                        <Form.Control
-                                            type="text"
-                                            value={precoVenda}
-                                            inputMode="numeric"
-                                            className={
-                                                preco > precoVenda &&
-                                                "is-invalid"
-                                            }
-                                            onChange={(e) =>
-                                                handlePriceVenda(currency(e))
-                                            }
-                                        />
-                                    </InputGroup>
+                                    <Row>
+                                        <Form.Label>
+                                            Sua porcentagem na venda %
+                                        </Form.Label>
+                                    </Row>
+                                    <Row>
+                                        <Col xs={5} md={4}>
+                                            <InputGroup>
+                                                <Form.Control
+                                                    type="number"
+                                                    inputMode="numeric"
+                                                    value={porcentagemVenda}
+                                                    onChange={(e) =>
+                                                        setPorcentagemVenda(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    className="w-25"
+                                                />
+                                                <InputGroup.Text>
+                                                    %
+                                                </InputGroup.Text>
+                                            </InputGroup>
+                                        </Col>
+                                    </Row>
                                 </Form.Group>
-                            ) : (
-                                <Row>
-                                    <Form.Group
-                                        className="mb-3 fw-bold"
-                                        controlId="porcentagem"
-                                    >
-                                        <Row>
-                                            <Form.Label>
-                                                Sua porcentagem na venda %
-                                            </Form.Label>
-                                        </Row>
-                                        <Row>
-                                            <Col xs={5} md={4}>
-                                                <InputGroup>
-                                                    <Form.Control
-                                                        type="number"
-                                                        inputMode="numeric"
-                                                        value={porcentagemVenda}
-                                                        onChange={(e) =>
-                                                            setPorcentagemVenda(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        className="w-25"
-                                                    />
-                                                    <InputGroup.Text>
-                                                        %
-                                                    </InputGroup.Text>
-                                                </InputGroup>
-                                            </Col>
-                                        </Row>
-                                    </Form.Group>
-                                </Row>
-                            ))}
+                            </Row>
+                        )}
 
                         <Card className="text-center bg-success bg-opacity-50">
                             <Row>
@@ -479,8 +475,7 @@ const DetalhesFornecedor = () => {
                             <Row>
                                 <Col className="fw-bold">
                                     {formatter.format(
-                                        fornecedor &&
-                                            fornecedor.metodo == "Revenda"
+                                        fornecedor?.metodo == "Revenda"
                                             ? toNumber(precoVenda) -
                                                   toNumber(preco)
                                             : (toNumber(preco) *

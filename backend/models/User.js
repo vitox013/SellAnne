@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
                 required: true,
             },
             telefone: {
-                type: Number,
+                type: String,
             },
             pedidos: [
                 {

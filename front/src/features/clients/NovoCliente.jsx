@@ -8,6 +8,7 @@ import {
     useUpdateUserMutation,
     useGetUserDataQuery,
 } from "../users/userApiSlice";
+import { telefoneMask } from "../../components/Telefone";
 
 const USER_REGEX = /^[A-z\ ]{3,20}$/;
 
@@ -46,7 +47,7 @@ const NovoCliente = () => {
                 .map((cliente) => cliente.clientName)
                 .some(
                     (clientName) =>
-                        clientName.toLowerCase() === nome.toLowerCase()
+                        clientName.toLowerCase() === nome.toLowerCase().trim()
                 )
         );
     }, [nome]);
@@ -74,7 +75,7 @@ const NovoCliente = () => {
         if (canSave) {
             await addNewClient({
                 userId: vendedorId,
-                cliente: { clientName: nome, telefone },
+                cliente: { clientName: nome.trim(), telefone },
             });
         }
     };
@@ -124,16 +125,22 @@ const NovoCliente = () => {
                                 <Form.Label>Telefone</Form.Label>
                                 <Form.Control
                                     type="tel"
-                                    pattern="[0-9]{11}"
+                                    maxLength={16}
                                     value={telefone}
-                                    onChange={onTelefoneChange}
+                                    onChange={(e) =>
+                                        onTelefoneChange(telefoneMask(e))
+                                    }
                                 />
                                 <Form.Text className="text-muted">
                                     Ex: (11) 9 9999-9999
                                 </Form.Text>
                             </Form.Group>
 
-                            <Button variant="success" type="submit">
+                            <Button
+                                variant="success"
+                                type="submit"
+                                disabled={!canSave}
+                            >
                                 Cadastrar
                             </Button>
                         </Form>

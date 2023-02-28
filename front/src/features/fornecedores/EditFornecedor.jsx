@@ -1,12 +1,12 @@
 import React from "react";
 import { Modal, Button, Form, Row, Col, InputGroup } from "react-bootstrap";
-import { useUpdateUserMutation } from "../features/users/userApiSlice";
+import { useUpdateUserMutation } from "../users/userApiSlice";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 import { useDispatch } from "react-redux";
-import { setMsg } from "../features/infoMsg/msgSlice";
-import { useGetUserDataQuery } from "../features/users/userApiSlice";
+import { setMsg } from "../infoMsg/msgSlice";
+import { useGetUserDataQuery } from "../users/userApiSlice";
 
 const EditFornecedor = ({
     showEdit,
@@ -60,7 +60,8 @@ const EditFornecedor = ({
             setDuplicated(
                 nomesForn.some(
                     (forn) =>
-                        forn.toLowerCase() === nomeFornecedor.toLowerCase()
+                        forn.toLowerCase() ===
+                        nomeFornecedor.toLowerCase().trim()
                 ) && nomeForn != nomeFornecedor
             );
         }
@@ -77,7 +78,7 @@ const EditFornecedor = ({
                 userId,
                 fornecedor: {
                     _id: fornecedorId,
-                    nomeFornecedor,
+                    nomeFornecedor: nomeFornecedor.trim(),
                     porcentagemPadrao: porcentagem,
                 },
             });

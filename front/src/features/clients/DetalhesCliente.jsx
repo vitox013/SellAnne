@@ -22,8 +22,9 @@ import {
 } from "../users/userApiSlice";
 import { onlyNumber } from "../../components/OnlyNumber";
 import { currency, toBRL, toNumber } from "../../components/Currency";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
+import EditClient from "./EditClient";
 
 const DetalhesPedido = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
@@ -33,12 +34,14 @@ const DetalhesPedido = () => {
 
     const [show, setShow] = useState(false);
     const [showPedido, setShowPedido] = useState(false);
-    const [msg, setMsg] = useState([]);
+    const [showEdit, setShowEdit] = useState(false);
     const [errMsg, setErrMsg] = useState("");
     const [content, setContent] = useState([]);
     const [clienteNome, setClienteNome] = useState("");
+    const [telefone, setTelefone] = useState("");
     const [pedidos, setPedidos] = useState([]);
     const [cliente, setCliente] = useState({});
+    const [nomesClientes, setNomesClientes] = useState([]);
     const [fornecedor, setFornecedor] = useState({});
     const [produtosFornecedor, setProdutosFornecedor] = useState([]);
     const [prodFound, setProdFound] = useState({});
@@ -62,7 +65,7 @@ const DetalhesPedido = () => {
 
     const { userId } = useAuth();
     const navigate = useNavigate();
-    const location = useLocation();
+    const dispatch = useDispatch();
 
     let message = useSelector((state) => state.infoMsg.msg);
 
@@ -79,18 +82,20 @@ const DetalhesPedido = () => {
     const [addNewPedido, { isSuccess: addIsSuccess, error: errorNewPedido }] =
         useUpdateUserMutation();
 
-    const [updateProduct, { isSuccess: updateIsSuccess, error: errorUpdate }] =
-        useUpdateUserMutation();
-
     const [createProduct, { isSuccess: createIsSuccess, error: errorCreate }] =
         useUpdateUserMutation();
+
+    const [
+        updateClient,
+        { isSuccess: updateClientIsSuccess, error: errorClientUpdate },
+    ] = useUpdateUserMutation();
 
     useEffect(() => {
         if (optionSelected != "Selecione fornecedor" && fornecedores) {
             let forn = fornecedores.filter(
                 (forn) => forn.nomeFornecedor == optionSelected
             );
-            forn && forn.length > 0 && setProdutosFornecedor(forn[0].produtos);
+            forn?.length > 0 && setProdutosFornecedor(forn[0].produtos);
 
             setFornecedor(
                 fornecedores.find(
@@ -116,11 +121,6 @@ const DetalhesPedido = () => {
                 ))
             );
         }
-        setMsg(
-            <h2 key={uuidv4()} className="mt-5 text-center">
-                Nenhum pedido cadastrado
-            </h2>
-        );
     }, [code, fornecedores, quantidade, optionSelected, produtosFornecedor]);
 
     useEffect(() => {
@@ -138,12 +138,15 @@ const DetalhesPedido = () => {
     useEffect(() => {
         if (clients) {
             setCliente(clients.find((client) => client._id === clientId));
+            setNomesClientes(clients.map((client) => client.clientName));
         }
 
         if (cliente) {
             setPedidos(cliente.pedidos);
+            setClienteNome(cliente.clientName);
+            setTelefone(cliente.telefone);
 
-            if (pedidos) {
+            if (pedidos?.length > 0) {
                 setContent(
                     pedidos.map((ped) => (
                         <CardPedido
@@ -178,10 +181,12 @@ const DetalhesPedido = () => {
                         )
                         .toFixed(2)
                 );
-            }
-        }
-        if (cliente) {
-            setClienteNome(cliente.clientName);
+            } else
+                setContent(
+                    <p className="alert alert-danger text-center mt-3">
+                        Nenhum produto cadastrado!
+                    </p>
+                );
         }
     }, [clients, cliente, pedidos]);
 
@@ -213,20 +218,12 @@ const DetalhesPedido = () => {
     };
     const handleShowStats = () => setShowStats(true);
     const handleCloseStats = () => setShowStats(false);
+    const handleShowEdit = () => setShowEdit(true);
+    const handleCloseEdit = () => setShowEdit(false);
     const handleCode = (e) => setDebouncedCode(e.target.value);
     const handlePrice = (e) => setPreco(e.target.value);
     const handlePriceVenda = (e) => setPrecoVenda(e.target.value);
-
     const handleQtdPaga = (e) => setQtdPaga(e.target.value);
-
-    const onSaveUserClicked = async (e) => {
-        e.preventDefault();
-        await deleteClient({
-            cliente: {
-                _id: clientId,
-            },
-        });
-    };
 
     const canSave =
         code &&
@@ -237,28 +234,35 @@ const DetalhesPedido = () => {
         (precoVenda || porcentagem) &&
         optionSelected != "Selecione fornecedor" &&
         toNumber(qtdPaga) >= 0 &&
-        (fornecedor.metodo == "Porcentagem"
+        (fornecedor?.metodo == "Porcentagem"
             ? toNumber(qtdPaga) <= quantidade * toNumber(preco)
             : toNumber(qtdPaga) <= quantidade * toNumber(precoVenda));
+
+    const onDeleteClient = async (e) => {
+        e.preventDefault();
+        await deleteClient({
+            cliente: {
+                _id: clientId,
+            },
+        });
+    };
 
     const handleAddNewPedido = async (e) => {
         e.preventDefault();
 
         if (canSave) {
-            let quantPaga = toNumber(qtdPaga);
-
             if (prodFound?.code) {
                 await addNewPedido({
                     cliente: {
                         _id: clientId,
                         pedido: {
-                            fornecedor: fornecedor.nomeFornecedor,
+                            fornecedor: fornecedor.nomeFornecedor.trim(),
                             fornecedorId: fornecedor._id,
                             produtoId: prodFound._id,
                             codigoProduto: prodFound.code,
-                            nomeProduto: prodFound.productName,
+                            nomeProduto: prodFound.productName.trim(),
                             quantidade,
-                            qtdPaga: quantPaga,
+                            qtdPaga: toNumber(qtdPaga),
                             valor: prodFound.preco,
                             valorVenda: prodFound.precoVenda,
                             porcentagem: fornecedor.porcentagemPadrao,
@@ -273,7 +277,7 @@ const DetalhesPedido = () => {
                         _id: fornecedor._id,
                         produto: {
                             code,
-                            productName,
+                            productName: productName.trim(),
                             preco: toNumber(preco),
                             precoVenda: toNumber(precoVenda),
                             porcentagemVenda: porcentagem,
@@ -284,11 +288,11 @@ const DetalhesPedido = () => {
                     cliente: {
                         _id: clientId,
                         pedido: {
-                            fornecedor: fornecedor.nomeFornecedor,
+                            fornecedor: fornecedor.nomeFornecedor.trim(),
                             fornecedorId: fornecedor._id,
                             produtoId: code.toString(),
                             codigoProduto: code,
-                            nomeProduto: productName,
+                            nomeProduto: productName.trim(),
                             quantidade,
                             qtdPaga: quantPaga,
                             valor: toNumber(preco),
@@ -314,6 +318,7 @@ const DetalhesPedido = () => {
     useEffect(() => {
         if (deleteIsSuccess) {
             navigate("/clientes");
+            dispatch(setMsg("Cliente deletado com sucesso!"));
         }
         if (errorDelete) {
             setErrMsg("Erro ao deletar cliente");
@@ -323,6 +328,7 @@ const DetalhesPedido = () => {
             clearFields();
             setShowPedido(false);
             setProdFound({});
+            dispatch(setMsg("Novo pedido criado com sucesso!"));
         } else if (errorNewPedido) {
             setErrMsg("Erro ao adicionar pedido");
         }
@@ -337,12 +343,10 @@ const DetalhesPedido = () => {
     }, [
         navigate,
         addIsSuccess,
-        updateIsSuccess,
         addIsSuccess,
         createIsSuccess,
         errorDelete,
         errorNewPedido,
-        errorUpdate,
         errorCreate,
         deleteIsSuccess,
     ]);
@@ -373,10 +377,7 @@ const DetalhesPedido = () => {
                             )}
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button
-                                variant="danger"
-                                onClick={onSaveUserClicked}
-                            >
+                            <Button variant="danger" onClick={onDeleteClient}>
                                 Excluir
                             </Button>
                             <Button variant="secondary" onClick={handleClose}>
@@ -390,7 +391,11 @@ const DetalhesPedido = () => {
             <Container className="pt-2">
                 <Row>
                     <Col className="h2 gap-2 d-flex align-items-end">
-                        {clienteNome}
+                        <span className="fw-bold">{clienteNome}</span>
+                        <i
+                            className="bx bxs-edit-alt ms-3 pointer fs-3"
+                            onClick={handleShowEdit}
+                        ></i>
                         {showStats ? (
                             <i
                                 className="bx bxs-low-vision pointer"
@@ -404,40 +409,55 @@ const DetalhesPedido = () => {
                         )}
                     </Col>
                 </Row>
+                {telefone && (
+                    <Row>
+                        <Col>
+                            Telefone:{" "}
+                            <span className="fw-bold">{telefone}</span>
+                        </Col>
+                    </Row>
+                )}
+
+                <EditClient
+                    showEdit={showEdit}
+                    handleClose={handleCloseEdit}
+                    nome={clienteNome}
+                    phone={cliente?.telefone ? cliente.telefone : ""}
+                    nomesClientes={nomesClientes}
+                />
+
                 {showStats && (
-                    <>
-                        <Row>
-                            <Col xs={6} md={2}>
-                                <Card className="p-1 text-center bg-success bg-opacity-75">
-                                    <p className="my-0">Total pago</p>
-                                    <p className="my-0">
-                                        {formatter.format(totalPago)}
-                                    </p>
-                                </Card>
-                            </Col>
-                            <Col xs={6} md={2}>
-                                <Card className="p-1 text-center bg-danger bg-opacity-75">
-                                    <p className="my-0">À pagar</p>
-                                    <p className="my-0">
-                                        {formatter.format(aPagar)}
-                                    </p>
-                                </Card>
-                            </Col>
-                        </Row>
-                    </>
+                    <Row className="mt-2">
+                        <Col xs={6} md={2}>
+                            <Card className="p-1 text-center bg-success bg-opacity-75">
+                                <p className="my-0">Total pago</p>
+                                <p className="my-0">
+                                    {formatter.format(totalPago)}
+                                </p>
+                            </Card>
+                        </Col>
+                        <Col xs={6} md={2}>
+                            <Card className="p-1 text-center bg-danger bg-opacity-75">
+                                <p className="my-0">À pagar</p>
+                                <p className="my-0">
+                                    {formatter.format(aPagar)}
+                                </p>
+                            </Card>
+                        </Col>
+                    </Row>
                 )}
                 <Card className=" px-2 py-2 mt-3 text-black shadow-sm fw-bold">
                     <Row>
                         <Col xs={4}>Item</Col>
                         <Col className="ps-0">Qtd</Col>
-                        <Col className="ps-0">Valor Total</Col>
+                        <Col className="ps-0">Valor</Col>
                         <Col>Situação</Col>
                     </Row>
                 </Card>
                 {message && (
                     <Message msg={message} type="alert alert-success" />
                 )}
-                {pedidos && (pedidos.length > 0 ? [content] : [msg])}
+                {content}
 
                 <Navbar
                     className="text-black mb-3 mx-0 py-0 fluid"
@@ -464,43 +484,40 @@ const DetalhesPedido = () => {
                             <Modal.Body>
                                 <Form>
                                     <Form.Group className="mb-3">
-                                        {options &&
-                                            (options.length > 0 ? (
-                                                <>
-                                                    <Form.Label>
-                                                        Fornecedor
-                                                    </Form.Label>
-                                                    <Form.Select
-                                                        className="w-75"
-                                                        onChange={(e) =>
-                                                            setOptionSelected(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    >
-                                                        <option>
-                                                            Selecione fornecedor
-                                                        </option>
-                                                        {options}
-                                                    </Form.Select>
-                                                </>
-                                            ) : (
-                                                <div className="text-center">
-                                                    <p className="alert alert-danger text-center">
-                                                        Nenhum fornecedor
-                                                        cadastrado
-                                                    </p>
-                                                    <Link to="/fornecedores/novofornecedor">
-                                                        <Button variant="success">
-                                                            Criar fornecedor
-                                                        </Button>
-                                                    </Link>
-                                                </div>
-                                            ))}
+                                        {options?.length > 0 ? (
+                                            <>
+                                                <Form.Label>
+                                                    Fornecedor
+                                                </Form.Label>
+                                                <Form.Select
+                                                    className="w-75"
+                                                    onChange={(e) =>
+                                                        setOptionSelected(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                >
+                                                    <option>
+                                                        Selecione fornecedor
+                                                    </option>
+                                                    {options}
+                                                </Form.Select>
+                                            </>
+                                        ) : (
+                                            <div className="text-center">
+                                                <p className="alert alert-danger text-center">
+                                                    Nenhum fornecedor cadastrado
+                                                </p>
+                                                <Link to="/fornecedores/novofornecedor">
+                                                    <Button variant="success">
+                                                        Criar fornecedor
+                                                    </Button>
+                                                </Link>
+                                            </div>
+                                        )}
                                     </Form.Group>
 
-                                    {options &&
-                                        options.length > 0 &&
+                                    {options?.length > 0 &&
                                         optionSelected !=
                                             "Selecione fornecedor" &&
                                         optionSelected && (
@@ -534,7 +551,7 @@ const DetalhesPedido = () => {
                                                                 list="listaProdutos"
                                                             />
                                                             <datalist id="listaProdutos">
-                                                                {list.length >
+                                                                {list?.length >
                                                                     0 && list}
                                                             </datalist>
 
@@ -612,89 +629,87 @@ const DetalhesPedido = () => {
                                                         </Form.Group>
                                                     </Col>
 
-                                                    {fornecedor &&
-                                                        (fornecedor.metodo ==
-                                                        "Revenda" ? (
-                                                            <Col>
-                                                                <Form.Group
-                                                                    className="mb-3"
-                                                                    controlId="precoVenda"
-                                                                >
-                                                                    <Form.Label>
-                                                                        Preço
-                                                                        venda
-                                                                    </Form.Label>
-                                                                    <InputGroup>
-                                                                        <InputGroup.Text>
-                                                                            R$
-                                                                        </InputGroup.Text>
-                                                                        <Form.Control
-                                                                            type="text"
-                                                                            inputMode="numeric"
-                                                                            required
-                                                                            disabled={
-                                                                                prodFound
-                                                                                    ? true
-                                                                                    : false
-                                                                            }
-                                                                            value={
-                                                                                precoVenda
-                                                                            }
-                                                                            onChange={(
-                                                                                e
-                                                                            ) =>
-                                                                                handlePriceVenda(
-                                                                                    currency(
-                                                                                        e
-                                                                                    )
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                    </InputGroup>
-                                                                </Form.Group>
-                                                            </Col>
-                                                        ) : (
-                                                            <Col xs={6}>
-                                                                <Form.Group
-                                                                    className="mb-3"
-                                                                    controlId="porcentagem"
-                                                                >
-                                                                    <Form.Label>
-                                                                        Porcentagem
-                                                                        %
-                                                                    </Form.Label>
-                                                                    <InputGroup>
-                                                                        <Form.Control
-                                                                            type="text"
-                                                                            inputMode="numeric"
-                                                                            pattern="[0-9]*"
-                                                                            max="100"
-                                                                            required
-                                                                            disabled={
-                                                                                prodFound
-                                                                                    ? true
-                                                                                    : false
-                                                                            }
-                                                                            value={
-                                                                                porcentagem
-                                                                            }
-                                                                            onChange={(
-                                                                                e
-                                                                            ) =>
-                                                                                setPorcentagem(
+                                                    {fornecedor?.metodo ==
+                                                    "Revenda" ? (
+                                                        <Col>
+                                                            <Form.Group
+                                                                className="mb-3"
+                                                                controlId="precoVenda"
+                                                            >
+                                                                <Form.Label>
+                                                                    Preço venda
+                                                                </Form.Label>
+                                                                <InputGroup>
+                                                                    <InputGroup.Text>
+                                                                        R$
+                                                                    </InputGroup.Text>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        inputMode="numeric"
+                                                                        required
+                                                                        disabled={
+                                                                            prodFound
+                                                                                ? true
+                                                                                : false
+                                                                        }
+                                                                        value={
+                                                                            precoVenda
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            handlePriceVenda(
+                                                                                currency(
                                                                                     e
-                                                                                        .target
-                                                                                        .value
                                                                                 )
-                                                                            }
-                                                                        />
-                                                                        <InputGroup.Text>
-                                                                            %
-                                                                        </InputGroup.Text>
-                                                                    </InputGroup>
-                                                                </Form.Group>
-                                                            </Col>
-                                                        ))}
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </InputGroup>
+                                                            </Form.Group>
+                                                        </Col>
+                                                    ) : (
+                                                        <Col xs={6}>
+                                                            <Form.Group
+                                                                className="mb-3"
+                                                                controlId="porcentagem"
+                                                            >
+                                                                <Form.Label>
+                                                                    Porcentagem
+                                                                    %
+                                                                </Form.Label>
+                                                                <InputGroup>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        inputMode="numeric"
+                                                                        pattern="[0-9]*"
+                                                                        max="100"
+                                                                        required
+                                                                        disabled={
+                                                                            prodFound
+                                                                                ? true
+                                                                                : false
+                                                                        }
+                                                                        value={
+                                                                            porcentagem
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            setPorcentagem(
+                                                                                e
+                                                                                    .target
+                                                                                    .value
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                    <InputGroup.Text>
+                                                                        %
+                                                                    </InputGroup.Text>
+                                                                </InputGroup>
+                                                            </Form.Group>
+                                                        </Col>
+                                                    )}
                                                 </Row>
                                                 <Row>
                                                     <Col>
@@ -850,7 +865,7 @@ const DetalhesPedido = () => {
                                         )}
                                 </Form>
                             </Modal.Body>
-                            {options && options.length > 0 && (
+                            {options?.length > 0 && (
                                 <Modal.Footer>
                                     <Button
                                         variant="danger"
