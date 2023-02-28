@@ -73,11 +73,12 @@ const Clientes = () => {
                                 key={clientId.id}
                                 clientId={clientId.id}
                                 clientName={clientId.clientName}
+                                qtdPedido={clientId.pedidos.length}
                                 path={clientId._id}
                             />
                         ))
                     ) : (
-                        <p className="alert alert-danger">
+                        <p className="alert alert-danger text-center mt-2">
                             Nenhum cliente {term} encontrado!
                         </p>
                     )
