@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 import { setMsg } from "../features/infoMsg/msgSlice";
 import { useGetUserDataQuery } from "../features/users/userApiSlice";
 
-const EditModal = ({
+const EditFornecedor = ({
     showEdit,
     nomeForn,
     method,
@@ -203,4 +203,4 @@ const EditModal = ({
     );
 };
 
-export default EditModal;
+export default EditFornecedor;
