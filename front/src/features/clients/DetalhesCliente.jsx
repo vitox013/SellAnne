@@ -294,7 +294,7 @@ const DetalhesPedido = () => {
                             codigoProduto: code,
                             nomeProduto: productName.trim(),
                             quantidade,
-                            qtdPaga: quantPaga,
+                            qtdPaga: toNumber(qtdPaga),
                             valor: toNumber(preco),
                             valorVenda: toNumber(precoVenda),
                             porcentagem,
@@ -309,7 +309,8 @@ const DetalhesPedido = () => {
     useEffect(() => {
         if (prodFound?.code) {
             setPreco(toBRL(prodFound.preco.toFixed(2)));
-            setPrecoVenda(prodFound.precoVenda);
+            fornecedor?.metodo == "Revenda" &&
+                setPrecoVenda(toBRL(prodFound.precoVenda.toFixed(2)));
             setProductName(prodFound.productName);
             setPorcentagem(prodFound.porcentagemVenda);
         }

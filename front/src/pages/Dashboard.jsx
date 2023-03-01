@@ -14,44 +14,110 @@ const Dashboard = () => {
 
     const { userId, currentUser } = useAuth();
     const [conteudo, setConteudo] = useState([]);
-    const [todosPedidos, setTodosPedidos] = useState([]);
-    const [totalPedidos, setTotalPedidos] = useState("");
-    const [totalPago, setTotalPago] = useState("");
-    const [totalReceber, setTotalReceber] = useState("");
+    const [fornecedores, setFornecedores] = useState([]);
+    const [pedidos, setPedidos] = useState([]);
+    const [pedidosForn, setPedidosForn] = useState([]);
 
-    const { clients } = useGetUserDataQuery(userId, {
+    const { userData } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
-            clients: data?.clients,
+            userData: data,
         }),
     });
 
     useEffect(() => {
-        if (clients) {
-            let pedidos = [];
-            clients.map((client) =>
-                client.pedidos.map((pedido) => pedidos.push(pedido))
+        if (userData) {
+            setPedidos([]);
+            setFornecedores(
+                userData?.fornecedores?.map(
+                    (fornecedor) => fornecedor.nomeFornecedor
+                )
             );
-            setTodosPedidos(pedidos);
+
+            userData?.clients?.map((cliente) =>
+                cliente?.pedidos.map((pedido) =>
+                    setPedidos((pedidos) => [...pedidos, pedido])
+                )
+            );
         }
-    }, [clients]);
+    }, [userData]);
 
     useEffect(() => {
-        if (todosPedidos) {
-            setTotalPedidos(todosPedidos.length);
-            setTotalPago(
-                todosPedidos.reduce((acc, pedido) => acc + pedido.qtdPaga, 0)
-            );
-            setTotalReceber(
-                todosPedidos
-                    .reduce(
-                        (acc, ped) =>
-                            acc + (ped.quantidade * ped.valor - ped.qtdPaga),
-                        0
-                    )
-                    .toFixed(2)
+        if (fornecedores?.length > 0 && pedidos?.length > 0) {
+            setPedidosForn(
+                fornecedores.map(function (fornecedor) {
+                    return {
+                        fornecedor: fornecedor,
+                        pedidos: pedidos.filter(
+                            (pedido) => pedido.fornecedor == fornecedor
+                        ),
+                        totalPago: pedidos
+                            .filter((pedido) => pedido.fornecedor == fornecedor)
+                            .reduce((acc, pedido) => acc + pedido.qtdPaga, 0),
+                        totalReceber: pedidos
+                            .filter((pedido) => pedido.fornecedor == fornecedor)
+                            .reduce(
+                                (acc, ped) =>
+                                    acc +
+                                    (ped.quantidade *
+                                        (ped?.valorVenda
+                                            ? ped.valorVenda
+                                            : ped.valor) -
+                                        ped.qtdPaga),
+                                0
+                            ),
+                        lucro: pedidos
+                            .filter((pedido) => pedido.fornecedor == fornecedor)
+                            .reduce(
+                                (acc, ped) =>
+                                    acc +
+                                    ped.quantidade *
+                                        (ped?.valorVenda
+                                            ? ped.valorVenda - ped.valor
+                                            : (ped.valor * ped.porcentagem) /
+                                              100),
+                                0
+                            ),
+                    };
+                })
             );
         }
-    }, [todosPedidos]);
+    }, [pedidos, fornecedores]);
+
+    useEffect(() => {
+        if (pedidosForn.length > 0) {
+            setConteudo(
+                pedidosForn.map((forn) => (
+                    <Row key={forn?.fornecedor} className="m-1">
+                        <p className="px-0 mb-2">
+                            <span className="h4">{forn?.fornecedor}</span> |{" "}
+                            <span>{forn?.pedidos?.length} pedidos </span>
+                        </p>
+
+                        <Table striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>Total Pago</th>
+                                    <th>A receber</th>
+                                    <th>Lucro:</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{formatter.format(forn.totalPago)}</td>
+                                    <td>
+                                        {formatter.format(forn.totalReceber)}
+                                    </td>
+                                    <td className="fw-bold">
+                                        {formatter.format(forn.lucro)}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </Table>
+                    </Row>
+                ))
+            );
+        }
+    }, [pedidosForn]);
 
     return (
         <>
@@ -80,33 +146,17 @@ const Dashboard = () => {
                         </Link>
                     </Col>
                 </Row>
-                <Row className="px-2">{conteudo}</Row>
+
                 <Card className="mt-4">
                     <Card.Body>
                         <Row>
-                            <Col className="mx-2">
-                                <h3 className="fw-bold ">
+                            <Col>
+                                <h3 className="fw-bold px-0 mx-1">
                                     Resumo de suas vendas
                                 </h3>
                             </Col>
                         </Row>
-
-                        <Table striped bordered hover>
-                            <thead>
-                                <tr>
-                                    <th>Total vendido</th>
-                                    <th>Total Pago</th>
-                                    <th>A receber</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>{totalPedidos}</td>
-                                    <td>{formatter.format(totalPago)}</td>
-                                    <td>{formatter.format(totalReceber)}</td>
-                                </tr>
-                            </tbody>
-                        </Table>
+                        {conteudo}
                     </Card.Body>
                 </Card>
             </Container>
