@@ -2,6 +2,9 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
+const Token = require("../models/Token");
+const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
 
 // @desc Login
 // @route POST /auth
@@ -22,6 +25,31 @@ const login = asyncHandler(async (req, res) => {
     const match = await bcrypt.compare(password, foundUser.password);
 
     if (!match) return res.status(400).json({ message: "Senha inválida" });
+
+    if (!foundUser.verified) {
+        let token = await Token.findOne({ userId: foundUser.id });
+
+        if (!token) {
+            token = await new Token({
+                userId: foundUser._id,
+                token: crypto.randomBytes(32).toString("hex"),
+            }).save();
+
+            const url = `${process.env.BASE_URL}users/${foundUser.id}/verify/${token.token}`;
+
+            await sendEmail(
+                foundUser.email,
+                "Verifique seu Email - SellAnne",
+                url,
+                foundUser.username
+            );
+        }
+
+        return res.status(400).send({
+            message:
+                "Verifique seu email através do link que lhe enviamos via email!",
+        });
+    }
 
     const accessToken = jwt.sign(
         {

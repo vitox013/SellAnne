@@ -18,8 +18,8 @@ import {
 import useAuth from "../hooks/useAuth";
 import { useDispatch } from "react-redux";
 import { setMsg } from "../features/infoMsg/msgSlice";
-import { toNumber, toBRL, currency } from "./Currency";
-import { onlyNumber } from "./OnlyNumber";
+import { toNumber, toBRL, currency } from "../utils/Currency";
+import { onlyNumber } from "../utils/OnlyNumber";
 
 const CardProduct = ({
     cod,

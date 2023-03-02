@@ -21,13 +21,13 @@ import {
 } from "../users/userApiSlice";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CardProduct from "../../components/CardProduct";
-import Message from "../../components/Message";
+import Message from "../../utils/Message";
 import DeleteModal from "../../components/DeleteModal";
 import EditFornecedor from "./EditFornecedor";
 import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
-import { currency, toNumber } from "../../components/Currency";
-import { onlyNumber } from "../../components/OnlyNumber";
+import { currency, toNumber } from "../../utils/Currency";
+import { onlyNumber } from "../../utils/OnlyNumber";
 
 const DetalhesFornecedor = () => {
     const { currentUser, userId, username } = useAuth();

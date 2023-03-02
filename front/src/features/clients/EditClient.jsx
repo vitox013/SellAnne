@@ -5,8 +5,8 @@ import { useParams } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
-import Message from "../../components/Message";
-import { telefoneMask } from "../../components/Telefone";
+import Message from "../../utils/Message";
+import { telefoneMask } from "../../utils/Telefone";
 
 const EditClient = ({ showEdit, handleClose, phone, nome, nomesClientes }) => {
     const [clientName, setClientName] = useState(nome);

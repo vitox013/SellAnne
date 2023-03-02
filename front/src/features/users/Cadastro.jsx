@@ -11,7 +11,8 @@ const USER_REGEX = /^[A-z\ ]{3,20}$/;
 const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/;
 
 const Cadastro = () => {
-    const [addNewUser, { isLoading, isSuccess }] = useAddNewUserMutation();
+    const [addNewUser, { isLoading, isSuccess, data, error }] =
+        useAddNewUserMutation();
 
     const navigate = useNavigate();
 
@@ -23,6 +24,7 @@ const Cadastro = () => {
     const [validPassword, setValidPassword] = useState(false);
     const [email, setEmail] = useState("");
     const [errMsg, setErrMsg] = useState("");
+    const [msg, setMsg] = useState("");
 
     useEffect(() => {
         setValidUsername(USER_REGEX.test(username));
@@ -36,9 +38,12 @@ const Cadastro = () => {
         if (isSuccess) {
             setUsername("");
             setPassword("");
-            navigate("/login");
+            setEmail("");
+            setMsg(data?.message);
+        } else if (error) {
+            setErrMsg(error?.data?.message);
         }
-    }, [isSuccess, navigate]);
+    }, [isSuccess, navigate, error]);
 
     useEffect(() => {
         setErrMsg("");
@@ -51,26 +56,17 @@ const Cadastro = () => {
     const canSave =
         [validUsername, validPassword, email].every(Boolean) && !isLoading;
 
-    
     const onSaveUserClicked = async (e) => {
         e.preventDefault();
-        try {
-            if (canSave) {
-                await addNewUser({ username, password, email }).unwrap();
-            }
-        } catch (err) {
-            if (!err.status) {
-                setErrMsg("Sem resposta do servidor");
-            } else if (err.status === 409) {
-                setErrMsg("Já existe um usuário cadastrado com esse e-mail");
-            } else {
-                setErrMsg(err.data?.message);
-            }
-            errRef.current.focus();
+
+        if (canSave) {
+            await addNewUser({
+                username: username.trim(),
+                password,
+                email: email.trim(),
+            }).unwrap();
         }
     };
-
-    const errClass = errMsg ? "alert alert-danger" : "d-none";
 
     return (
         <>
@@ -78,9 +74,11 @@ const Cadastro = () => {
             <Container className="d-flex flex-column col-md-6 col-lg-5 col-xxl-3 mt-5">
                 <Card className="shadow mt-5">
                     <Card.Body>
-                        <p ref={errRef} className={errClass}>
-                            {errMsg}
-                        </p>
+                        {errMsg && (
+                            <p className="alert alert-danger text-center">
+                                {errMsg}
+                            </p>
+                        )}
                         <Form className="fs-5" onSubmit={onSaveUserClicked}>
                             <Form.Group className="mb-3" controlId="username">
                                 <h3 className="mb-4 fw-bold">Crie uma conta</h3>
@@ -111,6 +109,9 @@ const Cadastro = () => {
                                     onChange={onPasswordChanged}
                                 />
                             </Form.Group>
+                            {msg && (
+                                <p className="alert alert-success">{msg}</p>
+                            )}
                             <Button
                                 className="fs-5 w-100"
                                 variant="primary"

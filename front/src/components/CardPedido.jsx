@@ -18,8 +18,8 @@ import {
     useUpdateUserMutation,
 } from "../features/users/userApiSlice";
 import useAuth from "../hooks/useAuth";
-import { onlyNumber } from "./OnlyNumber";
-import { currency, toBRL, toNumber } from "./Currency";
+import { onlyNumber } from "../utils/onlyNumber";
+import { currency, toBRL, toNumber } from "../utils/currency";
 import { useDispatch } from "react-redux";
 import { setMsg } from "../features/infoMsg/msgSlice";
 
@@ -159,7 +159,7 @@ const CardPedido = ({
         (quantidade * (metodo == "Revenda" ? valorVenda : valor)).toFixed(2)
             ? "Não pago"
             : "Pago";
-    
+
     return (
         <>
             <Card
@@ -169,7 +169,9 @@ const CardPedido = ({
                 <Row className="d-flex align-items-center">
                     <Col xs={4} className="d-flex flex-column fw">
                         <span className="fw-bold">{nomeProduto}</span>
-                        <small>cod: {codigo} | {fornecedor}</small>
+                        <small>
+                            cod: {codigo} | {fornecedor}
+                        </small>
                     </Col>
                     <Col className="ps-3 pe-0">{quantidade}</Col>
                     <Col className="px-0">

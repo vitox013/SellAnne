@@ -23,6 +23,8 @@ import FornecedoresLayout from "./features/fornecedores/FornecedoresLayout";
 import Fornecedores from "./features/fornecedores/Fornecedores";
 import DetalhesFornecedor from "./features/fornecedores/DetalhesFornecedor";
 import NovoFornecedor from "./features/fornecedores/NovoFornecedor";
+import EditPerfil from "./features/users/EditPerfil";
+import EmailVerify from "./features/users/EmailVerify";
 
 function App() {
     const { userId } = useAuth();
@@ -33,6 +35,10 @@ function App() {
                     <Route path="/" element={<Layout />}>
                         <Route index element={<Public />} />
                         <Route path="/signup" element={<Cadastro />} />
+                        <Route
+                            path="/users/:id/verify/:token"
+                            element={<EmailVerify />}
+                        />
                         <Route path="/login" element={<Login />} />
 
                         <Route element={<PersistLogin />}>
@@ -44,6 +50,10 @@ function App() {
                                     >
                                         <Route index element={<Dashboard />} />
                                     </Route>
+                                    <Route
+                                        path="profile"
+                                        element={<EditPerfil />}
+                                    />
                                     <Route
                                         path="clientes"
                                         element={<ClientesLayout />}

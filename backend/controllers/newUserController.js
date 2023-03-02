@@ -1,6 +1,9 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const asyncHandler = require("express-async-handler");
+const Token = require("../models/Token");
+const sendEmail = require("../utils/sendEmail");
+const crypto = require("crypto");
 
 // @desc CheckDuplicateEmail
 // @route POST /auth
@@ -26,9 +29,22 @@ const createNewUser = asyncHandler(async (req, res) => {
 
     const user = await User.create(userObject);
 
+    const token = await new Token({
+        userId: user._id,
+        token: crypto.randomBytes(32).toString("hex"),
+    }).save();
+
+    const url = `${process.env.BASE_URL}users/${user._id}/verify/${token.token}`;
+    await sendEmail(
+        user.email,
+        "Verifique seu email - SellAnne",
+        url,
+        user.username
+    );
+
     if (user) {
         res.status(201).json({
-            message: `Usuário ${username} criado com sucesso`,
+            message: `Conta criada, verifique seu email para verificar sua conta!`,
         });
     } else {
         res.status(400).json({ message: "Erro ao criar usuário" });

@@ -8,7 +8,7 @@ import useAuth from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetUserDataQuery } from "../users/userApiSlice";
 import { setMsg } from "../infoMsg/msgSlice";
-import Message from "../../components/Message";
+import Message from "../../utils/Message";
 
 const Clientes = () => {
     const { currentUser, userId, username } = useAuth();

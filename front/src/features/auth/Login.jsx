@@ -28,35 +28,33 @@ const Login = () => {
 
     const dispatch = useDispatch();
 
-    const [login, { isLoading }] = useLoginMutation();
-
-    useEffect(() => {
-        emailRef.current.focus();
-    }, []);
+    const [login, { isLoading, isSuccess, error }] = useLoginMutation();
 
     useEffect(() => {
         setErrMsg("");
     }, [email, password]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const { accessToken } = await login({ email, password }).unwrap();
-            dispatch(setCredentials({ accessToken }));
+    useEffect(() => {
+        if (isSuccess) {
             setEmail("");
             setPassword("");
+        } else if (error) {
+            setErrMsg(error?.data?.message);
+        }
+    }, [isSuccess, error]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const { accessToken } = await login({
+                email: email.trim(),
+                password: password.trim(),
+            }).unwrap();
+            dispatch(setCredentials({ accessToken }));
             navigate("/dashboard");
-        } catch (err) {
-            if (!err.status) {
-                setErrMsg("Sem resposta do servidor");
-            } else if (err.status === 400) {
-                setErrMsg("Email ou senha incorretos");
-            } else if (err.status === 401) {
-                setErrMsg("Email não cadastrado");
-            } else {
-                setErrMsg(err.data?.message);
-            }
-            errRef.current.focus();
+        } catch (error) {
+            console.log(error);
         }
     };
 

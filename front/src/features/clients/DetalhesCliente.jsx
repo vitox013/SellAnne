@@ -11,7 +11,7 @@ import {
     Form,
     InputGroup,
 } from "react-bootstrap";
-import Message from "../../components/Message";
+import Message from "../../utils/Message";
 import useAuth from "../../hooks/useAuth";
 import CardPedido from "../../components/CardPedido";
 import { v4 as uuidv4 } from "uuid";
@@ -20,8 +20,8 @@ import {
     useUpdateUserMutation,
     useDeleteUserMutation,
 } from "../users/userApiSlice";
-import { onlyNumber } from "../../components/OnlyNumber";
-import { currency, toBRL, toNumber } from "../../components/Currency";
+import { onlyNumber } from "../../utils/OnlyNumber";
+import { currency, toBRL, toNumber } from "../../utils/Currency";
 import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
 import EditClient from "./EditClient";

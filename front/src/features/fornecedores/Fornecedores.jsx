@@ -11,7 +11,7 @@ import {
 } from "../users/userApiSlice";
 import CardFornecedor from "../../components/CardFornecedor";
 import { useParams, useLocation } from "react-router-dom";
-import Message from "../../components/Message";
+import Message from "../../utils/Message";
 import { useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
 

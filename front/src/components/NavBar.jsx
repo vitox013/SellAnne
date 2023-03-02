@@ -50,7 +50,7 @@ function NavBar({ info, icon, fixed, path, page }) {
                     className="pe-0"
                 >
                     <Link
-                        to=""
+                        to="/profile"
                         className="text-dark btn w-100 d-flex hover-card"
                     >
                         Meu perfil
@@ -88,7 +88,7 @@ function NavBar({ info, icon, fixed, path, page }) {
                     align="end"
                 >
                     <Link
-                        to=""
+                        to="/profile"
                         className="text-dark btn w-100 d-flex hover-card"
                     >
                         Meu perfil
@@ -99,6 +99,43 @@ function NavBar({ info, icon, fixed, path, page }) {
                         className="text-dark btn w-100 d-flex hover-card"
                     >
                         Dashboard
+                    </Link>
+
+                    <NavDropdown.Divider />
+                    <NavDropdown.Item
+                        className="d-flex align-items-center justify-content-between "
+                        onClick={sendLogout}
+                    >
+                        Sair <i className="bx bx-log-out fs-3"></i>
+                    </NavDropdown.Item>
+                </NavDropdown>
+            </Nav>
+        );
+    } else if (page == "profile") {
+        conteudo = (
+            <Nav className="align-items-center float-end">
+                <Link to="/dashboard" className="text-black fs-5">
+                    Dashboard
+                </Link>
+
+                <NavDropdown
+                    title={<i className={`${icon} text-black`}></i>}
+                    id="basic-nav-dropdown"
+                    drop="down"
+                    align="end"
+                >
+                    <Link
+                        to="/clientes"
+                        className="text-dark btn w-100 d-flex hover-card"
+                    >
+                        Clientes
+                    </Link>
+
+                    <Link
+                        to="/fornecedores"
+                        className="text-dark btn w-100 d-flex hover-card"
+                    >
+                        Fornecedores
                     </Link>
 
                     <NavDropdown.Divider />
