@@ -25,6 +25,8 @@ import DetalhesFornecedor from "./features/fornecedores/DetalhesFornecedor";
 import NovoFornecedor from "./features/fornecedores/NovoFornecedor";
 import EditPerfil from "./features/users/EditPerfil";
 import EmailVerify from "./features/users/EmailVerify";
+import ResetPwd from "./features/auth/ResetPwd";
+
 
 function App() {
     const { userId } = useAuth();
@@ -40,6 +42,7 @@ function App() {
                             element={<EmailVerify />}
                         />
                         <Route path="/login" element={<Login />} />
+                        <Route path="/reset-password" element={<ResetPwd />} />
 
                         <Route element={<PersistLogin />}>
                             <Route element={<RequireAuth />}>

@@ -21,7 +21,7 @@ router.get("/:id/verify/:token/", async (req, res) => {
 
         if (!token) return res.status(400).send({ message: "Link expirado!" });
 
-        const teste = await User.findOneAndUpdate(
+        const setVerify = await User.findOneAndUpdate(
             { _id: user._id },
             {
                 $set: {

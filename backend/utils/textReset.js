@@ -3,17 +3,13 @@ module.exports = (userName, url) => {
                 <h3>
                     Olá, <strong>${userName}</strong>!
                 </h3>
-                <p>
-                    Para acessar nosso serviço é necessário verificar seu
-                    email.
-                </p>
-                <p>É muito simples, clique no botão abaixo:</p>
+                <p>Clique no botão abaixo para resetar sua senha:</p>
                 <button style="padding: 0.7em; background-color: #2b961f; border-radius: 10px; border:none ;">
                     <a
                         href="${url}"
                         style="text-decoration: none; color: white"
                     >
-                       Verifique seu email!
+                       Altere sua senha!
                     </a>
                 </button>
                 <p>

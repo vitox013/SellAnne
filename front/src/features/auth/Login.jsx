@@ -10,6 +10,7 @@ import { setCredentials } from "./authSlice";
 import { useLoginMutation } from "./authApiSlice";
 import usePersist from "../../hooks/usePersist";
 import useAuth from "../../hooks/useAuth";
+import ModalReset from "./ModalReset";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -25,6 +26,7 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [errMsg, setErrMsg] = useState("");
     const [persist, setPersist] = usePersist();
+    const [show, setShow] = useState(false);
 
     const dispatch = useDispatch();
 
@@ -63,6 +65,12 @@ const Login = () => {
     const handleToggle = () => setPersist((prev) => !prev);
 
     const errClass = errMsg ? "alert alert-danger" : "d-none";
+
+    const handleShow = () => setShow(true);
+    const handleClose = () => setShow(false);
+    const onEditClick = async () => {
+        e.preventDefault;
+    };
 
     if (isLoading) return <p>Loading</p>;
 
@@ -131,6 +139,14 @@ const Login = () => {
                         <p className="mt-3 text-center">
                             Novo aqui? <Link to="/signup">Crie uma conta</Link>
                         </p>
+                        <hr />
+                        <p
+                            className="mt-3 text-center pointer"
+                            onClick={handleShow}
+                        >
+                            <Link to="">Esqueci minha senha</Link>
+                        </p>
+                        <ModalReset show={show} handleClose={handleClose} />
                     </Card.Body>
                 </Card>
             </Container>

@@ -10,26 +10,48 @@ const EditPerfil = () => {
     const [email, setEmail] = useState(eMail);
 
     return (
-        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-            <h5>
-                Olá, <strong>VITOR</strong>!
-            </h5>
-            <p>Para acessar nosso serviço é necessário verificar seu email.</p>
-            <p>É muito simples, clique no botão abaixo:</p>
-            <button style="padding: 0.7em; background-color: #2b961f; border-radius: 10px; border:none ;">
-                <a href="LINK" style="text-decoration: none; color: white">
-                    Verifique seu email!
-                </a>
-            </button>
-            <p>
-                Caso não consiga clicando logo acima, é só copiar e colar o link
-                abaixo em seu navegador:
-            </p>
-            <p>LINK</p>
-            <p>
-                <small>SellAnne &reg;</small>
-            </p>
-        </div>
+        <>
+            <NavBar
+                icon="bx bx-user-circle fs-1 expand"
+                fixed=""
+                page="profile"
+            />
+            <Container>
+                <Row className="mt-2 text-center">
+                    <Col>
+                        <h2>Olá, {currentUser}</h2>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <Card>
+                            <Card.Body>
+                                <Form className="d-flex flex-column gap-4">
+                                    <Form.Group>
+                                        <Form.Label>Nome</Form.Label>
+                                        <Form.Control
+                                            value={name}
+                                            onChange={(e) =>
+                                                setName(e.target.value)
+                                            }
+                                        />
+                                    </Form.Group>
+                                    <Form.Group>
+                                        <Form.Label>Email</Form.Label>
+                                        <Form.Control
+                                            value={email}
+                                            onChange={(e) =>
+                                                setEmail(e.target.value)
+                                            }
+                                        />
+                                    </Form.Group>
+                                </Form>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
+        </>
     );
 };
 

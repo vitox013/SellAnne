@@ -39,7 +39,7 @@ const createNewUser = asyncHandler(async (req, res) => {
         user.email,
         "Verifique seu email - SellAnne",
         url,
-        user.username
+        user.username,
     );
 
     if (user) {
