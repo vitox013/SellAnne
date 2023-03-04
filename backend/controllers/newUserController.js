@@ -39,7 +39,7 @@ const createNewUser = asyncHandler(async (req, res) => {
         user.email,
         "Verifique seu email - SellAnne",
         url,
-        user.username,
+        user.username
     );
 
     if (user) {
@@ -51,6 +51,38 @@ const createNewUser = asyncHandler(async (req, res) => {
     }
 });
 
+const verifyUser = asyncHandler(async (req, res) => {
+    try {
+        const user = await User.findById({ _id: req.params.id });
+
+        if (!user)
+            return res.status(400).send({ message: "Usuário não encontrado!" });
+
+        const token = await Token.findOne({
+            userId: user._id,
+            token: req.params.token,
+        });
+
+        if (!token) return res.status(400).send({ message: "Link expirado!" });
+
+        await User.findOneAndUpdate(
+            { _id: user._id },
+            {
+                $set: {
+                    verified: true,
+                },
+            }
+        );
+
+        await token.remove();
+
+        res.status(200).send({ message: "Email verificado com sucesso!" });
+    } catch (error) {
+        res.status(500).send({ message: "Erro interno!" });
+    }
+});
+
 module.exports = {
     createNewUser,
+    verifyUser
 };

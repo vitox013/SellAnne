@@ -30,6 +30,7 @@ const login = asyncHandler(async (req, res) => {
         let token = await Token.findOne({ userId: foundUser.id });
 
         if (!token) {
+            console.log("cuzinho")
             token = await new Token({
                 userId: foundUser._id,
                 token: crypto.randomBytes(32).toString("hex"),
@@ -132,8 +133,55 @@ const logout = (req, res) => {
     res.json({ message: "Cookie cleared" });
 };
 
+const sendEmailResetPwd = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email) return res.status(400).json({ message: "Preencha o email" });
+
+    const foundUser = await User.findOne({ email }).exec();
+
+    if (!foundUser)
+        return res.status(401).json({ message: "Email não encontrado" });
+
+    let token = await Token.findOne({ userId: foundUser.id });
+
+    if (!token) {
+        token = await new Token({
+            userId: foundUser._id,
+            token: crypto.randomBytes(32).toString("hex"),
+        }).save();
+
+        const url = `${process.env.BASE_URL}users/${foundUser.id}/reset/${token.token}`;
+
+        await sendEmail(
+            foundUser.email,
+            "Resete sua senha - SellAnne",
+            url,
+            foundUser.username
+        );
+
+        return res
+            .status(200)
+            .json({
+                message: "Enviamos o link de recuperação para seu email!",
+            });
+    }
+
+    return res
+        .status(429)
+        .json({ message: "Link já foi enviado. Tente novamente mais tarde!" });
+});
+
+const changeForgotPwd = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+    
+
+})
+
+
 module.exports = {
     login,
     refresh,
     logout,
+    sendEmailResetPwd
 };
