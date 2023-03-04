@@ -38,6 +38,7 @@ const ModalReset = ({ handleClose, show }) => {
             dispatch(setMsg("Email enviado com sucesso!"));
             handleClose();
         } else if (error) {
+            handleClose();
             dispatch(setMsg(error?.data?.message));
         }
     }, [isSuccess, error]);

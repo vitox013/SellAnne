@@ -31,7 +31,6 @@ const login = asyncHandler(async (req, res) => {
         let token = await Token.findOne({ userId: foundUser.id });
 
         if (!token) {
-            console.log("cuzinho");
             token = await new Token({
                 userId: foundUser._id,
                 token: crypto.randomBytes(32).toString("hex"),
@@ -171,8 +170,35 @@ const sendEmailResetPwd = asyncHandler(async (req, res) => {
         .json({ message: "Link já foi enviado. Tente novamente mais tarde!" });
 });
 
-const changeForgotPwd = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+const resetPwd = asyncHandler(async (req, res) => {
+    const { password, userId, token } = req.body;
+
+    if (!password) {
+        return res.status(400).json({ message: "Preencha o campo senha!" });
+    } else if (!token) {
+        return res
+            .status(400)
+            .json({ message: "Link expirou. Tente novamente!" });
+    } else if (!userId) {
+        return res.status(400).json({ message: "Necessário o Id do usuário!" });
+    }
+
+    const foundUser = await User.findOne({ _id: userId }).exec();
+
+    if (!foundUser) {
+        return res.status(401).json({ message: "Usuario não encontrado" });
+    }
+
+    const foundToken = await Token.findOne({ userId: foundUser.id });
+
+    if (foundToken) {
+        foundUser.password = await bcrypt.hash(password, 10);
+        await foundUser.save();
+
+        return res.status(200).json({ message: "Senha alterada com sucesso" });
+    }
+
+    return res.status(401).json({ message: "Link expirado" });
 });
 
 module.exports = {
@@ -180,4 +206,5 @@ module.exports = {
     refresh,
     logout,
     sendEmailResetPwd,
+    resetPwd,
 };

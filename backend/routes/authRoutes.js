@@ -11,4 +11,6 @@ router.route("/logout").post(authController.logout);
 
 router.route("/sendEmailResetPwd").post(authController.sendEmailResetPwd);
 
+router.route("/resetPwd").patch(authController.resetPwd);
+
 module.exports = router;

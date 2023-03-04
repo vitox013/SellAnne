@@ -50,8 +50,20 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 body: { ...credentials },
             }),
         }),
+        resetPwd: builder.mutation({
+            query: (credentials) => ({
+                url: "/auth/resetPwd",
+                method: "PATCH",
+                body: { ...credentials },
+            }),
+        }),
     }),
 });
 
-export const { useLoginMutation, useSendLogoutMutation, useRefreshMutation, useSendEmailForgotPwdMutation } =
-    authApiSlice;
+export const {
+    useLoginMutation,
+    useSendLogoutMutation,
+    useRefreshMutation,
+    useSendEmailForgotPwdMutation,
+    useResetPwdMutation,
+} = authApiSlice;

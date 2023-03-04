@@ -27,7 +27,6 @@ import EditPerfil from "./features/users/EditPerfil";
 import EmailVerify from "./features/users/EmailVerify";
 import ResetPwd from "./features/auth/ResetPwd";
 
-
 function App() {
     const { userId } = useAuth();
     return (
@@ -40,6 +39,10 @@ function App() {
                         <Route
                             path="/users/:id/verify/:token"
                             element={<EmailVerify />}
+                        />
+                        <Route
+                            path="/users/:id/reset/:token"
+                            element={<ResetPwd />}
                         />
                         <Route path="/login" element={<Login />} />
                         <Route path="/reset-password" element={<ResetPwd />} />

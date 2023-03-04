@@ -213,21 +213,6 @@ const deleteUser = asyncHandler(async (req, res) => {
                 { arrayFilters: [{ "field._id": cliente._id }] }
             );
 
-            // const deletarPedido = await User.findOneAndUpdate(
-            //     {
-            //         "clients.pedidos._id": cliente.pedido._id,
-            //     },
-            //     {
-            //         $pullAll: {
-            //             "clients.$.pedidos.$[field]":
-            //                 cliente.pedido.quantidade
-            //         },
-            //     },
-            //     {
-            //         arrayFilters: [{ "field._id": cliente.pedido._id }],
-            //     }
-            // );
-
             return res.status(200).json({ message: "Pedido deletado" });
         } else {
             const deletarCliente = await User.findOneAndUpdate(
@@ -273,17 +258,6 @@ const deleteUser = asyncHandler(async (req, res) => {
         const reply = `Usuario: ${user.username} foi deletado com sucesso`;
         res.json(reply);
     }
-    // const user = await User.findById(userId).exec();
-
-    // if (!user) {
-    //     return res.status(400).json({ message: "Usuário não encontrado" });
-    // }
-
-    // const result = await user.deleteOne();
-
-    // const reply = `Usuario: ${user.username} foi deletado com sucesso`;
-
-    // res.json(reply);
 });
 
 module.exports = {
