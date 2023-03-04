@@ -195,6 +195,8 @@ const resetPwd = asyncHandler(async (req, res) => {
         foundUser.password = await bcrypt.hash(password, 10);
         await foundUser.save();
 
+        await foundToken.remove();
+
         return res.status(200).json({ message: "Senha alterada com sucesso" });
     }
 
