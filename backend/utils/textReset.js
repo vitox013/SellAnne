@@ -1,5 +1,5 @@
 module.exports = (userName, url) => {
-    const text = `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+    const textReset = `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                 <h3>
                     Olá, <strong>${userName}</strong>!
                 </h3>
@@ -27,5 +27,5 @@ module.exports = (userName, url) => {
                     <p>SellAnne &reg;</p>
                 </p>
             </div>`;
-    return text;
+    return textReset;
 };

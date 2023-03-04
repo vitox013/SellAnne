@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
+import { useDispatch } from "react-redux";
+import { useSendEmailForgotPwdMutation } from "./authApiSlice";
+import { setMsg } from "../infoMsg/msgSlice";
 
 const EMAIL_REGEX =
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
@@ -8,6 +11,10 @@ const ModalReset = ({ handleClose, show }) => {
     const [email, setEmail] = useState("");
 
     const [validEmail, setValidEmail] = useState();
+    const dispatch = useDispatch();
+
+    const [sendEmailResetPwd, { isSuccess, error }] =
+        useSendEmailForgotPwdMutation();
 
     useEffect(() => {
         setValidEmail(EMAIL_REGEX.test(email));
@@ -18,9 +25,22 @@ const ModalReset = ({ handleClose, show }) => {
         setValidEmail(false);
     }, [handleClose]);
 
-    const onEditClick = async () => {
-        e.preventDefault;
+    const onSendEmail = async () => {
+        if (validEmail) {
+            await sendEmailResetPwd({ email });
+        }
     };
+
+    useEffect(() => {
+        if (isSuccess) {
+            setEmail("");
+            setValidEmail(false);
+            dispatch(setMsg("Email enviado com sucesso!"));
+            handleClose();
+        } else if (error) {
+            dispatch(setMsg(error?.data?.message));
+        }
+    }, [isSuccess, error]);
 
     return (
         <Modal show={show} onHide={handleClose}>
@@ -48,7 +68,7 @@ const ModalReset = ({ handleClose, show }) => {
             <Modal.Footer>
                 <Button
                     variant="success"
-                    onClick={onEditClick}
+                    onClick={onSendEmail}
                     disabled={!validEmail}
                 >
                     Enviar email

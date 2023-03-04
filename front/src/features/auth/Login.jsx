@@ -5,12 +5,13 @@ import { useNavigate, Link } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import NavDash from "../../components/NavBar";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "./authSlice";
 import { useLoginMutation } from "./authApiSlice";
 import usePersist from "../../hooks/usePersist";
 import useAuth from "../../hooks/useAuth";
 import ModalReset from "./ModalReset";
+import { setMsg } from "../infoMsg/msgSlice";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -27,10 +28,11 @@ const Login = () => {
     const [errMsg, setErrMsg] = useState("");
     const [persist, setPersist] = usePersist();
     const [show, setShow] = useState(false);
-
+    
     const dispatch = useDispatch();
 
     const [login, { isLoading, isSuccess, error }] = useLoginMutation();
+    let message = useSelector((state) => state.infoMsg.msg);
 
     useEffect(() => {
         setErrMsg("");
@@ -127,6 +129,9 @@ const Login = () => {
                                     checked={persist}
                                 />
                             </Form.Group>
+                            {message && (
+                                <p className="alert alert-success text-center">{message}</p>
+                            )}
 
                             <Button
                                 className="fs-5 w-100"

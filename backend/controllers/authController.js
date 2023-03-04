@@ -5,6 +5,7 @@ const asyncHandler = require("express-async-handler");
 const Token = require("../models/Token");
 const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
+const sendResetEmail = require("../utils/sendResetEmail");
 
 // @desc Login
 // @route POST /auth
@@ -30,7 +31,7 @@ const login = asyncHandler(async (req, res) => {
         let token = await Token.findOne({ userId: foundUser.id });
 
         if (!token) {
-            console.log("cuzinho")
+            console.log("cuzinho");
             token = await new Token({
                 userId: foundUser._id,
                 token: crypto.randomBytes(32).toString("hex"),
@@ -153,18 +154,16 @@ const sendEmailResetPwd = asyncHandler(async (req, res) => {
 
         const url = `${process.env.BASE_URL}users/${foundUser.id}/reset/${token.token}`;
 
-        await sendEmail(
+        await sendResetEmail(
             foundUser.email,
             "Resete sua senha - SellAnne",
             url,
             foundUser.username
         );
 
-        return res
-            .status(200)
-            .json({
-                message: "Enviamos o link de recuperação para seu email!",
-            });
+        return res.status(200).json({
+            message: "Enviamos o link de recuperação para seu email!",
+        });
     }
 
     return res
@@ -174,14 +173,11 @@ const sendEmailResetPwd = asyncHandler(async (req, res) => {
 
 const changeForgotPwd = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-    
-
-})
-
+});
 
 module.exports = {
     login,
     refresh,
     logout,
-    sendEmailResetPwd
+    sendEmailResetPwd,
 };
