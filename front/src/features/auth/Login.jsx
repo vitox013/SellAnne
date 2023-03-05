@@ -28,7 +28,7 @@ const Login = () => {
     const [errMsg, setErrMsg] = useState("");
     const [persist, setPersist] = usePersist();
     const [show, setShow] = useState(false);
-    
+
     const dispatch = useDispatch();
 
     const [login, { isLoading, isSuccess, error }] = useLoginMutation();
@@ -80,11 +80,11 @@ const Login = () => {
         <>
             <NavDash info="" />
             <Container className="d-flex flex-column col-md-6 col-lg-5 col-xxl-3 mt-5">
-                <Card className="shadow mt-5">
+                <Card className="shadow mt-2">
                     <Card.Body>
                         <p
                             ref={errRef}
-                            className={errClass}
+                            className={`${errClass} text-center`}
                             aria-live="assertive"
                         >
                             {errMsg}
@@ -130,7 +130,9 @@ const Login = () => {
                                 />
                             </Form.Group>
                             {message && (
-                                <p className="alert alert-success text-center">{message}</p>
+                                <p className="alert alert-success text-center">
+                                    {message}
+                                </p>
                             )}
 
                             <Button

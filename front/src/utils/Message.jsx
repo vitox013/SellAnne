@@ -24,9 +24,7 @@ function Message({ type, msg }) {
     return (
         <>
             {visible && (
-                <div className={`message ${type} mt-2 text-center mb-0`}>
-                    {msg}
-                </div>
+                <p className={`${type} mt-2 text-center mb-0`}>{msg}</p>
             )}
         </>
     );

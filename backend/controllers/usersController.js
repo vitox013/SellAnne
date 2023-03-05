@@ -22,17 +22,23 @@ const getUserData = asyncHandler(async (req, res) => {
 // @acess Private
 
 const updateUser = asyncHandler(async (req, res) => {
-    const { userId, username, email, password, cliente, fornecedor } = req.body;
+    const {
+        userId,
+        username,
+        email,
+        password,
+        cliente,
+        fornecedor,
+        newPassword,
+    } = req.body;
 
     // Atualização dos dados cadastrais do usuário
 
     if (username || email || password) {
         if (!userId || !username || !email) {
-            {
-                return res
-                    .status(400)
-                    .json({ message: "Preencha todos os campos" });
-            }
+            return res
+                .status(400)
+                .json({ message: "Preencha todos os campos" });
         }
 
         const user = await User.findById(userId).exec();
@@ -50,16 +56,32 @@ const updateUser = asyncHandler(async (req, res) => {
                 .json({ message: "Existe um outro usuário com esse email" });
         }
 
-        user.username = username;
-        user.email = email;
+        if (user?.username !== username || user?.email !== email) {
+            user.username = username;
+            user.email = email;
+        }
 
         if (password) {
-            user.password = await bcrypt.hash(password, 10);
+            if (password == newPassword) {
+                return res
+                    .status(409)
+                    .json({ message: "Nova senha igual a senha atual!" });
+            }
+            const match = await bcrypt.compare(password, user.password);
+
+            if (!match)
+                return res.status(400).json({ message: "Senha inválida" });
+
+            user.password = await bcrypt.hash(newPassword, 10);
+            await user.save();
+            return res
+                .status(200)
+                .json({ message: "Senha atualizada com sucesso" });
         }
 
         const updateUser = await user.save();
 
-        res.json({ message: `${updateUser.username} atualizado!` });
+        res.status(200).json({ message: `Nome atualizado!` });
     }
     //Atualização de clientes ou produto
     if (cliente || fornecedor) {

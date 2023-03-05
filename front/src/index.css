@@ -27,6 +27,11 @@ a {
     text-decoration: none !important;
 }
 
+.a_decoration {
+    text-decoration: solid !important;
+    cursor: pointer !important;
+}
+
 .tableFixHead {
     overflow: auto;
     height: 100px;

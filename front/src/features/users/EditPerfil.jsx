@@ -1,13 +1,65 @@
 import React, { useState, useEffect } from "react";
-import { Card, Col, Container, Form, Row } from "react-bootstrap";
-import Back from "../../components/Back";
+import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import { useSelector } from "react-redux";
 import NavBar from "../../components/NavBar";
 import useAuth from "../../hooks/useAuth";
+import ModalChangePwd from "./ModalChangePwd";
+import Message from "../../utils/Message";
+import { useGetUserDataQuery, useUpdateUserMutation } from "./userApiSlice";
 
 const EditPerfil = () => {
-    const { userId, currentUser, email: eMail } = useAuth();
-    const [name, setName] = useState(currentUser);
-    const [email, setEmail] = useState(eMail);
+    const { userId, currentUser, email } = useAuth();
+
+    const { userName } = useGetUserDataQuery(userId, {
+        selectFromResult: ({ data }) => ({
+            userName: data?.username,
+        }),
+    });
+
+    const [name, setName] = useState("");
+    const [show, setShow] = useState(false);
+    const [feedback, setFeedback] = useState("");
+    const [classStatus, setClassStatus] = useState("");
+    const [nameChanged, setNameChanged] = useState(false);
+
+    const message = useSelector((state) => state.infoMsg.msg);
+
+    const [updateUser, { isSuccess, error, data }] = useUpdateUserMutation();
+
+    useEffect(() => {
+        setNameChanged(name !== userName);
+    }, [name]);
+
+    useEffect(() => {
+        if (userName) {
+            setName(userName);
+            setNameChanged(name !== userName);
+        }
+    }, [userName]);
+
+    const handleShow = () => setShow(true);
+    const handleClose = () => setShow(false);
+    const handleCancel = () => setName(userName);
+
+    const onSaveUserClicked = async (e) => {
+        if (name) {
+            await updateUser({
+                userId,
+                email,
+                username: name.trim(),
+            });
+        }
+    };
+
+    useEffect(() => {
+        if (isSuccess) {
+            setFeedback(data?.message);
+            setClassStatus("alert alert-success");
+        } else if (error) {
+            setFeedback(error?.data?.message);
+            setClassStatus("alert alert-danger");
+        }
+    }, [isSuccess, error]);
 
     return (
         <>
@@ -19,17 +71,26 @@ const EditPerfil = () => {
             <Container>
                 <Row className="mt-2 text-center">
                     <Col>
-                        <h2>Olá, {currentUser}</h2>
+                        <h2>Olá, {userName}</h2>
                     </Col>
                 </Row>
                 <Row>
-                    <Col>
+                    <Col md={6} className="mx-auto">
                         <Card>
                             <Card.Body>
-                                <Form className="d-flex flex-column gap-4">
+                                {feedback && (
+                                    <Message
+                                        msg={feedback}
+                                        type={classStatus}
+                                    />
+                                )}
+                                <Form className="d-flex flex-column gap-4 mb-3">
                                     <Form.Group>
-                                        <Form.Label>Nome</Form.Label>
+                                        <Form.Label>
+                                            <strong>Nome</strong>
+                                        </Form.Label>
                                         <Form.Control
+                                            maxLength="16"
                                             value={name}
                                             onChange={(e) =>
                                                 setName(e.target.value)
@@ -37,15 +98,51 @@ const EditPerfil = () => {
                                         />
                                     </Form.Group>
                                     <Form.Group>
-                                        <Form.Label>Email</Form.Label>
+                                        <Form.Label>
+                                            <strong>Email</strong>
+                                        </Form.Label>
                                         <Form.Control
                                             value={email}
-                                            onChange={(e) =>
-                                                setEmail(e.target.value)
-                                            }
+                                            disabled={true}
                                         />
                                     </Form.Group>
                                 </Form>
+                                {message && (
+                                    <Message
+                                        type="alert alert-success"
+                                        msg={message}
+                                    />
+                                )}
+                                <Row>
+                                    <a
+                                        className="a_decoration"
+                                        onClick={handleShow}
+                                    >
+                                        Alterar senha
+                                    </a>
+                                </Row>
+                                <ModalChangePwd
+                                    show={show}
+                                    handleClose={handleClose}
+                                />
+                                {nameChanged && (
+                                    <div className="d-flex gap-2">
+                                        <Button
+                                            variant="success"
+                                            className="mt-2"
+                                            onClick={onSaveUserClicked}
+                                        >
+                                            Salvar
+                                        </Button>
+                                        <Button
+                                            variant="secondary"
+                                            className="mt-2"
+                                            onClick={handleCancel}
+                                        >
+                                            Cancelar
+                                        </Button>
+                                    </div>
+                                )}
                             </Card.Body>
                         </Card>
                     </Col>

@@ -9,8 +9,9 @@ const EMAIL_REGEX =
 
 const ModalReset = ({ handleClose, show }) => {
     const [email, setEmail] = useState("");
-
     const [validEmail, setValidEmail] = useState();
+    const [errMsg, setErrMsg] = useState("");
+
     const dispatch = useDispatch();
 
     const [sendEmailResetPwd, { isSuccess, error }] =
@@ -18,11 +19,13 @@ const ModalReset = ({ handleClose, show }) => {
 
     useEffect(() => {
         setValidEmail(EMAIL_REGEX.test(email));
+        setErrMsg("")
     }, [email]);
 
     useEffect(() => {
         setEmail("");
         setValidEmail(false);
+        setErrMsg("");
     }, [handleClose]);
 
     const onSendEmail = async () => {
@@ -38,8 +41,8 @@ const ModalReset = ({ handleClose, show }) => {
             dispatch(setMsg("Email enviado com sucesso!"));
             handleClose();
         } else if (error) {
-            handleClose();
-            dispatch(setMsg(error?.data?.message));
+            setErrMsg(error?.data?.message);
+            // dispatch(setMsg(error?.data?.message));
         }
     }, [isSuccess, error]);
 
@@ -50,6 +53,11 @@ const ModalReset = ({ handleClose, show }) => {
             </Modal.Header>
             <Modal.Body>
                 <p>Entre com seu email cadastrado</p>
+                {errMsg && (
+                    <p className="alert text-danger alert-danger text-center">
+                        {errMsg}
+                    </p>
+                )}
                 <Form>
                     <Form.Group>
                         <Form.Label>

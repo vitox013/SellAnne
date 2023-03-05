@@ -141,7 +141,7 @@ const sendEmailResetPwd = asyncHandler(async (req, res) => {
     const foundUser = await User.findOne({ email }).exec();
 
     if (!foundUser)
-        return res.status(401).json({ message: "Email não encontrado" });
+        return res.status(401).json({ message: "Email não cadastrado" });
 
     let token = await Token.findOne({ userId: foundUser.id });
 
