@@ -6,7 +6,9 @@ import "bootstrap/dist/css/bootstrap.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
-import Error404 from "./pages/Error404";
+import { disableReactDevTools} from '@fvilers/disable-react-devtools'
+
+if (process.env.NODE_ENV === "production") disableReactDevTools()
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>

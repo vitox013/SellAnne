@@ -20,8 +20,8 @@ import {
     useUpdateUserMutation,
     useDeleteUserMutation,
 } from "../users/userApiSlice";
-import { onlyNumber } from "../../utils/OnlyNumber";
-import { currency, toBRL, toNumber } from "../../utils/Currency";
+import { onlyNumber } from "../../utils/onlyNumber";
+import { currency, toBRL, toNumber } from "../../utils/currency";
 import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
 import EditClient from "./EditClient";

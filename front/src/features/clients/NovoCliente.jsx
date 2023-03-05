@@ -8,7 +8,7 @@ import {
     useUpdateUserMutation,
     useGetUserDataQuery,
 } from "../users/userApiSlice";
-import { telefoneMask } from "../../utils/Telefone";
+import { telefoneMask } from "../../utils/telefone";
 
 const USER_REGEX = /^[A-z\ ]{3,20}$/;
 

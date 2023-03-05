@@ -6,7 +6,7 @@ import useAuth from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
 import Message from "../../utils/Message";
-import { telefoneMask } from "../../utils/Telefone";
+import { telefoneMask } from "../../utils/telefone";
 
 const EditClient = ({ showEdit, handleClose, phone, nome, nomesClientes }) => {
     const [clientName, setClientName] = useState(nome);

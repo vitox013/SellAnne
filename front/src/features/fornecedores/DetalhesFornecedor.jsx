@@ -26,8 +26,8 @@ import DeleteModal from "../../components/DeleteModal";
 import EditFornecedor from "./EditFornecedor";
 import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
-import { currency, toNumber } from "../../utils/Currency";
-import { onlyNumber } from "../../utils/OnlyNumber";
+import { currency, toNumber } from "../../utils/currency";
+import { onlyNumber } from "../../utils/onlyNumber";
 
 const DetalhesFornecedor = () => {
     const { currentUser, userId, username } = useAuth();
