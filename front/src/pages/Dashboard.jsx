@@ -156,7 +156,17 @@ const Dashboard = () => {
                                 </h3>
                             </Col>
                         </Row>
-                        {conteudo}
+                        {conteudo?.length > 0 ? (
+                            conteudo
+                        ) : (
+                            <div className="mx-1">
+                                <hr />
+                                <p>
+                                    Nenhum pedido realizado{" "}
+                                    <i className="bx bxs-sad"></i>
+                                </p>
+                            </div>
+                        )}
                     </Card.Body>
                 </Card>
             </Container>
