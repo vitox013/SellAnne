@@ -1,8 +1,6 @@
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
-import logo from "../img/dashSell_LOGO_transparent.png";
 import { Link } from "react-router-dom";
-import { FiLogIn } from "react-icons/fi";
 
 function Back({ fixed, path, element }) {
     return (
