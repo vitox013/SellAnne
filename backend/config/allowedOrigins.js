@@ -1,3 +1,3 @@
-const allowedOrigins = ['http://localhost:3500', 'http://localhost:5173', 'http://192.168.18.110:5173/', 'http://192.168.56.1:5173']
+const allowedOrigins = ["https://sellanne.onrender.com"];
 
-module.exports = allowedOrigins
+module.exports = allowedOrigins;
