@@ -12,6 +12,7 @@ import usePersist from "../../hooks/usePersist";
 import useAuth from "../../hooks/useAuth";
 import ModalReset from "./ModalReset";
 import { setMsg } from "../infoMsg/msgSlice";
+import Loading from "../../utils/Loading";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -74,14 +75,13 @@ const Login = () => {
         e.preventDefault;
     };
 
-    if (isLoading) return <p>Loading</p>;
-
     return (
         <>
             <NavDash info="" />
             <Container className="d-flex flex-column col-md-6 col-lg-5 col-xxl-3 mt-5">
                 <Card className="shadow mt-2">
                     <Card.Body>
+                        {isLoading && <Loading />}
                         <p
                             ref={errRef}
                             className={`${errClass} text-center`}
@@ -139,6 +139,7 @@ const Login = () => {
                                 className="fs-5 w-100"
                                 variant="primary"
                                 type="submit"
+                                disabled={isLoading}
                             >
                                 Entrar
                             </Button>

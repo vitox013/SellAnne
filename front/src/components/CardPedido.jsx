@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import {
-    Container,
-    Navbar,
     Button,
     Modal,
     Card,
@@ -14,7 +12,6 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import {
     useDeleteUserMutation,
-    useGetUserDataQuery,
     useUpdateUserMutation,
 } from "../features/users/userApiSlice";
 import useAuth from "../hooks/useAuth";
@@ -22,6 +19,7 @@ import { onlyNumber } from "../utils/onlyNumber";
 import { currency, toBRL, toNumber } from "../utils/currency";
 import { useDispatch } from "react-redux";
 import { setMsg } from "../features/infoMsg/msgSlice";
+import Loading from "../utils/Loading";
 
 const CardPedido = ({
     pedidoId,
@@ -32,9 +30,7 @@ const CardPedido = ({
     qtdPaga,
     metodo,
     valorVenda,
-    porcentagem,
     fornecedor,
-    fornecedorId,
 }) => {
     const formatter = new Intl.NumberFormat("pt-BR", {
         style: "currency",
@@ -59,11 +55,21 @@ const CardPedido = ({
 
     const [
         updatePedido,
-        { isSuccess: isUpdatePedidoSuccess, error: errorUpdatePedido },
+        {
+            isSuccess: isUpdatePedidoSuccess,
+            error: errorUpdatePedido,
+            isLoading: isLoadingUpdatePedido,
+        },
     ] = useUpdateUserMutation();
 
-    const [deletePedido, { isSuccess: isDeleteSuccess, error: errorDelete }] =
-        useDeleteUserMutation();
+    const [
+        deletePedido,
+        {
+            isSuccess: isDeleteSuccess,
+            error: errorDelete,
+            isLoading: isLoadingDelete,
+        },
+    ] = useDeleteUserMutation();
 
     const handleShow = () => setShow(true);
     const handleClose = () => {
@@ -222,6 +228,7 @@ const CardPedido = ({
                     </Row>
                     {showExcluir && (
                         <Row className="mb-4">
+                            {isLoadingDelete && <Loading />}
                             <Col xs={12}>
                                 <h5>Tem certeza?</h5>
                             </Col>
@@ -235,6 +242,7 @@ const CardPedido = ({
                                 <Button
                                     variant="danger"
                                     onClick={onClickDelete}
+                                    disabled={isLoadingDelete}
                                 >
                                     Excluir
                                 </Button>
@@ -317,12 +325,13 @@ const CardPedido = ({
 
                     {alterado && (
                         <Row className="mt-1">
+                            {isLoadingUpdatePedido && <Loading />}
                             <Col>
                                 <Button
                                     variant="success"
                                     onClick={onClickUpdate}
                                     className="me-2"
-                                    disabled={!canSave}
+                                    disabled={!canSave || isLoadingUpdatePedido}
                                 >
                                     Salvar edição
                                 </Button>

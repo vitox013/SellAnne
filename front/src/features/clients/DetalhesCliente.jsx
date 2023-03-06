@@ -25,6 +25,7 @@ import { currency, toBRL, toNumber } from "../../utils/currency";
 import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
 import EditClient from "./EditClient";
+import Loading from "../../utils/Loading";
 
 const DetalhesPedido = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
@@ -36,6 +37,7 @@ const DetalhesPedido = () => {
     const [showPedido, setShowPedido] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
     const [errMsg, setErrMsg] = useState("");
+    const [empty, setEmpty] = useState("");
     const [content, setContent] = useState([]);
     const [clienteNome, setClienteNome] = useState("");
     const [telefone, setTelefone] = useState("");
@@ -76,11 +78,23 @@ const DetalhesPedido = () => {
         }),
     });
 
-    const [deleteClient, { isSuccess: deleteIsSuccess, error: errorDelete }] =
-        useDeleteUserMutation(clientId);
+    const [
+        deleteClient,
+        {
+            isSuccess: deleteIsSuccess,
+            error: errorDelete,
+            isLoading: deleteLoading,
+        },
+    ] = useDeleteUserMutation(clientId);
 
-    const [addNewPedido, { isSuccess: addIsSuccess, error: errorNewPedido }] =
-        useUpdateUserMutation();
+    const [
+        addNewPedido,
+        {
+            isSuccess: addIsSuccess,
+            error: errorNewPedido,
+            isLoading: addLoading,
+        },
+    ] = useUpdateUserMutation();
 
     const [createProduct, { isSuccess: createIsSuccess, error: errorCreate }] =
         useUpdateUserMutation();
@@ -135,7 +149,8 @@ const DetalhesPedido = () => {
             );
         }
     }, [fornecedores]);
-
+    console.log(pedidos, fornecedores)
+    
     useEffect(() => {
         if (clients) {
             setCliente(clients.find((client) => client._id === clientId));
@@ -185,7 +200,7 @@ const DetalhesPedido = () => {
             } else
                 setContent(
                     <p className="alert alert-danger text-center mt-3">
-                        Nenhum produto cadastrado!
+                        Nenhum pedido cadastrado!
                     </p>
                 );
         }
@@ -368,6 +383,7 @@ const DetalhesPedido = () => {
                         <i className="bx bx-trash fs-2 text-dark"></i>
                     </Button>
                     <Modal show={show} onHide={handleClose}>
+                        {deleteLoading && <Loading />}
                         <Modal.Header closeButton>
                             <Modal.Title>Tem certeza?</Modal.Title>
                         </Modal.Header>
@@ -378,7 +394,11 @@ const DetalhesPedido = () => {
                             )}
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant="danger" onClick={onDeleteClient}>
+                            <Button
+                                variant="danger"
+                                onClick={onDeleteClient}
+                                disabled={deleteLoading}
+                            >
                                 Excluir
                             </Button>
                             <Button variant="secondary" onClick={handleClose}>
@@ -859,6 +879,7 @@ const DetalhesPedido = () => {
                                             </>
                                         )}
                                 </Form>
+                                {addLoading && <Loading />}
                             </Modal.Body>
                             {options?.length > 0 && (
                                 <Modal.Footer>
@@ -871,7 +892,7 @@ const DetalhesPedido = () => {
                                     <Button
                                         variant="success"
                                         onClick={handleAddNewPedido}
-                                        disabled={!canSave}
+                                        disabled={!canSave || addLoading}
                                     >
                                         Criar pedido
                                     </Button>

@@ -3,6 +3,7 @@ import { Button, Container } from "react-bootstrap";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import NavBar from "../../components/NavBar";
 import useAuth from "../../hooks/useAuth";
+import Loading from "../../utils/Loading";
 import { useVerifyUserQuery } from "./newUserApiSlice";
 
 const EmailVerify = () => {
@@ -12,10 +13,11 @@ const EmailVerify = () => {
     const navigate = useNavigate();
 
     const url = `${param.id}/verify/${param.token}`;
-    const { isSuccess, error } = useVerifyUserQuery(url, {
-        selectFromResult: ({ isSuccess, error }) => ({
+    const { isSuccess, error, isLoading } = useVerifyUserQuery(url, {
+        selectFromResult: ({ isSuccess, error, isLoading }) => ({
             isSuccess,
             error,
+            isLoading,
         }),
     });
 
@@ -52,6 +54,7 @@ const EmailVerify = () => {
     return (
         <>
             <NavBar />
+            {isLoading && <Loading/>}
             <Container className="text-center mt-5">{msg}</Container>
         </>
     );

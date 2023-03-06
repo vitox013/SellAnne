@@ -20,6 +20,7 @@ import { useDispatch } from "react-redux";
 import { setMsg } from "../features/infoMsg/msgSlice";
 import { toNumber, toBRL, currency } from "../utils/currency";
 import { onlyNumber } from "../utils/onlyNumber";
+import Loading from "../utils/Loading";
 
 const CardProduct = ({
     cod,
@@ -64,11 +65,23 @@ const CardProduct = ({
         }),
     });
 
-    const [updateProduct, { isSuccess: isUpdateSuccess, error: errorUpdate }] =
-        useUpdateUserMutation();
+    const [
+        updateProduct,
+        {
+            isSuccess: isUpdateSuccess,
+            error: errorUpdate,
+            isLoading: isLoadingUpdate,
+        },
+    ] = useUpdateUserMutation();
 
-    const [deleteProduct, { isSuccess: isDeleteSuccess, error: errorDelete }] =
-        useDeleteUserMutation();
+    const [
+        deleteProduct,
+        {
+            isSuccess: isDeleteSuccess,
+            error: errorDelete,
+            isLoading: isLoadingDelete,
+        },
+    ] = useDeleteUserMutation();
 
     const defaultStates = () => {
         setProductName(nomeProduto);
@@ -210,6 +223,7 @@ const CardProduct = ({
                     </Row>
                     {showExcluir && (
                         <Row className="mb-4 bg-danger bg-opacity-50 p-2">
+                            {isLoadingDelete && <Loading />}
                             <Col xs={12}>
                                 <h5>Tem certeza?</h5>
                             </Col>
@@ -220,6 +234,7 @@ const CardProduct = ({
                                 <Button
                                     variant="danger"
                                     onClick={onClickDelete}
+                                    disabled={isLoadingDelete}
                                 >
                                     Excluir
                                 </Button>
@@ -383,11 +398,14 @@ const CardProduct = ({
                             </>
                         )}
                     </Row>
+                    {isLoadingUpdate && <Loading />}
                     {modificado && (
                         <Button
                             className="mt-2 d-flex align-items-center btn-success"
                             onClick={onClickUpdate}
-                            disabled={!canSave || duplicatedCode}
+                            disabled={
+                                !canSave || duplicatedCode || isLoadingUpdate
+                            }
                         >
                             Salvar edição <i className="bx bx-edit ms-1"></i>
                         </Button>

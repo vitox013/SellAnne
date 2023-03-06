@@ -28,6 +28,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
 import { currency, toNumber } from "../../utils/currency";
 import { onlyNumber } from "../../utils/onlyNumber";
+import Loading from "../../utils/Loading";
 
 const DetalhesFornecedor = () => {
     const { currentUser, userId, username } = useAuth();
@@ -67,12 +68,12 @@ const DetalhesFornecedor = () => {
         }),
     });
 
-    const [addProduct, { isSuccess: isAddSuccess, error: errorAdd }] =
+    const [addProduct, { isSuccess: isAddSuccess, error: errorAdd, isLoading: isLoadingAddProduct }] =
         useUpdateUserMutation();
 
     const [
         deleteFornecedor,
-        { isSuccess: isDeleteSuccess, error: errorDelete },
+        { isSuccess: isDeleteSuccess, error: errorDelete, isLoading: isLoadingDeleteFornecedor },
     ] = useDeleteUserMutation();
 
     useEffect(() => {
@@ -281,6 +282,7 @@ const DetalhesFornecedor = () => {
                     handleClose={handleClose}
                     showExcluir={showExcluir}
                     onDeleteClick={onDeleteClick}
+                    isLoading={isLoadingDeleteFornecedor}
                 />
 
                 <EditFornecedor
@@ -362,6 +364,7 @@ const DetalhesFornecedor = () => {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    {isLoadingAddProduct && <Loading />}
                     <Form>
                         <Form.Group className="mb-3 fw-bold" controlId="code">
                             <Form.Label>Código produto</Form.Label>
@@ -492,7 +495,7 @@ const DetalhesFornecedor = () => {
                     </Button>
                     <Button
                         variant="success"
-                        disabled={!canSave}
+                        disabled={!canSave || isLoadingAddProduct}
                         onClick={onSaveProduct}
                     >
                         Criar produto
