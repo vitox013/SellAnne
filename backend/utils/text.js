@@ -1,5 +1,5 @@
 module.exports = (userName, url) => {
-    const text = `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+    const text = `<div>
                 <h3>
                     Olá, <strong>${userName}</strong>!
                 </h3>

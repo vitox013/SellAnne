@@ -1,5 +1,5 @@
 module.exports = (userName, url) => {
-    const textReset = `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+    const textReset = `<div>
                 <h3>
                     Olá, <strong>${userName}</strong>!
                 </h3>
