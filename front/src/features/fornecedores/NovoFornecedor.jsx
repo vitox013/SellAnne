@@ -8,6 +8,7 @@ import {
     useUpdateUserMutation,
     useGetUserDataQuery,
 } from "../users/userApiSlice";
+import Loading from "../../utils/Loading";
 
 const USER_REGEX = /^[a-zA-Z\ 0-9]{3,20}$/;
 
@@ -102,6 +103,7 @@ const NovoFornecedor = () => {
                         </h2>
                     </Col>
                     <Col className="mt-5 col-md-5 mx-md-auto ">
+                        {isLoading && <Loading />}
                         <Form onSubmit={onSaveUserClicked} className="fw-bold">
                             <p
                                 ref={errRef}
@@ -179,7 +181,7 @@ const NovoFornecedor = () => {
                             )}
                             <Button
                                 variant="success"
-                                disabled={!canSave || duplicated}
+                                disabled={!canSave || duplicated || isLoading} 
                                 type="submit"
                                 onClick={onSaveUserClicked}
                             >

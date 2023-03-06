@@ -6,6 +6,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import NavDash from "../../components/NavBar";
 import { useAddNewUserMutation } from "./newUserApiSlice";
+import Loading from "../../utils/Loading";
 
 const USER_REGEX = /^[A-z\ ]{3,20}$/;
 const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/;
@@ -74,6 +75,7 @@ const Cadastro = () => {
             <Container className="d-flex flex-column col-md-6 col-lg-5 col-xxl-3 mt-5">
                 <Card className="shadow mt-5">
                     <Card.Body>
+                        {isLoading && <Loading />}
                         {errMsg && (
                             <p className="alert alert-danger text-center">
                                 {errMsg}
@@ -116,6 +118,7 @@ const Cadastro = () => {
                                 className="fs-5 w-100"
                                 variant="primary"
                                 type="submit"
+                                disabled={isLoading}
                             >
                                 Cadastre-se
                             </Button>

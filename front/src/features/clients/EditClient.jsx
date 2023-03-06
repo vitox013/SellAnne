@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
 import Message from "../../utils/Message";
 import { telefoneMask } from "../../utils/telefone";
+import Loading from "../../utils/Loading";
 
 const EditClient = ({ showEdit, handleClose, phone, nome, nomesClientes }) => {
     const [clientName, setClientName] = useState(nome);
@@ -19,7 +20,8 @@ const EditClient = ({ showEdit, handleClose, phone, nome, nomesClientes }) => {
     const dispatch = useDispatch();
     const message = useSelector((state) => state.infoMsg.msg);
 
-    const [clientUpdate, { isSuccess, error }] = useUpdateUserMutation();
+    const [clientUpdate, { isSuccess, error, isLoading }] =
+        useUpdateUserMutation();
 
     useEffect(() => {
         setClientName(nome);
@@ -68,6 +70,7 @@ const EditClient = ({ showEdit, handleClose, phone, nome, nomesClientes }) => {
 
     return (
         <Modal show={showEdit} onHide={handleClose}>
+            {isLoading && <Loading />}
             <Modal.Header closeButton>
                 <Modal.Title>Edite seu cliente!</Modal.Title>
             </Modal.Header>
@@ -103,7 +106,7 @@ const EditClient = ({ showEdit, handleClose, phone, nome, nomesClientes }) => {
             <Modal.Footer>
                 <Button
                     variant="success"
-                    disabled={!canEdit}
+                    disabled={!canEdit || isLoading}
                     onClick={handleEditClient}
                 >
                     Salvar edição

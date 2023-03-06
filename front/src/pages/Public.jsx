@@ -3,6 +3,8 @@ import { Button, Row } from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 import { Link } from "react-router-dom";
 import NavDash from "../components/NavBar";
+import imgIntro from "../img/resumo.png";
+import imgIntroSm from "../img/resumo-sm.png";
 
 const Public = () => {
     return (

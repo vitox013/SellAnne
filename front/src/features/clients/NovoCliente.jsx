@@ -9,6 +9,7 @@ import {
     useGetUserDataQuery,
 } from "../users/userApiSlice";
 import { telefoneMask } from "../../utils/telefone";
+import Loading from "../../utils/Loading";
 
 const USER_REGEX = /^[A-z\ ]{3,20}$/;
 
@@ -84,6 +85,7 @@ const NovoCliente = () => {
 
     return (
         <>
+            {isLoading && <Loading />}
             <Back path="/clientes" />
             <Container>
                 <Row className="px-2 mt-md-5">
@@ -139,7 +141,7 @@ const NovoCliente = () => {
                             <Button
                                 variant="success"
                                 type="submit"
-                                disabled={!canSave}
+                                disabled={!canSave || isLoading}
                             >
                                 Cadastrar
                             </Button>

@@ -7,6 +7,7 @@ import useAuth from "../../hooks/useAuth";
 import { useDispatch } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
 import { useGetUserDataQuery } from "../users/userApiSlice";
+import Loading from "../../utils/Loading";
 
 const EditFornecedor = ({
     showEdit,
@@ -43,7 +44,7 @@ const EditFornecedor = ({
             );
     }, [fornecedores]);
 
-    const [updateFornecedor, { isSuccess, error }] = useUpdateUserMutation();
+    const [updateFornecedor, { isSuccess, error, isLoading }] = useUpdateUserMutation();
 
     useEffect(() => {
         setNomeFornecedor(nomeForn);
@@ -102,6 +103,7 @@ const EditFornecedor = ({
             </Modal.Header>
             <Modal.Body>
                 <Form>
+                    {isLoading && <Loading />}
                     <Row>
                         <Col>
                             <Form.Group className="mb-3" controlId="nome">
@@ -159,39 +161,14 @@ const EditFornecedor = ({
                             </Col>
                         </Row>
                     )}
-                    {/* <Form.Group className="mb-3" controlId="metodo">
-                        <Form.Label>
-                            <strong>Método</strong>
-                        </Form.Label>
-                        <Form.Select value={metodo} onChange={onSelectOption}>
-                            <option value="Revenda">Revenda</option>
-                            <option value="Porcentagem">
-                                Porcentagem total
-                            </option>
-                        </Form.Select>
-                    </Form.Group> */}
                 </Form>
-                {/* {(opcao == "Porcentagem" || metodo == "Porcentagem") && (
-                    <Form.Group className="mb-3" controlId="metodo">
-                        <Form.Label>
-                            <strong>Defina a porcentagem padrão</strong>
-                        </Form.Label>
-                        <Form.Control
-                            type="number"
-                            max="100"
-                            className="w-75"
-                            value={porcentagem}
-                            onChange={(e) => setPorcentagem(e.target.value)}
-                            required
-                        />
-                    </Form.Group>
-                )} */}
+                
                 {errMsg && <p className="alert alert-danger">{errMsg}</p>}
             </Modal.Body>
             <Modal.Footer>
                 <Button
                     variant="success"
-                    disabled={!alterado || !canSave || duplicated}
+                    disabled={!alterado || !canSave || duplicated || isLoading}
                     onClick={onEditClick}
                 >
                     Salvar edição

@@ -19,8 +19,6 @@ const Fornecedores = () => {
     const { currentUser, userId, username } = useAuth();
     const { id: fornecedorId } = useParams();
 
-
-
     let message = useSelector((state) => state.infoMsg.msg);
 
     const [term, setTerm] = useState("");
@@ -110,9 +108,8 @@ const Fornecedores = () => {
                 page="fornecedores"
             />
             <Container>
-                <h1 className="mt-2 pt-10">Olá, {currentUser}!</h1>
                 <Row>
-                    <Form className="d-flex mt-4 align-items-center">
+                    <Form className="d-flex  align-items-center mt-4 pt-10">
                         <Col xs={7}>
                             <h2 className="col-5 fw-bold">Fornecedores</h2>
                         </Col>
