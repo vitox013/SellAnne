@@ -894,7 +894,7 @@ const DetalhesPedido = () => {
                                         variant="success"
                                         onClick={handleAddNewPedido}
                                         disabled={!canSave || addLoading}
-                                        autoFocus={canSave}
+                                        autoFocus={true}
                                     >
                                         Criar pedido
                                     </Button>

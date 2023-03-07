@@ -508,6 +508,7 @@ const DetalhesFornecedor = () => {
                         variant="success"
                         disabled={!canSave || isLoadingAddProduct}
                         onClick={onSaveProduct}
+                        autoFocus={true}
                     >
                         Criar produto
                     </Button>
