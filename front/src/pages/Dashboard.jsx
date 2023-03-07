@@ -5,6 +5,7 @@ import { useState } from "react";
 import useAuth from "../hooks/useAuth";
 import { Link } from "react-router-dom";
 import { useGetUserDataQuery } from "../features/users/userApiSlice";
+import Loading from "../utils/Loading";
 
 const Dashboard = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
@@ -18,9 +19,10 @@ const Dashboard = () => {
     const [pedidos, setPedidos] = useState([]);
     const [pedidosForn, setPedidosForn] = useState([]);
 
-    const { userData } = useGetUserDataQuery(userId, {
-        selectFromResult: ({ data }) => ({
+    const { userData, isLoading } = useGetUserDataQuery(userId, {
+        selectFromResult: ({ data, isLoading }) => ({
             userData: data,
+            isLoading,
         }),
     });
 
@@ -116,6 +118,15 @@ const Dashboard = () => {
                     </Row>
                 ))
             );
+        } else if (!isLoading) {
+            setConteudo(
+                <Row className="mx-1">
+                    <hr />
+                    <p>
+                        Nenhum pedido realizado <i className="bx bxs-sad"></i>
+                    </p>
+                </Row>
+            );
         }
     }, [pedidosForn]);
 
@@ -156,17 +167,7 @@ const Dashboard = () => {
                                 </h3>
                             </Col>
                         </Row>
-                        {conteudo?.length > 0 ? (
-                            conteudo
-                        ) : (
-                            <div className="mx-1">
-                                <hr />
-                                <p>
-                                    Nenhum pedido realizado{" "}
-                                    <i className="bx bxs-sad"></i>
-                                </p>
-                            </div>
-                        )}
+                        {isLoading ? <Loading /> : conteudo}
                     </Card.Body>
                 </Card>
             </Container>

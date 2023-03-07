@@ -14,6 +14,7 @@ import { useParams, useLocation } from "react-router-dom";
 import Message from "../../utils/Message";
 import { useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
+import Loading from "../../utils/Loading";
 
 const Fornecedores = () => {
     const { currentUser, userId, username } = useAuth();
@@ -26,9 +27,10 @@ const Fornecedores = () => {
     const [conteudo, setConteudo] = useState([]);
     const [fornecedores, setFornecedores] = useState([]);
 
-    const { arrayFornecedores } = useGetUserDataQuery(userId, {
-        selectFromResult: ({ data }) => ({
+    const { arrayFornecedores, isLoading } = useGetUserDataQuery(userId, {
+        selectFromResult: ({ data, isLoading }) => ({
             arrayFornecedores: data?.fornecedores,
+            isLoading,
         }),
     });
 
@@ -50,7 +52,7 @@ const Fornecedores = () => {
     }, [debouncedTerm]);
 
     useEffect(() => {
-        if (term == "") {
+        if (term == "" && !isLoading) {
             setConteudo(
                 fornecedores?.length ? (
                     fornecedores.map((forn) => (
@@ -147,7 +149,7 @@ const Fornecedores = () => {
                 {message && (
                     <Message type="alert alert-success" msg={message} />
                 )}
-                <Row className="px-2">{conteudo}</Row>
+                <Row className="px-2">{isLoading ? <Loading /> : conteudo}</Row>
                 <Row>
                     <NavFooter
                         path="/fornecedores/novofornecedor"

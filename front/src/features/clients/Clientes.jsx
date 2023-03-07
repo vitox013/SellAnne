@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useGetUserDataQuery } from "../users/userApiSlice";
 import { setMsg } from "../infoMsg/msgSlice";
 import Message from "../../utils/Message";
+import Loading from "../../utils/Loading";
 
 const Clientes = () => {
     const { currentUser, userId, username } = useAuth();
@@ -19,9 +20,10 @@ const Clientes = () => {
 
     let message = useSelector((state) => state.infoMsg.msg);
 
-    const { clients } = useGetUserDataQuery(userId, {
-        selectFromResult: ({ data }) => ({
+    const { clients, isLoading } = useGetUserDataQuery(userId, {
+        selectFromResult: ({ data, isLoading }) => ({
             clients: data?.clients,
+            isLoading,
         }),
     });
 
@@ -41,7 +43,7 @@ const Clientes = () => {
     }, [debouncedTerm]);
 
     useEffect(() => {
-        if (term == "") {
+        if (term == "" && !isLoading) {
             setConteudo(
                 clientes?.length ? (
                     clientes.map((clientId) => (
@@ -101,7 +103,6 @@ const Clientes = () => {
                 page="clientes"
             />
             <Container>
-                
                 <Row>
                     <Form className="d-flex mt-4 pt-10 align-items-center">
                         <h2 className="col-5 fw-bold">Clientes</h2>
@@ -128,7 +129,7 @@ const Clientes = () => {
                         <Message type="alert alert-success" msg={message} />
                     )}
                 </Row>
-                <Row className="px-2">{conteudo}</Row>
+                <Row className="px-2">{isLoading ? <Loading /> : conteudo}</Row>
                 <Row>
                     <NavFooter
                         path="/clientes/novocliente"
