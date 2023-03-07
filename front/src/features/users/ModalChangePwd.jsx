@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import { useUpdateUserMutation } from "./userApiSlice";
 import { setMsg } from "../infoMsg/msgSlice";
+import Loading from "../../utils/Loading";
 
 const ModalChangePwd = ({ show, handleClose }) => {
     const navigate = useNavigate();
@@ -85,6 +86,7 @@ const ModalChangePwd = ({ show, handleClose }) => {
                     <Modal.Title>Altere sua senha</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    {isLoading && (<Loading />)}
                     {errMsg && (
                         <p className="alert text-center alert-danger">
                             {errMsg}
@@ -163,7 +165,7 @@ const ModalChangePwd = ({ show, handleClose }) => {
                             className="fs-5 w-100"
                             variant="primary"
                             type="submit"
-                            disabled={!canSave}
+                            disabled={!canSave || isLoading}
                             onClick={onSaveUserClicked}
                         >
                             Resetar

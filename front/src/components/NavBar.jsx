@@ -59,6 +59,7 @@ function NavBar({ info, icon, fixed, path, page }) {
                     <NavDropdown.Item
                         className="d-flex align-items-center justify-content-between "
                         onClick={sendLogout}
+                        disabled={isLoading}
                     >
                         Sair <i className="bx bx-log-out fs-3"></i>
                     </NavDropdown.Item>
@@ -105,6 +106,7 @@ function NavBar({ info, icon, fixed, path, page }) {
                     <NavDropdown.Item
                         className="d-flex align-items-center justify-content-between "
                         onClick={sendLogout}
+                        disabled={isLoading}
                     >
                         Sair <i className="bx bx-log-out fs-3"></i>
                     </NavDropdown.Item>
@@ -142,6 +144,7 @@ function NavBar({ info, icon, fixed, path, page }) {
                     <NavDropdown.Item
                         className="d-flex align-items-center justify-content-between "
                         onClick={sendLogout}
+                        disabled={isLoading}
                     >
                         Sair <i className="bx bx-log-out fs-3"></i>
                     </NavDropdown.Item>

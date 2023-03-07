@@ -104,6 +104,9 @@ const CardProduct = ({
     const handlePrice = (e) => {
         setPrecoBase(e.target.value);
     };
+    const handlePriceVenda = (e) => {
+        setPrecoVenda(e.target.value);
+    };
 
     useEffect(() => {
         setModificado(
@@ -326,8 +329,8 @@ const CardProduct = ({
                                                     inputMode="numeric"
                                                     value={precoVenda}
                                                     onChange={(e) =>
-                                                        setPrecoVenda(
-                                                            e.target.value
+                                                        handlePriceVenda(
+                                                            currency(e)
                                                         )
                                                     }
                                                 />

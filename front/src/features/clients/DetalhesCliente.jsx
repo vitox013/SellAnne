@@ -149,15 +149,15 @@ const DetalhesPedido = () => {
             );
         }
     }, [fornecedores]);
-    console.log(pedidos, fornecedores)
-    
+
     useEffect(() => {
         if (clients) {
             setCliente(clients.find((client) => client._id === clientId));
             setNomesClientes(clients.map((client) => client.clientName));
         }
+        setContent(<Loading />);
 
-        if (cliente) {
+        if (Object.keys(cliente).length > 0) {
             setPedidos(cliente.pedidos);
             setClienteNome(cliente.clientName);
             setTelefone(cliente.telefone);
@@ -341,6 +341,7 @@ const DetalhesPedido = () => {
         }
         if (addIsSuccess) {
             setProdutoId("");
+            setOptionSelected("")
             clearFields();
             setShowPedido(false);
             setProdFound({});

@@ -44,7 +44,17 @@ const EditFornecedor = ({
             );
     }, [fornecedores]);
 
-    const [updateFornecedor, { isSuccess, error, isLoading }] = useUpdateUserMutation();
+    const [updateFornecedor, { isSuccess, error, isLoading }] =
+        useUpdateUserMutation();
+
+    const [
+        updatePedido,
+        {
+            isSuccess: isUpdatePedidoSuccess,
+            error: errorUpdatePedido,
+            isLoading: isLoadingUpdatePedido,
+        },
+    ] = useUpdateUserMutation();
 
     useEffect(() => {
         setNomeFornecedor(nomeForn);
@@ -90,6 +100,21 @@ const EditFornecedor = ({
         if (isSuccess) {
             handleClose();
             dispatch(setMsg("Fornecedor editado com sucesso"));
+            async function updatePedidos() {
+                console.log("entrei async");
+                await updatePedido({
+                    userId,
+                    cliente: {
+                        pedido: {
+                            _id: 1,
+                            fornecedorId,
+                            nomeForn,
+                            nomeFornecedor,
+                        },
+                    },
+                });
+            }
+            updatePedidos();
         }
         if (error) {
             setErrMsg(error.data.message);
@@ -162,7 +187,7 @@ const EditFornecedor = ({
                         </Row>
                     )}
                 </Form>
-                
+
                 {errMsg && <p className="alert alert-danger">{errMsg}</p>}
             </Modal.Body>
             <Modal.Footer>

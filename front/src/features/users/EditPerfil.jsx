@@ -6,6 +6,7 @@ import useAuth from "../../hooks/useAuth";
 import ModalChangePwd from "./ModalChangePwd";
 import Message from "../../utils/Message";
 import { useGetUserDataQuery, useUpdateUserMutation } from "./userApiSlice";
+import Loading from "../../utils/Loading";
 
 const EditPerfil = () => {
     const { userId, currentUser, email } = useAuth();
@@ -24,7 +25,8 @@ const EditPerfil = () => {
 
     const message = useSelector((state) => state.infoMsg.msg);
 
-    const [updateUser, { isSuccess, error, data }] = useUpdateUserMutation();
+    const [updateUser, { isSuccess, error, data, isLoading }] =
+        useUpdateUserMutation();
 
     useEffect(() => {
         setNameChanged(name !== userName);
@@ -78,6 +80,7 @@ const EditPerfil = () => {
                     <Col md={6} className="mx-auto">
                         <Card>
                             <Card.Body>
+                                {isLoading && <Loading />}
                                 {feedback && (
                                     <Message
                                         msg={feedback}
@@ -131,6 +134,7 @@ const EditPerfil = () => {
                                             variant="success"
                                             className="mt-2"
                                             onClick={onSaveUserClicked}
+                                            disabled={isLoading}
                                         >
                                             Salvar
                                         </Button>

@@ -125,7 +125,10 @@ const updateUser = asyncHandler(async (req, res) => {
                         }
                     );
                     return res.json({ message: `Pedido criado!` });
-                } else {
+                } else if (
+                    cliente.pedido.quantidade ||
+                    cliente.pedido.qtdPaga
+                ) {
                     const atualizarPedido = await User.findOneAndUpdate(
                         {
                             "clients.pedidos._id": cliente.pedido._id,
@@ -143,6 +146,26 @@ const updateUser = asyncHandler(async (req, res) => {
                         }
                     );
 
+                    return res.json({ message: `Pedido atualizado!` });
+                } else {
+                    const atualizarNomePedidos = await User.updateMany(
+                        {
+                            "clients.pedidos.fornecedorId":
+                                cliente.pedido.fornecedorId,
+                        },
+                        {
+                            $set: {
+                                "clients.$.pedidos.$[field].fornecedor":
+                                    cliente.pedido.nomeFornecedor,
+                            },
+                        },
+                        {
+                            arrayFilters: [
+                                { "field.fornecedorId": cliente.pedido.fornecedorId },
+                            ],
+                        }
+                    );
+                    console.log(atualizarNomePedidos);
                     return res.json({ message: `Pedido atualizado!` });
                 }
             }

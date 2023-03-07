@@ -68,12 +68,22 @@ const DetalhesFornecedor = () => {
         }),
     });
 
-    const [addProduct, { isSuccess: isAddSuccess, error: errorAdd, isLoading: isLoadingAddProduct }] =
-        useUpdateUserMutation();
+    const [
+        addProduct,
+        {
+            isSuccess: isAddSuccess,
+            error: errorAdd,
+            isLoading: isLoadingAddProduct,
+        },
+    ] = useUpdateUserMutation();
 
     const [
         deleteFornecedor,
-        { isSuccess: isDeleteSuccess, error: errorDelete, isLoading: isLoadingDeleteFornecedor },
+        {
+            isSuccess: isDeleteSuccess,
+            error: errorDelete,
+            isLoading: isLoadingDeleteFornecedor,
+        },
     ] = useDeleteUserMutation();
 
     useEffect(() => {
@@ -94,30 +104,31 @@ const DetalhesFornecedor = () => {
     }, [debouncedTerm]);
 
     useEffect(() => {
-        if (term == "") {
+        setConteudo(<Loading />);
+        if (term == "" && produtosFornecedor?.length) {
             setConteudo(
-                produtosFornecedor?.length ? (
-                    produtosFornecedor.map((prod) => (
-                        <CardProduct
-                            key={prod._id}
-                            cod={prod.code}
-                            nomeProduto={prod.productName}
-                            formaLucro={
-                                fornecedor.metodo == "Revenda"
-                                    ? prod.precoVenda
-                                    : prod.porcentagemVenda
-                            }
-                            metodo={fornecedor.metodo}
-                            preco={prod.preco}
-                            produtoId={prod._id}
-                            nomeFornecedor={fornecedor.nomeFornecedor}
-                        />
-                    ))
-                ) : (
-                    <p className="alert alert-danger text-center">
-                        Nenhum produto cadastrado!
-                    </p>
-                )
+                produtosFornecedor.map((prod) => (
+                    <CardProduct
+                        key={prod._id}
+                        cod={prod.code}
+                        nomeProduto={prod.productName}
+                        formaLucro={
+                            fornecedor.metodo == "Revenda"
+                                ? prod.precoVenda
+                                : prod.porcentagemVenda
+                        }
+                        metodo={fornecedor.metodo}
+                        preco={prod.preco}
+                        produtoId={prod._id}
+                        nomeFornecedor={fornecedor.nomeFornecedor}
+                    />
+                ))
+            );
+        } else {
+            setConteudo(
+                <p className="alert alert-danger text-center">
+                    Nenhum produto cadastrado!
+                </p>
             );
         }
         if (term) {
