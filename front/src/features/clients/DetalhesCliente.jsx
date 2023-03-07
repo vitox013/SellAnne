@@ -341,7 +341,7 @@ const DetalhesPedido = () => {
         }
         if (addIsSuccess) {
             setProdutoId("");
-            setOptionSelected("")
+            setOptionSelected("");
             clearFields();
             setShowPedido(false);
             setProdFound({});
@@ -894,6 +894,7 @@ const DetalhesPedido = () => {
                                         variant="success"
                                         onClick={handleAddNewPedido}
                                         disabled={!canSave || addLoading}
+                                        autoFocus={canSave}
                                     >
                                         Criar pedido
                                     </Button>
