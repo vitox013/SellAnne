@@ -3,3 +3,4 @@ logs
 .env
 produtos.json
 usuarios.json
+.vercel
