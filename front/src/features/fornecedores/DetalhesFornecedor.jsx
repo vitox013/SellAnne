@@ -29,6 +29,7 @@ import { setMsg } from "../infoMsg/msgSlice";
 import { currency, toNumber } from "../../utils/currency";
 import { onlyNumber } from "../../utils/onlyNumber";
 import Loading from "../../utils/Loading";
+import NavFooter from "../../components/NavFooter";
 
 const DetalhesFornecedor = () => {
     const { currentUser, userId, username } = useAuth();
@@ -352,17 +353,12 @@ const DetalhesFornecedor = () => {
                 )}
                 <Row className="px-2">{conteudo}</Row>
                 <Row>
-                    <Navbar fixed="bottom">
-                        <Container>
-                            <Button
-                                variant="success"
-                                className="mx-auto"
-                                onClick={handleShow}
-                            >
-                                <i className="bx bx-plus"></i> Novo produto
-                            </Button>
-                        </Container>
-                    </Navbar>
+                    <NavFooter
+                        icon="bx bx-plus"
+                        info="Novo produto"
+                        onClick={handleShow}
+                        path=""
+                    />
                 </Row>
             </Container>
 

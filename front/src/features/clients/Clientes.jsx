@@ -32,7 +32,11 @@ const Clientes = () => {
             setClientes(
                 clients
                     .slice()
-                    .sort((a, b) => (a.clientName > b.clientName ? 1 : -1))
+                    .sort((a, b) =>
+                        a.clientName?.toUpperCase() > b.clientName.toUpperCase()
+                            ? 1
+                            : -1
+                    )
             );
         }
     }, [clients]);
@@ -129,6 +133,13 @@ const Clientes = () => {
                         <Message type="alert alert-success" msg={message} />
                     )}
                 </Row>
+                <Row className="px-2">{conteudo}</Row>
+            </Container>
+            <NavFooter
+                path="/clientes/novocliente"
+                info="Novo cliente"
+                icon="bx bx-plus me-1"
+            />
                 <Row className="px-2">{isLoading ? <Loading /> : conteudo}</Row>
                 <Row>
                     <NavFooter
