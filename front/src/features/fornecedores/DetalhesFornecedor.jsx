@@ -265,7 +265,7 @@ const DetalhesFornecedor = () => {
         setCode(e.target.value);
     };
 
-    return fornecedor?.nomeFornecedor ? (
+    return (
         <>
             <NavBar
                 info="Fornecedores"
@@ -511,8 +511,6 @@ const DetalhesFornecedor = () => {
                 </Modal.Footer>
             </Modal>
         </>
-    ) : (
-        navigate("/dashboard")
     );
 };
 
