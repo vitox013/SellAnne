@@ -11,7 +11,7 @@ import {
 import { telefoneMask } from "../../utils/telefone";
 import Loading from "../../utils/Loading";
 
-const USER_REGEX = /^[A-z\ ]{3,20}$/;
+const USER_REGEX = /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ ]{3,20}$/;
 
 const NovoCliente = () => {
     const navigate = useNavigate();

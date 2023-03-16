@@ -30,7 +30,7 @@ const Dashboard = () => {
             setFornecedores(
                 userData?.fornecedores?.map(
                     (fornecedor) => fornecedor.nomeFornecedor
-                )
+                ).reverse()
             );
 
             userData?.clients?.map((cliente) =>
