@@ -73,7 +73,7 @@ const Clientes = () => {
                         filteredClients.map((clientId) => (
                             <CardClient
                                 key={clientId.id}
-                                clientId={clientId.id}
+                                clientId={clientId._id}
                                 clientName={clientId.clientName}
                                 qtdPedido={clientId.pedidos.length}
                                 path={clientId._id}

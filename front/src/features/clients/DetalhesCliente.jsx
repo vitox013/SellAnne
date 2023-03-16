@@ -155,56 +155,59 @@ const DetalhesPedido = () => {
             setCliente(clients.find((client) => client._id === clientId));
             setNomesClientes(clients.map((client) => client.clientName));
         }
-        setContent(<Loading />);
+    }, [clients]);
 
-        if (Object.keys(cliente).length > 0) {
-            setPedidos(cliente.pedidos);
+    useEffect(() => {
+        if (cliente) {
+            let arrPedidos = cliente?.pedidos?.slice();
+
+            setPedidos(arrPedidos?.reverse());
             setClienteNome(cliente.clientName);
             setTelefone(cliente.telefone);
-
-            if (pedidos?.length > 0) {
-                setContent(
-                    pedidos.map((ped) => (
-                        <CardPedido
-                            key={ped._id}
-                            fornecedor={ped.fornecedor}
-                            fornecedorId={ped.fornecedorId}
-                            pedidoId={ped._id}
-                            nomeProduto={ped.nomeProduto}
-                            codigo={ped.codigoProduto}
-                            quantidade={ped.quantidade}
-                            valor={ped.valor}
-                            valorVenda={ped.valorVenda}
-                            porcentagem={ped.porcentagem}
-                            qtdPaga={ped.qtdPaga}
-                            metodo={ped.metodo}
-                        />
-                    ))
-                );
-                setTotalPago(
-                    pedidos.reduce((acc, ped) => acc + ped.qtdPaga, 0)
-                );
-                setAPagar(
-                    pedidos
-                        .reduce(
-                            (acc, ped) =>
-                                acc +
-                                ((ped.metodo == "Revenda"
-                                    ? ped.quantidade * ped.valorVenda
-                                    : ped.quantidade * ped.valor) -
-                                    ped.qtdPaga),
-                            0
-                        )
-                        .toFixed(2)
-                );
-            } else
-                setContent(
-                    <p className="alert alert-danger text-center mt-3">
-                        Nenhum pedido cadastrado!
-                    </p>
-                );
         }
-    }, [clients, cliente, pedidos]);
+    }, [cliente]);
+
+    useEffect(() => {
+        if (pedidos?.length > 0) {
+            setContent(
+                pedidos.map((ped) => (
+                    <CardPedido
+                        key={ped._id}
+                        fornecedor={ped.fornecedor}
+                        fornecedorId={ped.fornecedorId}
+                        pedidoId={ped._id}
+                        nomeProduto={ped.nomeProduto}
+                        codigo={ped.codigoProduto}
+                        quantidade={ped.quantidade}
+                        valor={ped.valor}
+                        valorVenda={ped.valorVenda}
+                        porcentagem={ped.porcentagem}
+                        qtdPaga={ped.qtdPaga}
+                        metodo={ped.metodo}
+                    />
+                ))
+            );
+            setTotalPago(pedidos.reduce((acc, ped) => acc + ped.qtdPaga, 0));
+            setAPagar(
+                pedidos
+                    .reduce(
+                        (acc, ped) =>
+                            acc +
+                            ((ped.metodo == "Revenda"
+                                ? ped.quantidade * ped.valorVenda
+                                : ped.quantidade * ped.valor) -
+                                ped.qtdPaga),
+                        0
+                    )
+                    .toFixed(2)
+            );
+        } else
+            setContent(
+                <p className="alert alert-danger text-center mt-3">
+                    Nenhum pedido cadastrado!
+                </p>
+            );
+    }, [pedidos]);
 
     useEffect(() => {
         const timer = setTimeout(() => setCode(debouncedCode), 1000);
@@ -894,7 +897,6 @@ const DetalhesPedido = () => {
                                         variant="success"
                                         onClick={handleAddNewPedido}
                                         disabled={!canSave || addLoading}
-                                        autoFocus={true}
                                     >
                                         Criar pedido
                                     </Button>
