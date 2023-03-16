@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useGetUserDataQuery } from "../users/userApiSlice";
 import { setMsg } from "../infoMsg/msgSlice";
 import Message from "../../utils/Message";
-import Loading from "../../utils/Loading";
 
 const Clientes = () => {
     const { currentUser, userId, username } = useAuth();
@@ -20,10 +19,9 @@ const Clientes = () => {
 
     let message = useSelector((state) => state.infoMsg.msg);
 
-    const { clients, isLoading } = useGetUserDataQuery(userId, {
-        selectFromResult: ({ data, isLoading }) => ({
+    const { clients } = useGetUserDataQuery(userId, {
+        selectFromResult: ({ data }) => ({
             clients: data?.clients,
-            isLoading,
         }),
     });
 
@@ -32,11 +30,7 @@ const Clientes = () => {
             setClientes(
                 clients
                     .slice()
-                    .sort((a, b) =>
-                        a.clientName?.toUpperCase() > b.clientName.toUpperCase()
-                            ? 1
-                            : -1
-                    )
+                    .sort((a, b) => (a.clientName > b.clientName ? 1 : -1))
             );
         }
     }, [clients]);
@@ -47,7 +41,7 @@ const Clientes = () => {
     }, [debouncedTerm]);
 
     useEffect(() => {
-        if (term == "" && !isLoading) {
+        if (term == "") {
             setConteudo(
                 clientes?.length ? (
                     clientes.map((clientId) => (
@@ -134,13 +128,6 @@ const Clientes = () => {
                     )}
                 </Row>
                 <Row className="px-2">{conteudo}</Row>
-            </Container>
-            <NavFooter
-                path="/clientes/novocliente"
-                info="Novo cliente"
-                icon="bx bx-plus me-1"
-            />
-                <Row className="px-2">{isLoading ? <Loading /> : conteudo}</Row>
                 <Row>
                     <NavFooter
                         path="/clientes/novocliente"
