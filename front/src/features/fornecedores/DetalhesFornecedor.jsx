@@ -265,7 +265,13 @@ const DetalhesFornecedor = () => {
         setCode(e.target.value);
     };
 
-    return (
+    let fornDeleted = false;
+
+    useEffect(() => {
+        fornDeleted && navigate("/dashboard");
+    }, [fornDeleted]);
+
+    return fornecedor?.nomeFornecedor ? (
         <>
             <NavBar
                 info="Fornecedores"
@@ -511,6 +517,8 @@ const DetalhesFornecedor = () => {
                 </Modal.Footer>
             </Modal>
         </>
+    ) : (
+        (fornDeleted = true)
     );
 };
 
