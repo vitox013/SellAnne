@@ -71,8 +71,8 @@ const EditFornecedor = ({
             setDuplicated(
                 nomesForn.some(
                     (forn) =>
-                        forn.toLowerCase() ===
-                        nomeFornecedor.toLowerCase().trim()
+                        forn?.toLowerCase() ===
+                        nomeFornecedor?.toLowerCase().trim()
                 ) && nomeForn != nomeFornecedor
             );
         }
