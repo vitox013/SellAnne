@@ -32,6 +32,12 @@ a {
     cursor: pointer !important;
 }
 
+.fixed-button {
+    position: fixed !important;
+    top: 95%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 
 .loader {
     position: absolute !important;

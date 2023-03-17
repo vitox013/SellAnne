@@ -885,7 +885,7 @@ const DetalhesPedido = () => {
             <NavFooter
                 icon="bx bx-plus fs-4"
                 path=""
-                info="Criar novo pedido"
+                info="Novo pedido"
                 onClick={handleShowPedido}
             />
         </>
