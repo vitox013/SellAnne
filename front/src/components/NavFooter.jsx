@@ -7,9 +7,8 @@ function NavFooter({ path, info, icon, onClick }) {
     return (
         <Link to={path}>
             <Button
-                variant="success"
                 onClick={onClick}
-                className="d-flex align-items-center mx-auto mb-3 fixed-bottom"
+                className="d-flex btn-success align-items-center mx-auto mb-3 fixed-bottom"
             >
                 <i className={icon}></i>
                 <span>{info}</span>

@@ -47,15 +47,6 @@ const EditFornecedor = ({
     const [updateFornecedor, { isSuccess, error, isLoading }] =
         useUpdateUserMutation();
 
-    const [
-        updatePedido,
-        {
-            isSuccess: isUpdatePedidoSuccess,
-            error: errorUpdatePedido,
-            isLoading: isLoadingUpdatePedido,
-        },
-    ] = useUpdateUserMutation();
-
     useEffect(() => {
         setNomeFornecedor(nomeForn);
         setMetodo(method);

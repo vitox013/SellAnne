@@ -88,7 +88,9 @@ const DetalhesFornecedor = () => {
     ] = useDeleteUserMutation();
 
     useEffect(() => {
-        if (fornecedor) {
+        if (fornecedor === undefined) {
+            navigate("/fornecedores", { replace: true });
+        } else {
             setProdutosFornecedor(
                 fornecedor.produtos
                     .slice()
