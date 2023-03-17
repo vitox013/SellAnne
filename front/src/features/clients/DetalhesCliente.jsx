@@ -27,7 +27,6 @@ import { setMsg } from "../infoMsg/msgSlice";
 import EditClient from "./EditClient";
 import Loading from "../../utils/Loading";
 import NavFooter from "../../components/NavFooter";
-import NavFooter from "../../components/NavFooter";
 
 const DetalhesPedido = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
