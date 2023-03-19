@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
     Button,
     Container,
@@ -60,6 +60,8 @@ const DetalhesFornecedor = () => {
     const [show, setShow] = useState(false);
     const [showExcluir, setShowExcluir] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
+    const btnRef = useRef(null);
+    const codRef = useRef(null);
 
     const { fornecedor } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
@@ -86,6 +88,10 @@ const DetalhesFornecedor = () => {
             isLoading: isLoadingDeleteFornecedor,
         },
     ] = useDeleteUserMutation();
+
+    useEffect(() => {
+        codRef.current.focus();
+    }, []);
 
     useEffect(() => {
         if (fornecedor === undefined) {
@@ -212,6 +218,12 @@ const DetalhesFornecedor = () => {
             });
         }
     };
+
+    useEffect(() => {
+        if (canSave) {
+            btnRef.current.focus();
+        }
+    }, [canSave]);
 
     const onDeleteClick = async () => {
         await deleteFornecedor({
@@ -388,7 +400,7 @@ const DetalhesFornecedor = () => {
                                 pattern="[0-9]{18}"
                                 inputMode="numeric"
                                 placeholder="Código"
-                                autoFocus
+                                ref={codRef}
                                 maxLength={18}
                                 value={code}
                                 onChange={(e) => handleCode(onlyNumber(e))}
@@ -512,7 +524,7 @@ const DetalhesFornecedor = () => {
                         variant="success"
                         disabled={!canSave || isLoadingAddProduct}
                         onClick={onSaveProduct}
-                        autoFocus={true}
+                        ref={btnRef}
                     >
                         Criar produto
                     </Button>

@@ -68,6 +68,7 @@ const DetalhesPedido = () => {
     const [options, setOptions] = useState([]);
     const { selectedOption } = useSelector((state) => state.selectedOption);
     const btnRef = useRef(null);
+    const codRef = useRef(null);
 
     const { id: clientId } = useParams();
 
@@ -104,6 +105,10 @@ const DetalhesPedido = () => {
 
     const [createProduct, { isSuccess: createIsSuccess, error: errorCreate }] =
         useUpdateUserMutation();
+
+    useEffect(() => {
+        codRef.current.focus();
+    }, []);
 
     useEffect(() => {
         if (selectedOption != "Todos" && fornecedores) {
@@ -567,7 +572,7 @@ const DetalhesPedido = () => {
                                                             maxLength={18}
                                                             inputMode="numeric"
                                                             placeholder="Código"
-                                                            autoFocus
+                                                            ref={codRef}
                                                             value={
                                                                 debouncedCode
                                                             }
