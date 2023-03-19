@@ -1,5 +1,12 @@
 import React, { useEffect } from "react";
-import { Button, Container, Row, Form, NavDropdown } from "react-bootstrap";
+import {
+    Button,
+    Container,
+    Row,
+    Form,
+    NavDropdown,
+    Col,
+} from "react-bootstrap";
 import CardClient from "../../components/CardClient";
 import NavDash from "../../components/NavBar";
 import NavFooter from "../../components/NavFooter";
@@ -9,6 +16,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useGetUserDataQuery } from "../users/userApiSlice";
 import { setMsg } from "../infoMsg/msgSlice";
 import Message from "../../utils/Message";
+import selectedOption, {
+    setSelectedOption,
+} from "../../reducers/selectedOption";
 
 const Clientes = () => {
     const { currentUser, userId, username } = useAuth();
@@ -16,24 +26,52 @@ const Clientes = () => {
     const [debouncedTerm, setDebouncedTerm] = useState(term);
     const [conteudo, setConteudo] = useState([]);
     const [clientes, setClientes] = useState([]);
+    const [opcoesForn, setOpcoesForn] = useState([]);
+    const { selectedOption } = useSelector((state) => state.selectedOption);
 
     let message = useSelector((state) => state.infoMsg.msg);
 
-    const { clients } = useGetUserDataQuery(userId, {
+    const dispatch = useDispatch();
+
+    const { clients, forns } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
             clients: data?.clients,
+            forns: data?.fornecedores,
         }),
     });
 
     useEffect(() => {
-        if (clients) {
+        if (clients && selectedOption != "Todos") {
+            setClientes(
+                clients
+                    .slice()
+                    .filter((client) =>
+                        client.pedidos.some(
+                            (pedido) => pedido.fornecedor == selectedOption
+                        )
+                    )
+                    .sort((a, b) => (a.clientName > b.clientName ? 1 : -1))
+            );
+        } else if (clients) {
             setClientes(
                 clients
                     .slice()
                     .sort((a, b) => (a.clientName > b.clientName ? 1 : -1))
             );
         }
-    }, [clients]);
+
+        // .sort((a, b) => (a.clientName > b.clientName ? 1 : -1)
+
+        if (forns) {
+            setOpcoesForn(
+                forns.slice().map((forn) => (
+                    <option key={forn._id} value={forn.nomeFornecedor}>
+                        {forn.nomeFornecedor}
+                    </option>
+                ))
+            );
+        }
+    }, [clients, forns, selectedOption]);
 
     useEffect(() => {
         const timer = setTimeout(() => setTerm(debouncedTerm), 1000);
@@ -46,11 +84,11 @@ const Clientes = () => {
                 clientes?.length ? (
                     clientes.map((clientId) => (
                         <CardClient
-                            key={clientId._id}
-                            clientId={clientId._id}
-                            clientName={clientId.clientName}
-                            qtdPedido={clientId.pedidos.length}
-                            path={clientId._id}
+                            key={clientId?._id}
+                            clientId={clientId?._id}
+                            clientName={clientId?.clientName}
+                            qtdPedido={clientId?.pedidos?.length}
+                            path={clientId?._id}
                         />
                     ))
                 ) : (
@@ -61,6 +99,7 @@ const Clientes = () => {
             );
         }
         if (term) {
+            dispatch(setSelectedOption("Todos"))
             const filteredClients = clientes.filter((client) =>
                 client.clientName.toLowerCase().includes(term.toLowerCase())
             );
@@ -85,10 +124,14 @@ const Clientes = () => {
                 );
             }
         }
-    }, [clientes, term]);
+    }, [clientes, term, selectedOption]);
 
     const onSearch = (e) => {
         e.preventDefault();
+    };
+
+    const onHandleSetSelectedOption = (e) => {
+        dispatch(setSelectedOption(e.target.value));
     };
 
     return (
@@ -121,6 +164,19 @@ const Clientes = () => {
                             <i className="bx bx-search"></i>
                         </Button>
                     </Form>
+                </Row>
+                <Row>
+                    <Col xs={5}>
+                        <Form>
+                            <Form.Select
+                                onChange={onHandleSetSelectedOption}
+                                value={selectedOption}
+                            >
+                                <option>Todos</option>
+                                {opcoesForn}
+                            </Form.Select>
+                        </Form>
+                    </Col>
                 </Row>
                 <Row>
                     {message && (

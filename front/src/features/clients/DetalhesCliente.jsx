@@ -1,4 +1,4 @@
-import { useState, useEffect, React } from "react";
+import { useState, useEffect, React, useRef } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import {
     Container,
@@ -24,6 +24,9 @@ import { onlyNumber } from "../../utils/onlyNumber";
 import { currency, toBRL, toNumber } from "../../utils/currency";
 import { useDispatch, useSelector } from "react-redux";
 import { setMsg } from "../infoMsg/msgSlice";
+import selectedOption, {
+    setSelectedOption,
+} from "../../reducers/selectedOption";
 import EditClient from "./EditClient";
 import Loading from "../../utils/Loading";
 import NavFooter from "../../components/NavFooter";
@@ -63,6 +66,8 @@ const DetalhesPedido = () => {
     const [showStats, setShowStats] = useState(false);
     const [optionSelected, setOptionSelected] = useState("");
     const [options, setOptions] = useState([]);
+    const { selectedOption } = useSelector((state) => state.selectedOption);
+    const btnRef = useRef();
 
     const { id: clientId } = useParams();
 
@@ -101,19 +106,19 @@ const DetalhesPedido = () => {
         useUpdateUserMutation();
 
     useEffect(() => {
-        if (optionSelected != "Selecione fornecedor" && fornecedores) {
+        if (selectedOption != "Todos" && fornecedores) {
             let forn = fornecedores.filter(
-                (forn) => forn.nomeFornecedor == optionSelected
+                (forn) => forn.nomeFornecedor == selectedOption
             );
             forn?.length > 0 && setProdutosFornecedor(forn[0].produtos);
 
             setFornecedor(
                 fornecedores.find(
-                    (forn) => forn.nomeFornecedor === optionSelected
+                    (forn) => forn.nomeFornecedor === selectedOption
                 )
             );
         }
-    }, [optionSelected]);
+    }, [selectedOption]);
 
     useEffect(() => {
         if (fornecedor?.porcentagemPadrao) {
@@ -137,7 +142,7 @@ const DetalhesPedido = () => {
                 ))
             );
         }
-    }, [code, fornecedores, quantidade, optionSelected, produtosFornecedor]);
+    }, [code, fornecedores, quantidade, selectedOption, produtosFornecedor]);
 
     useEffect(() => {
         if (fornecedores) {
@@ -233,7 +238,6 @@ const DetalhesPedido = () => {
     const handleShowPedido = () => setShowPedido(true);
     const handleClosePedido = () => {
         setShowPedido(false);
-        setOptionSelected("");
         clearFields();
     };
     const handleShowStats = () => setShowStats(true);
@@ -252,11 +256,15 @@ const DetalhesPedido = () => {
         productName &&
         qtdPaga &&
         (precoVenda || porcentagem) &&
-        optionSelected != "Selecione fornecedor" &&
+        selectedOption != "Todos" &&
         toNumber(qtdPaga) >= 0 &&
         (fornecedor?.metodo == "Porcentagem"
             ? toNumber(qtdPaga) <= quantidade * toNumber(preco)
             : toNumber(qtdPaga) <= quantidade * toNumber(precoVenda));
+
+    if (canSave) {
+        btnRef.current.focus();
+    }
 
     const onDeleteClient = async (e) => {
         e.preventDefault();
@@ -346,7 +354,6 @@ const DetalhesPedido = () => {
         }
         if (addIsSuccess) {
             setProdutoId("");
-            setOptionSelected("");
             clearFields();
             setShowPedido(false);
             setProdFound({});
@@ -506,16 +513,21 @@ const DetalhesPedido = () => {
                                 <Form.Group className="mb-3">
                                     {options?.length > 0 ? (
                                         <>
-                                            <Form.Label>Fornecedor</Form.Label>
+                                            <Form.Label>
+                                                <strong>Fornecedor</strong>
+                                            </Form.Label>
                                             <Form.Select
                                                 className="w-75"
                                                 onChange={(e) =>
-                                                    setOptionSelected(
-                                                        e.target.value
+                                                    dispatch(
+                                                        setSelectedOption(
+                                                            e.target.value
+                                                        )
                                                     )
                                                 }
+                                                value={selectedOption}
                                             >
-                                                <option>
+                                                <option hidden>
                                                     Selecione fornecedor
                                                 </option>
                                                 {options}
@@ -536,8 +548,8 @@ const DetalhesPedido = () => {
                                 </Form.Group>
 
                                 {options?.length > 0 &&
-                                    optionSelected != "Selecione fornecedor" &&
-                                    optionSelected && (
+                                    selectedOption != "Todos" &&
+                                    selectedOption && (
                                         <>
                                             <Row>
                                                 <Col>
@@ -874,6 +886,7 @@ const DetalhesPedido = () => {
                                     variant="success"
                                     onClick={handleAddNewPedido}
                                     disabled={!canSave || addLoading}
+                                    ref={btnRef}
                                 >
                                     Criar pedido
                                 </Button>
