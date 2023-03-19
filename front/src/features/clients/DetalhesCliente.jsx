@@ -67,7 +67,7 @@ const DetalhesPedido = () => {
     const [optionSelected, setOptionSelected] = useState("");
     const [options, setOptions] = useState([]);
     const { selectedOption } = useSelector((state) => state.selectedOption);
-    const btnRef = useRef();
+    const btnRef = useRef(null);
 
     const { id: clientId } = useParams();
 
@@ -262,9 +262,11 @@ const DetalhesPedido = () => {
             ? toNumber(qtdPaga) <= quantidade * toNumber(preco)
             : toNumber(qtdPaga) <= quantidade * toNumber(precoVenda));
 
-    if (canSave) {
-        btnRef.current.focus();
-    }
+    useEffect(() => {
+        if (canSave) {
+            btnRef.current.focus();
+        }
+    }, [canSave]);
 
     const onDeleteClient = async (e) => {
         e.preventDefault();
