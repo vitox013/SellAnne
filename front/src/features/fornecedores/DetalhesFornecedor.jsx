@@ -61,7 +61,6 @@ const DetalhesFornecedor = () => {
     const [showExcluir, setShowExcluir] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
     const btnRef = useRef(null);
-    const codRef = useRef(null);
 
     const { fornecedor } = useGetUserDataQuery(userId, {
         selectFromResult: ({ data }) => ({
@@ -88,10 +87,6 @@ const DetalhesFornecedor = () => {
             isLoading: isLoadingDeleteFornecedor,
         },
     ] = useDeleteUserMutation();
-
-    useEffect(() => {
-        codRef.current.focus();
-    }, []);
 
     useEffect(() => {
         if (fornecedor === undefined) {
@@ -400,7 +395,7 @@ const DetalhesFornecedor = () => {
                                 pattern="[0-9]{18}"
                                 inputMode="numeric"
                                 placeholder="Código"
-                                ref={codRef}
+                                autoFocus
                                 maxLength={18}
                                 value={code}
                                 onChange={(e) => handleCode(onlyNumber(e))}
