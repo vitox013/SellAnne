@@ -216,7 +216,7 @@ const DetalhesFornecedor = () => {
 
     useEffect(() => {
         if (canSave) {
-            btnRef.current.focus();
+            btnRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }, [canSave]);
 

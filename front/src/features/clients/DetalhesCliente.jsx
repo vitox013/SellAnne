@@ -264,7 +264,7 @@ const DetalhesPedido = () => {
 
     useEffect(() => {
         if (canSave) {
-            btnRef?.current?.focus();
+            btnRef?.current?.scrollIntoView({behavior: 'smooth'});
         }
     }, [canSave]);
 
@@ -889,6 +889,7 @@ const DetalhesPedido = () => {
                                     onClick={handleAddNewPedido}
                                     disabled={!canSave || addLoading}
                                     ref={btnRef}
+                                    
                                 >
                                     Criar pedido
                                 </Button>
