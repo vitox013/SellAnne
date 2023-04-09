@@ -30,6 +30,8 @@ import selectedOption, {
 import EditClient from "./EditClient";
 import Loading from "../../utils/Loading";
 import NavFooter from "../../components/NavFooter";
+import SelectFornecedores from "../../components/SelectFornecedores";
+import ModalPDF from "../../components/ModalPDF";
 
 const DetalhesPedido = () => {
     const formatter = new Intl.NumberFormat("pt-BR", {
@@ -66,6 +68,7 @@ const DetalhesPedido = () => {
     const [showStats, setShowStats] = useState(false);
     const [optionSelected, setOptionSelected] = useState("");
     const [options, setOptions] = useState([]);
+    const [showPDF, setShowPDF] = useState(false);
     const { selectedOption } = useSelector((state) => state.selectedOption);
     const btnRef = useRef(null);
 
@@ -110,22 +113,40 @@ const DetalhesPedido = () => {
             let forn = fornecedores.filter(
                 (forn) => forn.nomeFornecedor == selectedOption
             );
-            forn?.length > 0 && setProdutosFornecedor(forn[0].produtos);
+
+            if (forn?.length > 0) {
+                setProdutosFornecedor(forn[0].produtos);
+
+                let arrPedidos = cliente?.pedidos
+                    ?.slice()
+                    .filter((pedido) => pedido.fornecedor === selectedOption);
+
+                setPedidos(arrPedidos?.reverse());
+            }
 
             setFornecedor(
                 fornecedores.find(
                     (forn) => forn.nomeFornecedor === selectedOption
                 )
             );
+        } else if (fornecedores?.length > 0) {
+            let arrPedidos = cliente?.pedidos?.slice();
+            setPedidos(arrPedidos?.reverse());
         }
-    }, [selectedOption]);
+    }, [
+        selectedOption,
+        cliente,
+        addIsSuccess,
+        createIsSuccess,
+        deleteIsSuccess,
+    ]);
 
     useEffect(() => {
         if (fornecedor?.porcentagemPadrao) {
             setPorcentagem(fornecedor?.porcentagemPadrao);
         }
         clearFields();
-    }, [fornecedor]);
+    }, [fornecedor, cliente]);
 
     useEffect(() => {
         if (code && produtosFornecedor) {
@@ -167,8 +188,8 @@ const DetalhesPedido = () => {
         if (cliente == undefined) {
             navigate("/clientes", { replace: true });
         } else {
-            let arrPedidos = cliente?.pedidos?.slice();
-            setPedidos(arrPedidos?.reverse());
+            // let arrPedidos = cliente?.pedidos?.slice();
+            // setPedidos(arrPedidos?.reverse());
             setClienteNome(cliente?.clientName);
             setTelefone(cliente.telefone);
         }
@@ -191,6 +212,7 @@ const DetalhesPedido = () => {
                         porcentagem={ped.porcentagem}
                         qtdPaga={ped.qtdPaga}
                         metodo={ped.metodo}
+                        data={ped.criadoEm}
                     />
                 ))
             );
@@ -248,6 +270,11 @@ const DetalhesPedido = () => {
     const handlePrice = (e) => setPreco(e.target.value);
     const handlePriceVenda = (e) => setPrecoVenda(e.target.value);
     const handleQtdPaga = (e) => setQtdPaga(e.target.value);
+    const handleShowPDF = () => {
+        dispatch(setSelectedOption("Todos"));
+        setShowPDF(true);
+    };
+    const handleClosePDF = () => setShowPDF(false);
 
     const canSave =
         code &&
@@ -450,6 +477,22 @@ const DetalhesPedido = () => {
                             ></i>
                         )}
                     </Col>
+                    <Col
+                        xs={2}
+                        className="h2 gap-2 d-flex align-items-end pointer"
+                    >
+                        <i
+                            className="bx bxs-file-pdf"
+                            onClick={handleShowPDF}
+                        ></i>
+                        <ModalPDF
+                            handleClosePDF={handleClosePDF}
+                            showPDF={showPDF}
+                            fornecedores={fornecedores}
+                            pedidos={pedidos}
+                            clienteNome={clienteNome}
+                        />
+                    </Col>
                 </Row>
                 {telefone && (
                     <Row>
@@ -488,6 +531,7 @@ const DetalhesPedido = () => {
                         </Col>
                     </Row>
                 )}
+                <SelectFornecedores />
                 <Card className=" px-2 py-2 mt-3 text-black shadow-sm fw-bold">
                     <Row>
                         <Col xs={4}>Item</Col>
@@ -499,6 +543,7 @@ const DetalhesPedido = () => {
                 {message && (
                     <Message msg={message} type="alert alert-success" />
                 )}
+
                 {content}
 
                 <Container className="d-flex justify-content-center">

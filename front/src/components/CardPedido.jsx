@@ -20,6 +20,7 @@ import { currency, toBRL, toNumber } from "../utils/currency";
 import { useDispatch } from "react-redux";
 import { setMsg } from "../features/infoMsg/msgSlice";
 import Loading from "../utils/Loading";
+import SelectFornecedores from "./SelectFornecedores";
 
 const CardPedido = ({
     pedidoId,
@@ -31,6 +32,7 @@ const CardPedido = ({
     metodo,
     valorVenda,
     fornecedor,
+    data,
 }) => {
     const formatter = new Intl.NumberFormat("pt-BR", {
         style: "currency",
@@ -50,6 +52,10 @@ const CardPedido = ({
     const [alterado, setAlterado] = useState(false);
     const [errMsg, setErrMsg] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
+    const criadoEm = {
+        fontSize: "0.8rem",
+    };
+    const date = new Date(data).toLocaleDateString("pt-BR");
 
     const dispatch = useDispatch();
 
@@ -203,6 +209,13 @@ const CardPedido = ({
                                     onClick={handleShowExcluir}
                                 ></i>
                             </Col>
+                            {date != "Invalid Date" && (
+                                <Col>
+                                    <small style={criadoEm}>
+                                        Criado em: {date}
+                                    </small>
+                                </Col>
+                            )}
                         </Row>
                     </Modal.Title>
                 </Modal.Header>
@@ -224,8 +237,11 @@ const CardPedido = ({
                                         : metodo}
                                 </span>
                             </small>
+                            <br></br>
+                            <small>Fornecedor: {fornecedor}</small>
                         </Col>
                     </Row>
+
                     {showExcluir && (
                         <Row className="mb-4">
                             {isLoadingDelete && <Loading />}

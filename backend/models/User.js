@@ -70,6 +70,10 @@ const userSchema = new mongoose.Schema({
                     porcentagem: {
                         type: Number,
                     },
+                    criadoEm: {
+                        type: Date,
+                        default: Date.now,
+                    },
                 },
             ],
         },
@@ -107,6 +111,10 @@ const userSchema = new mongoose.Schema({
                     },
                     porcentagemVenda: {
                         type: Number,
+                    },
+                    adicionadoEm: {
+                        type: Date,
+                        default: Date.now,
                     },
                 },
             ],

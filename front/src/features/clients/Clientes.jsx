@@ -19,6 +19,7 @@ import Message from "../../utils/Message";
 import selectedOption, {
     setSelectedOption,
 } from "../../reducers/selectedOption";
+import SelectFornecedores from "../../components/SelectFornecedores";
 
 const Clientes = () => {
     const { currentUser, userId, username } = useAuth();
@@ -60,9 +61,7 @@ const Clientes = () => {
             );
         }
 
-        // .sort((a, b) => (a.clientName > b.clientName ? 1 : -1)
-
-        if (forns) {
+        if (forns?.length > 0) {
             setOpcoesForn(
                 forns.slice().map((forn) => (
                     <option key={forn._id} value={forn.nomeFornecedor}>
@@ -87,7 +86,15 @@ const Clientes = () => {
                             key={clientId?._id}
                             clientId={clientId?._id}
                             clientName={clientId?.clientName}
-                            qtdPedido={clientId?.pedidos?.length}
+                            qtdPedido={
+                                selectedOption == "Todos"
+                                    ? clientId?.pedidos?.length
+                                    : clientId?.pedidos?.filter(
+                                          (pedido) =>
+                                              pedido.fornecedor ==
+                                              selectedOption
+                                      )?.length
+                            }
                             path={clientId?._id}
                         />
                     ))
@@ -99,7 +106,7 @@ const Clientes = () => {
             );
         }
         if (term) {
-            dispatch(setSelectedOption("Todos"))
+            dispatch(setSelectedOption("Todos"));
             const filteredClients = clientes.filter((client) =>
                 client.clientName.toLowerCase().includes(term.toLowerCase())
             );
@@ -165,19 +172,7 @@ const Clientes = () => {
                         </Button>
                     </Form>
                 </Row>
-                <Row>
-                    <Col xs={5}>
-                        <Form>
-                            <Form.Select
-                                onChange={onHandleSetSelectedOption}
-                                value={selectedOption}
-                            >
-                                <option>Todos</option>
-                                {opcoesForn}
-                            </Form.Select>
-                        </Form>
-                    </Col>
-                </Row>
+                <SelectFornecedores />
                 <Row>
                     {message && (
                         <Message type="alert alert-success" msg={message} />

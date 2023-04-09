@@ -6,13 +6,11 @@ import { useState, useEffect } from "react";
 const CardClient = ({ clientId, userId, clientName, qtdPedido }) => {
     const [content, setContent] = useState(null);
 
-
-
     useEffect(() => {
         qtdPedido != 1
             ? setContent(<span className="">{qtdPedido} pedidos</span>)
             : setContent(<span className="">{qtdPedido} pedido</span>);
-    }, [clientName]);
+    }, [clientName, qtdPedido]);
 
     if (clientName) {
         return (
@@ -22,7 +20,6 @@ const CardClient = ({ clientId, userId, clientName, qtdPedido }) => {
                         <span className="">{clientName}</span>
 
                         {content}
-                        {/* <i className="bx bxs-edit-alt col-1"></i> */}
                     </Card.Body>
                 </Link>
             </Card>
