@@ -86,7 +86,11 @@ const ModalPDF = ({
                     ))}
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="success" onClick={onClickGenerate}>
+                <Button
+                    variant="success"
+                    onClick={onClickGenerate}
+                    disabled={pedidosSelecionados?.length == 0}
+                >
                     Gerar PDF
                 </Button>
 

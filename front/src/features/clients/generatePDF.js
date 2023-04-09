@@ -37,5 +37,5 @@ export function generatePDF(cliente, pedidos) {
         140,
         linha + 10
     );
-    doc.save("a4.pdf");
+    doc.save(`relatorio-${cliente}.pdf`);
 }
