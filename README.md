@@ -1,31 +1,38 @@
 # [SellAnne](https://sellanne.onrender.com/)
-Aplicação web desenvolvida com MongoDB, Express, React e NodeJS, com foco na responsividade.</br>
 
-## Motivo da criação
-A ideia surgiu após minha mãe me informar que estava com dificuldade em gerenciar suas vendas. Com isso criei esse gerenciador com foco em fácil manuseio
-e levando seu nome nele, Anne. <br/>
+SellAnne é uma aplicação web full-stack desenvolvida com **MongoDB, Express, React e Node.js (MERN Stack)**, focada em **facilitar o gerenciamento de vendas** de forma intuitiva e responsiva. O projeto foi criado para resolver um problema real: a dificuldade que minha mãe enfrentava ao gerenciar suas vendas. Por isso, dediquei-me a criar uma solução simples, eficiente e personalizada, batizando-a com o nome dela, **Anne**.
 
-Com isso, foi uma ótima oportunidade para eu colocar minhas habilidades em prática e aprender novas tecnologias.
+## 🚀 **Motivação**
+A ideia surgiu quando minha mãe compartilhou suas dificuldades em organizar e controlar suas vendas. Decidi criar o **SellAnne** para ajudá-la, oferecendo uma ferramenta de fácil uso e acessível em qualquer dispositivo. Além de resolver um problema real, o projeto foi uma excelente oportunidade para **colocar minhas habilidades em prática** e **aprender novas tecnologias**, como integração de autenticação, envio de e-mails e gerenciamento de estado com Redux.
 
-## Tecnologias utilizadas nesse projeto.
-* ### Front-End
-  * ReactJS
-  * Bootstrap
-  * Redux
-* ### Back-End
-  * NodeJS
-  * MongoDB
-  * Express
-* ### Tools
-  * vite
-  * bcrypt
-  * cookie-parser
-  * jsonwebtoken
-  * mongoose
-  * nodemailer
-  * uuid
-  * jwt-decode
-  
+## ✨ **Destaques do Projeto**
+- **Foco na usabilidade**: Interface intuitiva e responsiva, projetada para ser acessível em dispositivos móveis e desktops.
+- **Segurança**: Implementação de autenticação com **JSON Web Tokens (JWT)** e criptografia de senhas com **bcrypt**.
+- **Funcionalidades avançadas**: Inclui recursos como recuperação de senha via e-mail (com **Nodemailer**) e gerenciamento de sessões de usuário.
+- **Tecnologias modernas**: Utilização de **Vite** para agilizar o desenvolvimento do front-end e **Redux** para gerenciamento de estado global.
+
+## 🛠️ **Tecnologias Utilizadas**
+
+### Front-End
+- **ReactJS**: Para construção da interface do usuário.
+- **Bootstrap**: Para estilização responsiva e design moderno.
+- **Redux**: Para gerenciamento de estado global.
+
+### Back-End
+- **Node.js**: Para construção da API.
+- **Express**: Para gerenciamento de rotas e middlewares.
+- **MongoDB**: Como banco de dados NoSQL para armazenamento de dados.
+
+### Ferramentas e Bibliotecas
+- **Vite**: Para otimização e agilidade no desenvolvimento do front-end.
+- **bcrypt**: Para criptografia de senhas.
+- **cookie-parser**: Para gerenciamento de cookies.
+- **jsonwebtoken**: Para autenticação e autorização de usuários.
+- **mongoose**: Para modelagem de dados no MongoDB.
+- **nodemailer**: Para envio de e-mails (ex.: recuperação de senha).
+- **uuid**: Para geração de IDs únicos.
+- **jwt-decode**: Para decodificação de tokens JWT no front-end.
+
 ## Screenshots
 
  * ### Home Page
